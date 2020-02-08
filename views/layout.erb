@@ -1,0 +1,162 @@
+<% 
+  default_page_params = {
+    title: "orfheo | your cultural community",
+    description: "Muestra y descubre proyectos, lanza tus convocatorias, participa en grandes eventos. Crea en red: tu comunidad cultural te llama.",
+    og_url: "https://www.orfheo.org",
+    theme_color: "#ffffff"
+  }
+  page_params ||= {}.to_json
+  page_params = JSON.parse(page_params)
+  default_page_params.keys.each{ |k| 
+    page_params[k.to_s] ||= default_page_params[k]
+  }
+%>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+
+  <head>
+    <title> <%= page_params['title'] %> </title>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta 
+      name="theme-color" 
+      content= '<%= page_params['theme_color'] %>'
+    />
+
+    <!-- Search Engine -->
+   
+    <meta 
+      name="description" 
+      content= '<%= page_params['description'] %>'
+    />
+    <meta 
+      name="image" 
+      content= <% if page_params['image'].nil? %> 
+      '<%= image_path 'orfheo_fb_preview.jpg' %>'
+      <% else %> 
+      '<%= page_params['image']%>'
+      <% end %>
+    />
+    <meta 
+      name="keywords" 
+      content="orfheo, convocatoria, eventos, organizaciones, festival, federaciones, ong, empresas, instituciones, valencia, arte, artistas, proyectos, espacios, asociaciones, música, taller, artes, escénicas, exposición, comunidad, cultura, plataforma, social, network, gestión, cultural, community, futuro, cambio, herramienta, alternativa, sostenibilidad, creación, colaboración, portfolio, vetrina, enlaces, red, colores" 
+    />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="orfheo community project" />
+
+    <!-- Schema.org for Google -->
+    <meta 
+      itemprop="name" 
+      content='<%= page_params['title'] %>'
+    />
+    <meta 
+      itemprop="description" 
+      content='<%= page_params['description'] %>'
+    />
+    <meta 
+      itemprop="image" 
+      content= <% if page_params['image'].nil? %> 
+      '<%= image_path 'orfheo_fb_preview.jpg' %>'
+      <% else %> 
+      '<%= page_params['image']%>'
+      <% end %>
+    />
+
+    <!-- Twitter -->
+
+    <meta 
+      name="twitter:title" 
+      content='<%= page_params['title'] %>'
+    />
+    <meta 
+      name="twitter:description" 
+      content='<%= page_params['description'] %>'
+    />
+    <meta name="twitter:site" content="@orfheo">
+    <meta name="twitter:creator" content="@orfheo">
+    <meta 
+      name="twitter:image:src" 
+      content=<% if page_params['image'].nil? %> 
+      '<%= image_path 'orfheo_fb_preview.jpg' %>'
+      <% else %> 
+      '<%= page_params['image']%>'
+      <% end %>
+    />
+
+    <!-- fb preview meta tags -->
+
+    <meta 
+      property="og:image:url" 
+      content= <% if page_params['image'].nil? %> 
+      '<%= image_path 'orfheo_fb_preview.jpg' %>'
+      <% else %> 
+      '<%= page_params['image']%>'
+      <% end %>
+    />     <!-- img 1200 x 630 (alto x ancho) -->
+
+    <meta 
+      property="og:title" 
+      content= '<%= page_params['title']%>'
+    />
+    <meta 
+      property="og:url" 
+      content='<%= page_params['og_url']%>'
+    />
+    <meta 
+      property="og:description" 
+      content= '<%= page_params['description']%>'
+    />
+    <meta property="og:image:type" content="image/jpg">
+    <meta property="og:site_name" content="orfheo"/>
+    <meta property="og:type" content="website"/>
+
+    <!-- favicon -->
+
+    <link rel="apple-touch-icon" sizes="180x180" href="<%= image_path 'apple-touch-icon.png' %>">
+    <link rel="icon" type="image/png" sizes="32x32" href="<%= image_path 'favicon-32x32.png'%>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<%= image_path 'favicon-16x16.png'%>">
+    <link rel="manifest" href="<%= image_path 'manifest.json'%>">
+    <link rel="mask-icon" href="<%= image_path 'safari-pinned-tab.svg'%>" color="#000000">
+
+    <!-- google icon -->
+
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet">
+
+    
+    <!-- google maps -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCimmihWSDJV09dkGVYeD60faKAebhYJXg&libraries=places"></script>
+
+
+    <!-- Monitoring code google-analytics -->
+
+    <script>
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+      ga('create', 'UA-76861000-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+    <%= stylesheet_tag 'ours' %>
+
+	</head>
+
+	<body>
+
+    <%= javascript_tag 'ours' %>
+	  <%= yield %>
+
+	</body>
+
+</html>
+

@@ -1,0 +1,7 @@
+for
+assets:clean
+assets:precompile
+db:drop
+db:drop_actions
+test
+test:spec

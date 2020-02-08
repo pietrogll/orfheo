@@ -1,0 +1,47 @@
+{
+  "name": "orfheo",
+  "main": "src/index.js",
+  "author": "orfheo <tech@orfheo.com>",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "",
+  "homepage": "",
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js",
+    "build-watch": "webpack --config ./webpack.config.js --watch",
+    "build-production": "webpack --config ./webpack.config.production.js"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react",
+      "latest",
+      "stage-0",
+      "es2015"
+    ]
+  },
+  "dependencies": {
+    "cloudinary-react": "^1.1.0",
+    "dotenv-webpack": "^1.7.0",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "react-foundation-modal": "^0.1.5",
+    "react-router-dom": "^4.3.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-es2015": "^6.0.15",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.0.15",
+    "expose-loader": "^0.7.1",
+    "react-infinite-scroller": "1.2.4",
+    "react-sinatra-ujs": "^1.0.1",
+    "terser-webpack-plugin": "^1.3.0",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3"
+  }
+}
