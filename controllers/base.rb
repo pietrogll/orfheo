@@ -1,5 +1,10 @@
 class BaseController < Sinatra::Base
 
+  before do
+    headers 'Access-Control-Allow-Origin' => 'http://localhost',
+            'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
+  end
+
   helpers do
 
     def respond_with_json
@@ -27,10 +32,10 @@ class BaseController < Sinatra::Base
     end
 
     def check_admin!
-      raise Pard::Invalid::Admin unless admin? 
+      raise Pard::Invalid::Admin unless admin?
     end
 
-    def admin? 
+    def admin?
       MetaRepos::Admins.exists? session[:identity]
     end
 
