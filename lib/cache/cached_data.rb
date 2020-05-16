@@ -66,13 +66,13 @@ class CachedEvent < BaseCache
     end
     
     def program_hosts event_id
-      @@cached_program.fetch("hosts_#{event_id}") do get_cached_program_hosts event_id
+      @@cached_program.fetch(hosts_key(event_id)) do get_cached_program_hosts event_id
       end
     end
 
     def delete event_id
-      @@cached_program.delete(event_id)
-      @@cached_program.delete("hosts_#{event_id}")
+      @@cached_program.delete(program_key(event_id))
+      @@cached_program.delete(hosts_key(event_id))
     end
 
     def write_program_with_timestamp event_id, program
@@ -81,9 +81,16 @@ class CachedEvent < BaseCache
 
     private
 
+    def program_key event_id
+      "program_#{event_id}"
+    end
+
+    def hosts_key event_id
+      "hosts_#{event_id}"
+    end
 
     def fetch_cached_program_data event_id
-      @@cached_program.fetch("program_#{event_id}") do
+      @@cached_program.fetch(program_key(event_id)) do
         program = get_event_program(event_id)
         program_with_timestamp(program)
       end

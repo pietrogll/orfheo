@@ -51,17 +51,17 @@ describe 'Caches'  do
 		}
 	
 		it 'writes and reads a value' do
-			CachedEvent.write('my_key', 'my_value')
-			expect(CachedEvent.read('my_key')).to eq 'my_value'
+			CachedEvent.write('program_event_id', 'my_value')
+			expect(CachedEvent.read('program_event_id')).to eq 'my_value'
 		end
 
 		it 'reads a value previously stored' do
-			expect(CachedEvent.read('my_key')).to eq 'my_value'
+			expect(CachedEvent.read('program_event_id')).to eq 'my_value'
 		end
 
 		it 'deletes a key and its value' do
-			CachedEvent.delete('my_key')
-			expect(CachedEvent.read('my_key')).to eq nil
+			CachedEvent.delete('event_id')
+      expect(CachedEvent.read('program_event_id')).to eq nil
 		end
 
     it 'does not make the program up if cached' do
