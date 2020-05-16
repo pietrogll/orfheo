@@ -64,18 +64,35 @@ describe 'Caches'  do
 			expect(CachedEvent.read('my_key')).to eq nil
 		end
 
-		it 'makes the program up if not cached and stores it' do
-			CachedEvent.clear
-			expect(Services::Programs).to receive(:arrange_program).with('program_id').and_return('program')
-			CachedEvent.program('event_id')
-			expect(CachedEvent.read('event_id')).to eq('program')
-		end
+    it 'does not make the program up if cached' do
+      program_data_key = 'program_event_id'
+      CachedEvent.write(program_data_key, {})
+      expect(Services::Programs).not_to receive(:arrange_program)
+      CachedEvent.program('event_id')
+    end
 
-		it 'does not make the program up if cached' do
-			expect(Services::Programs).not_to receive(:arrange_program)
-			CachedEvent.program('event_id')
-		end
+    context 'if the program is not cached' do
+      let(:program){ 'program' }
 
+      before do
+        CachedEvent.clear
+        allow(Services::Programs).to receive(:arrange_program).and_return(program)
+      end
+
+  		it 'makes the program up and stores it' do
+  			expect(Services::Programs).to receive(:arrange_program).with('program_id')
+  			CachedEvent.program('event_id')
+  			expect(CachedEvent.program('event_id')).to eq(program)
+  		end
+
+      it 'adds a new timestamp to the program' do
+        mocked_time = Time.new(2022, 10, 31)
+        allow(Time).to receive(:now).and_return(mocked_time)
+        expected_millisec_timestamp = (mocked_time.to_f*1000).to_i
+        timestamp = CachedEvent.program_timestamp('event_id')
+        expect(timestamp).to eq(expected_millisec_timestamp)
+      end
+    end
 	end
 
 end

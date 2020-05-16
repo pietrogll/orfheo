@@ -84,7 +84,7 @@ class EventData
 
   def arranged_program for_manager=true
     made_up_program = Services::Programs.make_up_program_with(activities, program, artist_proposals, space_proposals, for_manager)
-    CachedEvent.write(event[:id], made_up_program) unless for_manager
+    CachedEvent.write_program_with_timestamp(event[:id], made_up_program) unless for_manager
     made_up_program || []
   end
 

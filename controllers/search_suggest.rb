@@ -37,12 +37,20 @@ class SearchController < BaseController
   end
 
   post '/results_program' do
-    scopify :query, :event_id, :filters, :date, :time, :lang
+    scopify :query, :event_id, :filters, :date, :time, :lang, :program_timestamp
+    unless program_timestamp.nil?
+      cached_program_timestamp = CachedEvent.program_timestamp(event_id)
+      halt 304 if cached_program_timestamp.to_i == program_timestamp.to_i
+    end
     tags = get_query query
     queriable_filters = get_filters filters
     results = Services::Search.get_program_results lang, event_id, tags, queriable_filters, date, time
     hosts = Services::Events.get_event_program_hosts event_id
-    success({program: results, hosts: hosts})
+    success({
+      program: results,
+      hosts: hosts,
+      program_timestamp: CachedEvent.program_timestamp(event_id)
+    })
   end
 
   post '/suggest_tags' do

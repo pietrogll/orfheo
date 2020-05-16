@@ -58,8 +58,11 @@ class CachedEvent < BaseCache
     @@cached_program = @@cache
 
     def program event_id
-      @@cached_program.fetch(event_id) do get_cached_program event_id
-      end
+      fetch_cached_program_data(event_id)[:program]
+    end
+
+    def program_timestamp event_id
+      fetch_cached_program_data(event_id)[:program_timestamp]
     end
     
     def program_hosts event_id
@@ -72,11 +75,23 @@ class CachedEvent < BaseCache
       @@cached_program.delete("hosts_#{event_id}")
     end
 
+    def write_program_with_timestamp event_id, program
+      write(event_id, program_with_timestamp)
+    end
+
     private
 
-    def get_cached_program event_id
-      program = @@cached_program.read(event_id)
-      program ||= get_event_program(event_id) 
+
+    def fetch_cached_program_data event_id
+      @@cached_program.fetch("program_#{event_id}") do
+        program = get_event_program(event_id)
+        program_with_timestamp(program)
+      end
+    end
+
+    def program_with_timestamp program
+      timestamp = (Time.now.to_f*1000).to_i
+      {program: program, program_timestamp: timestamp}
     end
 
     def get_event_program event_id
@@ -85,11 +100,6 @@ class CachedEvent < BaseCache
     end
 
     def get_cached_program_hosts event_id
-      hosts = @@cached_program.read("hosts_#{event_id}")
-      hosts ||= get_program_hosts(event_id) 
-    end
-
-    def get_program_hosts event_id
       hosts_identifiers = []
       program(event_id).inject([]) do |accumulator, performance|
         identifier = performance[:host_id]+performance[:host_name]
@@ -100,7 +110,6 @@ class CachedEvent < BaseCache
         accumulator 
       end
     end
-
   end
 
 end
