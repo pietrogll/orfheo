@@ -6,8 +6,6 @@
 
   ns.ProfileDisplayer = function(profile){
 
-    console.log(profile)
-
     var owner = Pard.UserStatus['status'] == 'owner' || Pard.UserStatus['status'] == 'admin';
 
     var _content = $('<div>').addClass('very-fast reveal full');

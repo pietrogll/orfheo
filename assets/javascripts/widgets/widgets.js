@@ -283,10 +283,7 @@
     var _photo = $.cloudinary.unsigned_upload_tag(
       "kqtqeksl",
       {
-        // cloud_name: 'hxgvncv7u',
         folder: folder
-        // ,
-        // use_filename: true
       }
     );
 
