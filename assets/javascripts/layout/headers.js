@@ -334,7 +334,9 @@ ns.Widgets = ns.Widgets || {};
         function () {
           _contactChoice.removeClass('isOver showEventManagerChoice')
         }
-      );    
+      );
+    
+    user = user || Pard.UserStatus.status == 'owner';
 
     if (user){
       var _deleteUserPopup;
