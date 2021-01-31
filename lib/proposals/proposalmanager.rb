@@ -25,8 +25,7 @@ class ProposalManager
 	  	private
 
 	  	def with_production
-		    production = Actions::UserCreatesProduction.run(owner_id, params.except("id")) if params[:production_id].blank?
-		    params[:production_id] = production[:id] if params[:production_id].blank?
+		    params[:production_id] ||= Actions::UserCreatesProduction.run(owner_id, params.except(:id))[:id]
 		    yield(params)
 		  end
 
@@ -78,7 +77,7 @@ class ProposalManager
 	  	end
 	  	
 		  def create_space owner_id, params
-		    Actions::UserCreatesSpace.run owner_id, params.except("id") if params[:space_id].blank?
+		    Actions::UserCreatesSpace.run owner_id, params.except(:id) if params[:space_id].blank?
 		  end    
 
 		  def remove_space_from_order proposal
