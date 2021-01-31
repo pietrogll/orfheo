@@ -33,11 +33,12 @@ gem 'sorted_set'
 
 # gem 'newrelic_rpm' #Gem for monitoring memory leak
 
+gem 'pry'
+
 group :development do
 	gem 'therubyracer'
 	gem 'execjs'
 	gem 'rerun'
-  gem 'pry'
 end
 
 group :test do
