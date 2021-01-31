@@ -73,7 +73,7 @@ describe ParticipantsController do
     end
 
     it 'calls Actions::ModifiesParticipant' do
-      expect(Actions::ModifiesParticipantForManager).to receive(:run).with(Util.stringify_hash params)
+      expect(Actions::ModifiesParticipantForManager).to receive(:run).with(params)
       post modify_participant_route, params
     end
 
@@ -88,9 +88,5 @@ describe ParticipantsController do
       expect(parsed_response['model']).to eq(Util.stringify_hash participant_returned.except(:user_id))
 
     end
-
-   
-
   end
-
 end
