@@ -94,15 +94,15 @@ class Dictionary
 					},
 					feedback:{
 						subject:'feedback',
-						body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Mensaje:</b> #{payload[:message]}</p>"
+						body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Email:</b> #{payload[:email]}</p><p><p><b>Mensaje:</b> #{payload[:message]}</p>"
 					},
 					techSupport: {
 						subject: "techSupport: #{payload[:subject]}",
-            body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Perfil:</b> #{payload[:profile]}</p><p><b>Navegador:</b> #{payload[:browser]}</p><p><b>Mensaje:</b> #{payload[:message]}</p>"
+            body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Perfil:</b> #{payload[:profile]}</p><p><b>Email:</b> #{payload[:email]}</p><p><b>Navegador:</b> #{payload[:browser]}</p><p><b>Mensaje:</b> #{payload[:message]}</p>"
 					},
 					business:{
 						subject: "services: #{payload[:subject]}",
-            body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Teléfono:</b> #{payload[:phone]}</p><p>Contacto teléfono: #{payload[:contactPhone]}</p><p>Contacto Hangout: #{payload[:contactHangout]}</p><p><b>Disponibilidad:</b> #{payload[:dayAvailability]}</p><p><b>Disponibilidad horaria:</b> #{payload[:periodAvailability]}</p><p><b>Links:</b> #{payload[:links]}</p><p><b>Mensaje:</b> #{payload[:message]}</p>"
+            body: "<p><b>Nombre:</b> #{payload[:name]}</p><p><b>Email:</b> #{payload[:email]}</p><p><p><b>Teléfono:</b> #{payload[:phone]}</p><p>Contacto teléfono: #{payload[:contactPhone]}</p><p>Contacto Hangout: #{payload[:contactHangout]}</p><p><b>Disponibilidad:</b> #{payload[:dayAvailability]}</p><p><b>Disponibilidad horaria:</b> #{payload[:periodAvailability]}</p><p><b>Links:</b> #{payload[:links]}</p><p><b>Mensaje:</b> #{payload[:message]}</p>"
 					}
 				}
 			}

@@ -235,7 +235,7 @@ describe Services::Mails do
     end
 
     it 'assigns the message to the body' do
-      expect(feedback_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Mensaje:</b> message</p>")
+      expect(feedback_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Email:</b> contacter@contact</p><p><p><b>Mensaje:</b> message</p>")
     end
 
     it 'renders the receiver to be info@orfheo.org' do
@@ -257,7 +257,7 @@ describe Services::Mails do
     end
 
     it 'assigns the message to the body' do
-      expect(tech_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Perfil:</b> my_profile</p><p><b>Navegador:</b> firefox</p><p><b>Mensaje:</b> help</p>")
+      expect(tech_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Perfil:</b> my_profile</p><p><b>Email:</b> contacter@contact</p><p><b>Navegador:</b> firefox</p><p><b>Mensaje:</b> help</p>")
     end
 
     it 'renders the receiver to be tech@orfheo.org' do
@@ -285,7 +285,7 @@ describe Services::Mails do
     end
 
     it 'assigns the message to the body' do
-      expect(business_mail.body).to include('<p><b>Nombre:</b> contacter</p><p><b>Teléfono:</b> 123456789</p><p>Contacto teléfono: </p><p>Contacto Hangout: </p><p><b>Disponibilidad:</b> dayAvailability</p><p><b>Disponibilidad horaria:</b> periodAvailability</p><p><b>Links:</b> links</p><p><b>Mensaje:</b> message</p>')
+      expect(business_mail.body).to include('<p><b>Nombre:</b> contacter</p><p><b>Email:</b> contacter@contact</p><p><p><b>Teléfono:</b> 123456789</p><p>Contacto teléfono: </p><p>Contacto Hangout: </p><p><b>Disponibilidad:</b> dayAvailability</p><p><b>Disponibilidad horaria:</b> periodAvailability</p><p><b>Links:</b> links</p><p><b>Mensaje:</b> message</p>')
     end
 
     it 'renders the receiver to be info@orfheo.org' do
