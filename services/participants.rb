@@ -3,7 +3,7 @@ module Services
     class << self
     	
     	def make_up_for_manager participant
-    		participant[:profile_id] = participant[:id].to_s + '-own'
+    		participant[:profile_id] = participant[:id]+'-own'
     		participant.delete(:id)
         participant[:email] = participant[:email][:value]
     		participant

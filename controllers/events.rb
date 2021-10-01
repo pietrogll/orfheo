@@ -1,9 +1,7 @@
 class EventsController < BaseController
 
   get '/event/:slug' do # Event Page by slug
-    @params = params.to_h.symbolize_keys 
     lang = user_lang || params[:lang] || nil
-
     event, lang = Actions::UserGetsEventFromSlug.run session[:identity], params[:slug], lang
     status = status_for event[:user_id]
     erb :event, :locals => {:the_event => event.to_json, :status => status.to_json, :lang => lang.to_json}

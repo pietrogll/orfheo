@@ -33,6 +33,8 @@ class ArtistProposal
     }
     raise Pard::Invalid::Category unless correct_category? params[:category]
     raise Pard::Invalid::Params unless form.except(:email).all?{ |field, entry|
+      puts "#{field}: #{params[field]}"
+
       correct_entry? params[field], entry[:type]
     }
   end

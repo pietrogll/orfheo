@@ -78,8 +78,8 @@ module Actions
 
   class UserSavesPermanents
     def self.run program_id, permanents, event_id
-      CachedEvent.delete event_id      
-      permanents_dt = Util.arrayify_hash(permanents.deep_dup)   
+      CachedEvent.delete event_id
+      permanents_dt = Util.arrayify_hash(permanents.deep_dup)
       Repos::Programs.modify({id: program_id, permanents: permanents_dt})
       [permanents_dt, update_activities(program_id, Util.arrayify_hash(permanents))]
     end
@@ -90,8 +90,7 @@ module Actions
       permanent_activities = Repos::Activities.get({'$and': [{program_id: program_id}, {permanent: 'true'}]})
       Actions::UserModifiesActivities.modify(permanent_activities.select{|permanent_act| 
           permanent_dt = permanents.deep_dup.inject([]){ |dt_arr, dt|
-            dt = dt.deep_symbolize_keys
-            dt_arr << dt.except(:subcategories) if dt[:subcategories].blank? || dt[:subcategories].include?(Repos::Artistproposals.get_by_id(permanent_act[:participant_proposal_id])[:subcategory])
+            dt_arr << dt.except('subcategories', :subcategories) if dt[:subcategories].blank? || dt[:subcategories].include?(Repos::Artistproposals.get_by_id(permanent_act[:participant_proposal_id])[:subcategory])
             dt_arr 
           }
           permanent_act[:dateTime] = permanent_dt unless permanent_dt.blank?

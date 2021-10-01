@@ -3,7 +3,6 @@ class BaseController < Sinatra::Base
   before do
     headers 'Access-Control-Allow-Origin' => 'http://localhost',
             'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
-    @params = params.to_h.symbolize_keys 
   end
 
   helpers do
