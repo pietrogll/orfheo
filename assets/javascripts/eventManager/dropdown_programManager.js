@@ -238,7 +238,7 @@
         var program = Object.keys(artistProgram).map(function(performance_id){
           return artistProgram[performance_id].show;
         });
-        var noSelected = proposals.filter(function(proposal){
+        var noSelected = (proposals || []).filter(function(proposal){
           return program.every(function(show){
             return show.participant_proposal_id != proposal.proposal_id;
           });
