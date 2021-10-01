@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '2.5.3'
+ruby '3.0.0'
 #ruby-gemset=orfheo
 
 gem 'bundle'
@@ -29,7 +29,11 @@ gem 'sucker_punch'
 
 gem 'dotenv'
 
+gem 'sorted_set'
+
 # gem 'newrelic_rpm' #Gem for monitoring memory leak
+
+gem 'pry'
 
 group :development do
 	gem 'therubyracer'
