@@ -37,7 +37,7 @@ GEM
     dotenv (2.7.5)
     eventmachine (1.2.7)
     execjs (2.7.0)
-    faye-websocket (0.10.9)
+    faye-websocket (0.11.0)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
     ffi (1.14.2)
@@ -175,9 +175,9 @@ GEM
     unf_ext (0.0.7.6)
     uuid (2.3.9)
       macaddr (~> 1.0)
-    websocket-driver (0.7.1)
+    websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
-    websocket-extensions (0.1.4)
+    websocket-extensions (0.1.5)
     zeitwerk (2.4.2)
 
 PLATFORMS
