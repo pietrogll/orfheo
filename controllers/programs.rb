@@ -8,8 +8,8 @@ class ProgramsController < BaseController
     success ({program: program})
   end
 
-  post '/users/create_program' do  
-    scopify :event_id    
+  post '/users/create_program' do
+    scopify :event_id
     owner_id = check_event_ownership! event_id
     program = Actions::UserCreatesProgram.run owner_id, params
     success({program: program})
@@ -46,16 +46,16 @@ class ProgramsController < BaseController
     send_web_socket_message event_id, 'publishEvent', status
   end
 
-  post '/users/artist_subcategories_price' do 
+  post '/users/artist_subcategories_price' do
     # ATT! It change the price of all activities of the subcategories in the object subcategories_price
     scopify :id, :event_id, :subcategories_price
     check_program_ownership! id
-    check_future_event! event_id 
+    check_future_event! event_id
     Actions::UserSavesArtistSubcatPrices.run id, subcategories_price, event_id unless subcategories_price.blank?
     send_web_socket_message event_id, 'assignPrices', subcategories_price
   end
 
-  post '/users/set_permanents' do 
+  post '/users/set_permanents' do
     # ATT! It change the permanents time of all permanent activities of the subcategories in the object permanents_time
     scopify :id, :event_id, :permanents
     check_program_ownership! id

@@ -5,7 +5,7 @@ require 'pry'
 Bundler.setup
 
 require './config/config'
-require './workers/workers_index' #it requires config/config 
+require './workers/workers_index' #it requires config/config
 
 use Rack::Deflater
 
@@ -26,8 +26,10 @@ use ProgramsController
 
 use ReactController
 
-use Services::Websocket
-use Services::EventSource
+if ENV['RACK_ENV'] != 'test'
+  use Services::Websocket
+  use Services::EventSource
+end
 
 MetaRepos.constants.each do |repo_class|
   repo = MetaRepos.const_get(repo_class)
@@ -66,4 +68,3 @@ $stdout.sync = true #Necessary for logging puts in heroku console
 # putting here the Updater, it is executed when loading a page for first time
 # require './updater_events'
 # EventsUpdater.run
-

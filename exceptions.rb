@@ -10,7 +10,7 @@ module Pard
   class Invalid < StandardError
   end
 
-  class Invalid::UnexistingDbEl < Invalid 
+  class Invalid::UnexistingDbEl < Invalid
     def message
       'not_existing_element'
     end
@@ -246,6 +246,10 @@ module Pard
     end
   end
 
+  class Invalid::ExistingSlug < Invalid
+    def message
+      'existing_slug'
+    end
+  end
+
 end
-
-

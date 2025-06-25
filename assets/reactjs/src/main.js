@@ -1,7 +1,7 @@
-require("babel-core/register")
-require("babel-polyfill")
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
-import  React from 'react'
+import  React from 'react' // Important for JSX support
 import ReactDOM from 'react-dom'
 import App from './App'
 

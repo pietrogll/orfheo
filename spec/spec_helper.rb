@@ -15,6 +15,13 @@ require File.join File.dirname(__FILE__), './rack_session_helper'
 require File.join(File.dirname(__FILE__), '..', 'config', 'config')
 require File.join(File.dirname(__FILE__), '..', 'workers', 'workers_index')
 
+# Cloudinary test config to prevent real API calls and errors
+Cloudinary.config do |config|
+  config.cloud_name = 'test'
+  config.api_key = 'test'
+  config.api_secret = 'test'
+end
+
 def app
   Rack::Builder.parse_file(File.expand_path('../../config.ru', __FILE__)).first
 end
@@ -37,8 +44,8 @@ RSpec.configure do |config|
 
   config.before(:all){
     puts "mongo_uri: #{mongo_uri}"
-    @db = Mongo::Client.new(mongo_uri)
-    CachedEvent.clear 
+    @db = Mongo::Client.new(mongo_uri, retry_writes: false)
+    CachedEvent.clear
   }
 
   config.before(:each){
@@ -48,6 +55,12 @@ RSpec.configure do |config|
   config.after(:all){
     drop_database
   }
+
+  config.before(:each) do
+    allow(Cloudinary::Api).to receive(:delete_resources).and_return(true)
+    allow(Cloudinary::Uploader).to receive(:upload).and_return({'public_id' => 'test'})
+    allow(Cloudinary::Uploader).to receive(:destroy).and_return({'result' => 'ok'})
+  end
 
 
   # rspec-expectations config goes here. You can use an alternate

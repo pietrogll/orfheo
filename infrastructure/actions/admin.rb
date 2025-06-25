@@ -32,9 +32,9 @@ module Actions
 
     def get_process_status_for process_id
       process_status = {
-        total: WorkersServices::Status.total(process_id), 
+        total: WorkersServices::Status.total(process_id),
         done: WorkersServices::Status.at(process_id),
-        status: WorkersServices::Status.status(process_id), 
+        status: WorkersServices::Status.status(process_id),
       }
     end
 
@@ -70,7 +70,7 @@ module Actions
   class AdminSendsEmail
 
     def self.with params
-      process_id = Workers::BulkMailer.perform_async(params)
+      process_id = Workers::BulkMailer.perform_async(Util.stringify_hash(params))
     end
 
     def self.open_call event_id
@@ -87,7 +87,7 @@ module Actions
       {
         text: open_call_text(payload),
         categories: event[:categories][:artist],
-        email_type: 'event_call', 
+        email_type: 'event_call',
         address: event[:address]
       }
     end
@@ -105,7 +105,7 @@ module Actions
       end
     end
 
-   
+
   end
 
 end

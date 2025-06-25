@@ -14,7 +14,7 @@ module Pard
       # end
 
       def empty_collections
-        connection = Mongo::Client.new(mongo_uri)
+        connection = Mongo::Client.new(mongo_uri, retry_writes: false)
         connection.collections.each{ |c|
           c.delete_many
         }
@@ -22,11 +22,10 @@ module Pard
       end
 
       def drop_database
-        connection = Mongo::Client.new(mongo_uri)
+        connection = Mongo::Client.new(mongo_uri, retry_writes: false)
         connection.database.drop
         connection.close
       end
     end
   end
 end
-

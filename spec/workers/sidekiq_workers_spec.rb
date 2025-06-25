@@ -1,4 +1,4 @@
-require 'sidekiq/testing' 
+require 'sidekiq/testing'
 
 describe Workers do
 
@@ -6,11 +6,11 @@ describe Workers do
     Sidekiq::Worker.clear_all
   end
 
-	
+
 	describe 'Mailer' do
 
 		let(:mailer){Services::Mails.new}
-    
+
     before(:each){
       allow(Services::Mails).to receive(:new).and_return(mailer)
     }
@@ -36,13 +36,13 @@ describe Workers do
 			receivers_list = ['a@a.a','b@b.b']
 			expect(Services::MailingList).to receive(:build_receivers_for).with(receivers_list).and_return([])
 
-			worker_mailer.perform_async({receivers: receivers_list})
+			worker_mailer.perform_async(Util.stringify_hash({receivers: receivers_list}))
 			Sidekiq::Worker.drain_all
 		end
 
 		it 'calls Services::Mails' do
 			expect(mailer).to receive(:deliver_to_mailing_list).and_return([])
-			
+
 			worker_mailer.perform_async({})
 			Sidekiq::Worker.drain_all
 		end
@@ -54,8 +54,7 @@ describe Workers do
 			expect(Services::MailingList).to receive(:build_receivers_for).with(receivers_list).and_return(receivers_list)
 			expect(mailer).to receive(:deliver_to_mailing_list).and_return(mailing_list)
 
-			
-			process_id = worker_mailer.perform_async({receivers: receivers_list})
+			process_id = worker_mailer.perform_async(Util.stringify_hash({receivers: receivers_list}))
 			Sidekiq::Worker.drain_all
 
 			expect(status_checker.total process_id).to eq(receivers_list.count)
@@ -68,16 +67,16 @@ describe Workers do
 
 			allow(Services::MailingList).to receive(:build_receivers_for).with(receivers_list).and_return(receivers_list)
 			allow(mailer).to receive(:deliver_mail_to)
-			
-			process_id = worker_mailer.perform_async({receivers: receivers_list})
+
+			process_id = worker_mailer.perform_async(Util.stringify_hash({receivers: receivers_list}))
 			Sidekiq::Worker.drain_all
 
 			expect(status_checker.at process_id).to eq(receivers_list.count)
 		end
 
 
-		
 
-	
+
+
 	end
 end

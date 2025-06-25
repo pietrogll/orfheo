@@ -3,6 +3,12 @@ module Actions
 
   class UserCreatesEvent
     def self.run user_id, params, is_admin = false
+      # Check for slug existence if slug is provided
+      if params[:slug] && !params[:slug].to_s.strip.empty?
+        unless Repos::Events.available_slug?(params[:slug])
+          raise Pard::Invalid::ExistingSlug
+        end
+      end
       event_instance = Event.new(user_id, params)
       if (is_admin and params[:professional].is_true?)
         event_instance.make_professional
@@ -34,9 +40,9 @@ module Actions
     def self.run event_id, is_admin
       event = Repos::Events.get_by_id event_id
       if(event[:professional].is_true?)
-        raise Pard::Invalid::Admin unless is_admin   
+        raise Pard::Invalid::Admin unless is_admin
         Actions::UserDeletesProgram.run event[:program_id] unless event[:program_id].blank?
-        Actions::UserDeletesCall.run event[:call_id] unless event[:call_id].blank? 
+        Actions::UserDeletesCall.run event[:call_id] unless event[:call_id].blank?
       end
       Actions::UserDeletesGallery.run event[:id]
       Actions::UserUpdatesEventPartnersPictures.run({ id: event[:id], partners: {}})
@@ -72,7 +78,7 @@ module Actions
       partners.keys.map do |type|
         partners[type].map do |partner|
           partner[:img]
-        end  
+        end
       end.flatten.compact
     end
 
@@ -151,6 +157,6 @@ module Actions
     end
   end
 
-  
+
 
 end

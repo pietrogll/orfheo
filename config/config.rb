@@ -1,12 +1,13 @@
 require_relative './gems'
 require_relative './ours'
+require 'active_support/core_ext/integer/time'
 
 Faye::WebSocket.load_adapter('thin')
 
 class Array
   def blank?
     obj = self
-    return true if !obj || obj.empty? 
+    return true if !obj || obj.empty?
     obj.reject!{|el| el.empty?} if obj.is_a? Array
     obj.empty?
   end
@@ -40,7 +41,7 @@ class BaseController < Sinatra::Base
     manifest.json
   )
 
-  
+
   # The path to your assets
   set :assets_paths, %w(assets/reactjs/dist assets/javascripts assets/stylesheets assets/images vendor/assets/javascripts vendor/assets/stylesheets)
 
@@ -74,14 +75,14 @@ class BaseController < Sinatra::Base
 
   Mongo::Logger.logger.level = ::Logger::FATAL
 
-  configure :development, :test do #Run only when the environment (APP_ENV environment variable) is set to :development or :test 
+  configure :development, :test do #Run only when the environment (APP_ENV environment variable) is set to :development or :test
     puts "ENV['RACK_ENV'] --> #{ENV['RACK_ENV']}"
 
     Pony.override_options = {:via => :test}
     puts 'configured Pony for development, test (dt)'
   end
 
-  configure :production, :deployment do #Run on :production or :deployment 
+  configure :production, :deployment do #Run on :production or :deployment
     puts "ENV['RACK_ENV'] --> #{ENV['RACK_ENV']}"
 
     Pony.override_options = options
@@ -99,13 +100,13 @@ class BaseController < Sinatra::Base
     Cloudinary.config(cloudinary_settings)
     puts 'configured Cloudinary'
 
-    @@db = Mongo::Client.new(ENV['MONGOLAB_URI'])
+    @@db = Mongo::Client.new(ENV['MONGOLAB_URI'] || [ '127.0.0.1:27017' ], retry_writes: false)
     ReposFactory.new(@@db).build
     MetaRepos.for @@db
     puts 'configured Mongo database'
 
     # uri = URI.parse(ENV["REDISTOGO_URL"] || "redis://localhost:6379/")
-    # redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password) 
+    # redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
     # puts 'configured Redis'
 
     Sidekiq.configure_client do |config|
@@ -126,8 +127,8 @@ class BaseController < Sinatra::Base
     set :show_exceptions, false
   end
 
-  configure do 
-    # it allows cross-origin frame (iframe a page) 
+  configure do
+    # it allows cross-origin frame (iframe a page)
     set :protection, except: [:frame_options]
   end
 

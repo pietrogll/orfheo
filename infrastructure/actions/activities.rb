@@ -2,7 +2,7 @@ module Actions
 
 
   class UserCreatesActivities
-    def self.run params, owner_id 
+    def self.run params, owner_id
       CachedEvent.delete params[:event_id]
       Util.arrayify_hash(params[:program]).map do |activity|
         new_participant = nil
@@ -21,7 +21,7 @@ module Actions
     private
 
     def self.create_and_save_activity activity
-      new_activity = Activity.new(activity).to_h 
+      new_activity = Activity.new(activity).to_h
       Repos::Activities.save new_activity
       new_activity
     end
@@ -62,7 +62,7 @@ module Actions
     def self.modify activities
       activities.map do |activity|
         check_existence! activity[:id]
-        new_activity = Activity.new(activity).to_h        
+        new_activity = Activity.new(activity).to_h
         Repos::Activities.modify new_activity
         new_activity
       end
@@ -70,7 +70,7 @@ module Actions
 
     private
     def self.check_existence! activity_id
-      raise Pard::Invalid::UnexistingActivity unless Repos::Activities.exists? activity_id 
+      raise Pard::Invalid::UnexistingActivity unless Repos::Activities.exists? activity_id
     end
   end
 

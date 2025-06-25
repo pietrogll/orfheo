@@ -3,7 +3,7 @@ class BaseController < Sinatra::Base
   before do
     headers 'Access-Control-Allow-Origin' => 'http://localhost',
             'Access-Control-Allow-Methods' => ['OPTIONS', 'GET', 'POST']
-    @params = params.to_h.symbolize_keys 
+    @params = params.to_h.symbolize_keys
   end
 
   helpers do
@@ -56,11 +56,11 @@ class BaseController < Sinatra::Base
       raise Pard::Invalid.new 'non_existing_call' unless Repos::Calls.exists? call_id
       owner_id = Repos::Calls.get_owner(call_id)
       raise Pard::Invalid.new 'call_ownership' unless (owner_id == session[:identity] || admin?)
-      owner_id 
+      owner_id
     end
 
-    def check_profile_ownership! profile_id      
-      raise Pard::Invalid::UnexistingProfile unless Repos::Profiles.exists? profile_id      
+    def check_profile_ownership! profile_id
+      raise Pard::Invalid::UnexistingProfile unless Repos::Profiles.exists? profile_id
       owner_id = Repos::Profiles.get_owner(profile_id)
       raise Pard::Invalid::ProfileOwnership unless (owner_id == session[:identity] || admin?)
       owner_id
@@ -94,10 +94,10 @@ class BaseController < Sinatra::Base
       return :owner if owner == session[:identity]
       return :visitor if (!session[:identity].blank? && owner != session[:identity])
       :outsider
-    end 
+    end
 
     def user_lang
-      return nil if !session[:identity] 
+      return nil if !session[:identity]
       Repos::Users.get_by_id(session[:identity])[:lang]
     end
 
@@ -119,14 +119,14 @@ class BaseController < Sinatra::Base
 
     def is_future_event? event_id
       Repos::Events.is_future_event? event_id
-    end 
+    end
 
     def clean_session
       session.delete(:identity)
       session.delete(:last_login)
     end
 
-    
+
     private
 
     def build_message payload

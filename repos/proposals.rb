@@ -26,15 +26,15 @@ module ExtraReposMethods
           user_id: {'$arrayElemAt': ['$user_id.user_id',0]}
         }}
       ])
-      bulk_write_pipeline = documents.map{ |doc| 
+      bulk_write_pipeline = documents.map{ |doc|
         {
           "update_one": {
             "filter": {id: doc['id']},
             "update": {'$set': doc}
           }
         }
-      }        
-      collection.bulk_write(bulk_write_pipeline)
+      }
+      collection.bulk_write(bulk_write_pipeline) unless bulk_write_pipeline.empty?
     end
 
     def select_deselect proposal_id
@@ -48,15 +48,14 @@ module ExtraReposMethods
         "$unset": fields
       })
     end
-  end 
+  end
 
   module Artistproposals
-    include Proposals 
+    include Proposals
   end
 
   module Spaceproposals
-    include Proposals 
+    include Proposals
   end
 
 end
-
