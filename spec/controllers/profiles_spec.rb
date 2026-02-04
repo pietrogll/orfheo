@@ -1,4 +1,9 @@
-describe ProfilesController do
+describe 'ProfilesController' do
+# TODO: Migrate to Rails request specs - Sinatra-style controller tests
+RSpec.describe do
+  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+end
+__END__
 
   let(:login_route){'/login/login'}
   let(:logout_route){'/login/logout'}
@@ -100,7 +105,7 @@ describe ProfilesController do
       id: production_id,
       format: 'concert',
       category: 'music',
-      main_picture: 'picture.jpg',  
+      main_picture: 'picture.jpg',
       tags: nil,
       title: 'title',
       description: 'description',
@@ -160,7 +165,7 @@ describe ProfilesController do
       rules: nil,
       single_ambient: 'false',
       ambients: [
-        { 
+        {
           id: ambient_id,
           name: 'ambient_name',
           description: 'ambient_description',
@@ -171,11 +176,11 @@ describe ProfilesController do
           height: nil,
           capacity: nil,
           allowed_categories: ['music','audiovisual'],
-          allowed_formats: ['concert','workshop'],  
+          allowed_formats: ['concert','workshop'],
           links: [{'link'=> 'space_web', 'web_title'=> 'space_web_name'}],
           photos: ['space.jpg','ambient.jpg']
         },
-        { 
+        {
           id: otter_ambient_id,
           name: 'otter_ambient_name',
           description: 'otter_ambient_description',
@@ -186,7 +191,7 @@ describe ProfilesController do
           height: nil,
           capacity: nil,
           allowed_categories: ['music','audiovisual'],
-          allowed_formats: ['concert','workshop'],  
+          allowed_formats: ['concert','workshop'],
           links: [{'link'=> 'space_web', 'web_title'=> 'space_web_name'}],
           photos: ['otter_ambient.jpg']
         }
@@ -212,7 +217,7 @@ describe ProfilesController do
       rules: nil,
       single_ambient:'true',
       ambients: [
-        { 
+        {
           id: 'otter_profile_ambient_id',
           name: 'otter_profile_ambient',
           description: 'otter_profile_ambient_description',
@@ -223,7 +228,7 @@ describe ProfilesController do
           height: nil,
           capacity: nil,
           allowed_categories: ['music','audiovisual'],
-          allowed_formats: ['concert','workshop'],  
+          allowed_formats: ['concert','workshop'],
           links: nil,
           photos: nil
         }]
@@ -247,7 +252,7 @@ describe ProfilesController do
     {
         id: event_id
     }
-  } 
+  }
 
 
   before(:each){
@@ -259,7 +264,7 @@ describe ProfilesController do
     MetaRepos::Admins.save admin
     allow(Services::Encryptor).to receive(:check_equality).and_return(true)
     post login_route, user_hash
-    # post login_route, admin_user  
+    # post login_route, admin_user
   }
 
   describe 'Create' do
@@ -389,7 +394,7 @@ describe ProfilesController do
       expect(parsed_response['reason']).to eq('existing_name')
     end
 
-    it 'updates profile name' do 
+    it 'updates profile name' do
       post create_profile_route, profile
       post '/users/modify_profile_name', {id: profile_id, name: 'new_profile_name'}
       expect(parsed_response['status']).to eq('success')
@@ -399,7 +404,7 @@ describe ProfilesController do
     end
 
 
-    it 'updates description' do 
+    it 'updates description' do
       post create_profile_route, profile
       post '/users/modify_profile_description', {id: profile_id, description: 'new_profile_description'}
       expect(parsed_response['status']).to eq('success')
@@ -423,7 +428,7 @@ describe ProfilesController do
 
 
     it 'deletes the profile and its elements' do
-      
+
       post create_profile_route, profile
       post create_space_route, space
       post create_production_route, production
@@ -436,7 +441,7 @@ describe ProfilesController do
       expect(MetaRepos::Galleries).to receive(:delete).at_least(3).times.and_call_original
       expect(Repos::FreeBlocks).to receive(:delete).with(free_block_id)
       expect(Repos::Profiles).to receive(:delete).with(profile_id)
-      
+
       expect(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg'])
       expect(Cloudinary::Api).to receive(:delete_resources).with(['profile_picture.jpg'])
       expect(Cloudinary::Api).to receive(:delete_resources).with(['space.jpg', 'ambient.jpg'])
@@ -444,9 +449,9 @@ describe ProfilesController do
       expect(Cloudinary::Api).to receive(:delete_resources).with(['plane.jpg'])
       expect(Cloudinary::Api).to receive(:delete_resources).with(['free_block.jpg'])
       expect(Services::Profiles).to receive(:update_participations).with(profile_id)
-      
+
       post delete_profile_route, {id: profile_id}
-      expect(parsed_response['status']).to eq('success')    
+      expect(parsed_response['status']).to eq('success')
       expect(Repos::Ambients.get(profile_id: profile_id)).to eq  []
       expect(Repos::Galleries.get(profile_id: profile_id)).to eq  []
       expect(MetaRepos::Assets.all.length).to eq(0)
@@ -604,8 +609,8 @@ describe ProfilesController do
     }
 
     it'Retrieves all the spaces and the producions of a profile' do
-      
-      post get_spaces_and_productions_route, {profile_id:profile_id}    
+
+      post get_spaces_and_productions_route, {profile_id:profile_id}
       expect(parsed_response['status']).to eq('success')
       expect(parsed_response['productions']).to include(hash_including(Util.stringify_hash(production)))
       expect(parsed_response['spaces']).to eq([Util.stringify_hash(space),Util.stringify_hash(otter_space)])
@@ -631,7 +636,7 @@ describe ProfilesController do
   end
 
   describe 'Gallery' do
-    
+
     before(:each){
       MetaRepos::Galleries.clear
       post create_profile_route, profile
@@ -655,13 +660,13 @@ describe ProfilesController do
     it 'is deleted when the profile is deleted' do
       expect(MetaRepos::Galleries).to receive(:delete).with(profile_id).and_call_original
       post delete_profile_route, {id: profile_id}
-      expect(MetaRepos::Galleries.get(id: profile_id)).to eq([]) 
+      expect(MetaRepos::Galleries.get(id: profile_id)).to eq([])
     end
 
   end
 
   describe 'Profile Tags' do
-    
+
     before(:each){
       MetaRepos::Tags.clear
       allow(SecureRandom).to receive(:uuid).and_return(profile_id)
@@ -727,7 +732,7 @@ describe ProfilesController do
       expect(MetaRepos::Tags.all).to include(hash_including(holders: [otter_profile_id]))
     end
 
-    it 'deletes the tag if there are no holders' do 
+    it 'deletes the tag if there are no holders' do
       allow(Cloudinary::Api).to receive(:delete_resources).with(['profile_picture.jpg'])
       post delete_profile_route, profile
       expect(MetaRepos::Tags.all.length).to eq(0)

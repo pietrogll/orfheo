@@ -1,66 +1,38 @@
-require 'rubygems'
-require 'bundler'
-require 'pry'
+# This file is used by Rack-based servers to start the application.
 
-Bundler.setup
+require_relative 'config/environment'
 
-require './config/config'
-require './workers/workers_index' #it requires config/config
+# Mount Rails application
+run Rails.application
+Rails.application.load_server
 
-use Rack::Deflater
-
-require './handling'
-use MyExceptionHandling
-
-use UsersController
-use ProfilesController
-use ProductionsController
-use SpacesController
-use FreeBlocksController
-use EventsController
-use CallsController
-use ArtistProposalsController
-use SpaceProposalsController
-use ActivitiesController
-use ProgramsController
-
-use ReactController
-
-if ENV['RACK_ENV'] != 'test'
-  use Services::Websocket
-  use Services::EventSource
-end
-
-MetaRepos.constants.each do |repo_class|
-  repo = MetaRepos.const_get(repo_class)
-  Repos.const_set repo_class, repo unless Repos.const_defined? repo_class
-  controller = MetaController.for(repo)
-  use controller
-end
-
-map '/' do
-  run WelcomeController
-end
-
-map '/login' do
-  run LoginController
-end
-
-map '/search' do
-	run SearchController
-end
-
-map '/forms' do
-	run FormsController
-end
-
-map '/admin' do #FOR META REPOS!!!
-  run AdminController
-end
-
-map '/participant' do
-  run ParticipantsController
-end
+# Legacy Sinatra setup (DISABLED during Rails migration - see Phase 4+ for controller migration)
+#
+# These routes will be migrated to config/routes.rb incrementally:
+# - Phase 4: /login -> SessionsController
+# - Phase 5: /search -> Search::SearchController
+# - Phase 6-10: All other controllers
+#
+# Original Sinatra mappings (for reference):
+# map '/login' do
+#   run LoginController
+# end
+#
+# map '/search' do
+# 	run SearchController
+# end
+#
+# map '/forms' do
+# 	run FormsController
+# end
+#
+# map '/admin' do #FOR META REPOS!!!
+#   run AdminController
+# end
+#
+# map '/participant' do
+#   run ParticipantsController
+# end
 
 $stdout.sync = true #Necessary for logging puts in heroku console
 

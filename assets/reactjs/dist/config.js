@@ -15,7 +15,7 @@
   \***********************/
 /***/ (() => {
 
-eval("$.cloudinary.config({\n  cloud_name: \"MISSING_ENV_VAR\".CLOUDINARY_CLOUD_NAME,\n  api_key: \"MISSING_ENV_VAR\".CLOUDINARY_CLOUD_API_KEY,\n  use_filename: true\n});\n\n//# sourceURL=webpack://orfheo/./src/config.js?");
+eval("$.cloudinary.config({\n  cloud_name: \"hxgvncv7u\",\n  api_key: \"844974134959653\",\n  use_filename: true\n});\n\n//# sourceURL=webpack://orfheo/./src/config.js?");
 
 /***/ })
 

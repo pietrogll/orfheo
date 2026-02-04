@@ -46,4 +46,3 @@ class WelcomeController < BaseController
 	end
 
 end
-

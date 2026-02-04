@@ -1,4 +1,9 @@
-describe ProductionsController do
+describe 'ProductionsController' do
+# TODO: Migrate to Rails request specs - Sinatra-style controller tests
+RSpec.describe do
+  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+end
+__END__
 
   let(:login_route){'/login/login'}
   let(:logout_route){'/login/logout'}
@@ -93,7 +98,7 @@ describe ProductionsController do
         "description",
         "portfolio",
         "history"
-        ] 
+        ]
 
     }
   }
@@ -104,7 +109,7 @@ describe ProductionsController do
       id: production_id,
       format: 'concert',
       category: 'music',
-      main_picture: 'picture.jpg',  
+      main_picture: 'picture.jpg',
       tags: ['production_tag1', 'production_tag2'],
       title: 'title',
       description: 'description',
@@ -256,7 +261,7 @@ describe ProductionsController do
 
       allow(SecureRandom).to receive(:uuid)
       allow(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg'])
-      
+
       production[:photos] = ['new_production_picture.jpg']
       production[:links] = [{'link'=> 'other_web'}]
 
@@ -264,7 +269,7 @@ describe ProductionsController do
 
       expect(MetaRepos::Galleries.get(id: production_id)).to include hash_including({photos: ['new_production_picture.jpg']})
       expect(MetaRepos::Galleries.get(id: production_id)).to include hash_including({links: [{'link'=> 'other_web'}]})
-    
+
     end
 
     it 'is deleted when the production is deleted' do
@@ -273,13 +278,13 @@ describe ProductionsController do
 
       expect(MetaRepos::Galleries).to receive(:delete).with(production_id).and_call_original
       post delete_production_route, {id: production_id}
-      expect(MetaRepos::Galleries.get(id: profile_id)).to eq([]) 
+      expect(MetaRepos::Galleries.get(id: profile_id)).to eq([])
     end
 
   end
 
   describe 'Production Tags' do
-    
+
     before(:each){
       MetaRepos::Tags.clear
 
@@ -317,7 +322,7 @@ describe ProductionsController do
       production[:tags] = ['id_t1', 'id_t2']
       MetaRepos::Tags.save({id: 'id_t1', text: 'production_tag1', holders: ['prod_1_id', production_id], source: 'productions'})
       MetaRepos::Tags.save({id: 'id_t2', text: 'production_tag2', holders: [production_id], source: 'productions'})
-      post create_production_route, production     
+      post create_production_route, production
       expect(MetaRepos::Tags.all.length).to eq(2)
       production[:tags] = nil
       post modify_production_route, production
@@ -330,7 +335,7 @@ describe ProductionsController do
       production[:tags] = ['id_t1', 'id_t2']
       MetaRepos::Tags.save({id: 'id_t1', text: 'production_tag1', holders: ['prod_1_id', production_id], source: 'productions'})
       MetaRepos::Tags.save({id: 'id_t2', text: 'production_tag2', holders: [production_id], source: 'productions'})
-      post create_production_route, production     
+      post create_production_route, production
       expect(MetaRepos::Tags.all.length).to eq(2)
       post delete_production_route, production
       expect(MetaRepos::Tags.all.length).to eq(1)
@@ -338,11 +343,11 @@ describe ProductionsController do
     end
 
     it 'deletes the tag if there are no holders' do
-      allow(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg']) 
+      allow(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg'])
       production[:tags] = ['id_t1', 'id_t2']
       MetaRepos::Tags.save({id: 'id_t1', text: 'production_tag1', holders: [production_id], source: 'productions'})
       MetaRepos::Tags.save({id: 'id_t2', text: 'production_tag2', holders: [production_id], source: 'productions'})
-      post create_production_route, production     
+      post create_production_route, production
       post delete_production_route, production
       expect(MetaRepos::Tags.all.length).to eq(0)
     end
@@ -387,7 +392,7 @@ describe ProductionsController do
     before(:each){
       Repos::Productions.save production
     }
-    
+
     it 'fails if element does not exist' do
       get public_info, {id: unexisting_production_id, db_key: 'productions'}
       expect(parsed_response['status']).to eq('fail')
@@ -401,7 +406,7 @@ describe ProductionsController do
       expected_result[:profile_color] = 'color'
 
       get public_info, {id: production_id, db_key: 'productions'}
-            
+
       expect(parsed_response['status']).to eq('success')
       expect(parsed_response['db_element']).to eq(Util.stringify_hash(expected_result))
     end

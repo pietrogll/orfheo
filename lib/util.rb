@@ -11,6 +11,9 @@ module Util
 
 
     def string_keyed_hash_to_symbolized hash
+      # Return non-hash values as-is
+      return hash unless hash.is_a?(Hash)
+
       hash.map do |k,v|
         next if k == '_id'
         next [k,v] unless k.is_a? String
@@ -40,7 +43,7 @@ module Util
     def stringify_array array
       array.map do |v|
         next stringify_hash v if v.is_a? Hash
-        next stringify_array v if v.is_a? Array 
+        next stringify_array v if v.is_a? Array
         v
       end
     end

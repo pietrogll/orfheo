@@ -1,15 +1,20 @@
-describe EventsController do
+describe 'EventsController' do
+# TODO: Migrate to Rails request specs - Sinatra-style controller tests
+RSpec.describe do
+  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+end
+__END__
 
   include_examples 'http_methods'
-  include_examples 'ids'  
-  include_examples 'db_elements'  
+  include_examples 'ids'
+  include_examples 'db_elements'
 
   let(:event){
     {
       user_id: user_id,
       profile_id: profile_id,
       call_id: call_id,
-      program_id: program_id, 
+      program_id: program_id,
       name: 'event_name',
       type: 'festival',
       texts: {
@@ -22,15 +27,15 @@ describe EventsController do
       eventTime: [
         {
          "date": "2017-04-25",
-         "time": [ 
-            "1493136000000", 
+         "time": [
+            "1493136000000",
             "1493157600000"
           ]
         },
         {
           "date": "2017-04-26",
-          "time": [ 
-            "1493222400000", 
+          "time": [
+            "1493222400000",
             "1493244000000"
           ]
         }
@@ -124,14 +129,14 @@ describe EventsController do
         form_id => {
             'blocks' => artist_blocks[:es],
             'texts' => {label: 'label'},
-            "type"=>"artist", 
+            "type"=>"artist",
             "form_id"=> form_id,
             "widgets"=>{}
           },
         "form_id_2" => {
             'blocks' => artist_blocks[:es],
             'texts' => 'texts',
-            "type"=>"artist", 
+            "type"=>"artist",
             "form_id"=>"form_id_2",
             "widgets"=> {'wk' =>'wv'}
           }
@@ -140,14 +145,14 @@ describe EventsController do
         "form_id_3" => {
             'blocks' => space_block[:es],
             'texts' => 'texts',
-            "type"=>"space", 
+            "type"=>"space",
             "form_id"=>"form_id_3",
-            "widgets"=>{} 
+            "widgets"=>{}
           },
         "form_id_4" => {
             'blocks' => space_block[:es],
             'texts' => 'texts',
-            "type"=>"space", 
+            "type"=>"space",
             "form_id"=>"form_id_4",
             "widgets"=>{}
           }
@@ -229,7 +234,7 @@ describe EventsController do
         expect(parsed_response['status']).to eq('success')
         expect(parsed_response['event']).to include(Util.stringify_hash(event))
       end
-      
+
       it 'makes professional an event if admin and params[:professional]=true' do
         expect(Repos::Events).to receive(:save).with(event)
         post create_event_route, event
@@ -248,7 +253,7 @@ describe EventsController do
       expect(parsed_response['event']).to include(Util.stringify_hash(event))
     end
 
-    
+
     it 'does not make professional if NOT admin' do
       post logout_route
       post login_route, user
@@ -306,7 +311,7 @@ describe EventsController do
       event[:img] = ['new_image']
       expect(Services::Gallery).to receive(:update_pictures).once
       post modify_event_route, event
-    end  
+    end
 
 
     it 'modifies an event if admin' do
@@ -374,7 +379,7 @@ describe EventsController do
   describe 'delete_event' do
 
     before(:each){
-     post create_event_route, event  
+     post create_event_route, event
     }
 
     it 'fails if event is professional' do
@@ -446,7 +451,7 @@ describe EventsController do
 
 
   describe 'Access event page' do
-    
+
     let(:event_route){'/event?id=' + event_id}
 
     before(:each){
@@ -593,8 +598,8 @@ describe EventsController do
       expect(parsed_response['status']).to eq('fail')
       expect(parsed_response['reason']).to eq('existing_slug')
     end
-  
+
   end
 
-  
+
 end

@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
 
   <head>
-    <title>simple-sinatra</title>
+    <title>orfheo</title>
     <meta charset="utf-8" />
   </head>
 
   <body>
     <div id='react-root'></div>
-    <%= javascript_tag 'bundle' %>   
+    <%= javascript_include_tag 'bundle' %>
     <script>
       Pard.UserStatus['status'] = <%= status %>
     </script>

@@ -2,38 +2,49 @@ source 'https://rubygems.org'
 ruby '3.4.4'
 #ruby-gemset=orfheo
 
-gem 'bundle'
-gem 'thin'
+# Rails 8.1.2 Framework
+gem 'rails', '~> 8.1.2'
+gem 'puma', '~> 6.0'
+gem 'propshaft' # Rails 8 default asset pipeline
+gem 'rack-cors' # CORS middleware
 
-gem 'sinatra', require: false
-gem 'sinatra-contrib', require: false
-gem 'sinatra-asset-pipeline', '~> 2.2.0'
-gem 'sprockets-helpers'
-gem 'sprockets-es6'
-
-gem 'json'
-
-gem 'uglifier'
-gem 'pony', '~> 1.12.0'
+# Database & Background Jobs (preserved from Sinatra)
 gem 'mongo', '~> 2.8', '>= 2.8'
-gem 'uuid'
-gem 'cloudinary'
-gem 'activesupport'
-gem 'faye-websocket'
-
-gem 'bcrypt' #encrypt strings
-
 gem 'sidekiq'
 gem 'sidekiq-status'
 gem 'sucker_punch'
+gem 'redis', '~> 5.0' # Required for Action Cable & Sidekiq
 
+# Authentication & Security (preserved)
+gem 'bcrypt'
+
+# External Services (preserved)
+gem 'cloudinary'
+gem 'uuid'
+
+# Utilities (preserved)
+gem 'json'
 gem 'dotenv'
+
+# Sinatra dependencies (will be removed after migration)
+gem 'sinatra', '~> 4.1', require: false
+gem 'sinatra-contrib', '~> 4.1', '>= 4.1.1', require: false
+gem 'sprockets-helpers'
+gem 'sprockets-es6'
+gem 'uglifier'
+# gem 'pony' - Migrated to ActionMailer (Rails 8)
+gem 'faye-websocket' # Will migrate to Action Cable
 
 gem 'sorted_set'
 
 # gem 'newrelic_rpm' #Gem for monitoring memory leak
 
 gem 'pry'
+
+group :development, :test do
+  gem 'rspec-rails', '~> 7.0' # Rails-specific RSpec support
+  gem 'pry'
+end
 
 group :development do
 	gem 'therubyracer'
@@ -44,6 +55,7 @@ end
 group :test do
 	gem 'rack-test'
   gem 'rspec'
+  gem 'database_cleaner-mongo' # MongoDB test cleanup
 	gem 'awesome_print'
 	gem 'psych'
 	gem 'rspec-eventmachine'

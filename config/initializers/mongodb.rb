@@ -1,0 +1,19 @@
+# MongoDB connection configuration for Rails
+# Connects to MongoDB using the mongo gem (not Mongoid/ActiveRecord)
+
+require 'mongo'
+
+# Configure MongoDB client
+mongodb_uri = ENV.fetch('MONGOLAB_URI', 'mongodb://localhost:27017/orfheo')
+
+MONGO_CLIENT = Mongo::Client.new(mongodb_uri)
+
+# Make globally accessible for existing repository pattern
+$db = MONGO_CLIENT
+
+Rails.logger.info "MongoDB connected: #{mongodb_uri}"
+
+# Graceful shutdown
+at_exit do
+  MONGO_CLIENT.close if defined?(MONGO_CLIENT)
+end

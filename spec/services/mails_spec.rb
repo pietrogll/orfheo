@@ -11,7 +11,7 @@ describe Services::Mails do
       password: 'password',
       lang: 'es',
       validation: false,
-      validation_code: validation_code   
+      validation_code: validation_code
     }
   }
 
@@ -86,7 +86,7 @@ describe Services::Mails do
   }
 
   let(:mailer){Services::Mails.new}
-  
+
 
   describe 'Delivers mail' do
 
@@ -241,7 +241,7 @@ describe Services::Mails do
     it 'renders the receiver to be info@orfheo.org' do
       expect(feedback_mail.to).to eq(['info@orfheo.org'])
     end
-  
+
   end
 
   describe 'TechSupport' do
@@ -264,9 +264,8 @@ describe Services::Mails do
       expect(tech_mail.to).to eq(['tech@orfheo.org'])
     end
 
-    it 'has the correct from options' do
-      options = Services::Mails::MailOptionsGenerator.generate_options_for(:techSupport, {:email=>'tech@orfheo.org'}, techSupport)
-      expect(options[:from]).to eq(techSupport[:email])
+    it 'uses sender email as from address' do
+      expect(tech_mail.from).to eq([techSupport[:email]])
     end
 
 
@@ -369,7 +368,7 @@ describe Services::Mails do
     end
 
     it 'execute a given block to each iteration' do
-      @count = 0  
+      @count = 0
       @receivers_done = []
       allow(mailer).to receive(:deliver_mail_to).and_return(true)
       mailer.deliver_to_mailing_list(mailing_list, {}) do |receivers_done|

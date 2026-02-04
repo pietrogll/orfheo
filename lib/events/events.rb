@@ -29,24 +29,24 @@ class Event
       :id,
       :user_id,
       :profile_id,
-      :call_id, 
+      :call_id,
       :program_id,
-      :name, 
+      :name,
       :texts,
       :type,
-      :img, 
-      :qr, 
-      :place, 
+      :img,
+      :qr,
+      :place,
       :address,
-      :partners, 
-      :eventTime, 
-      :categories, 
+      :partners,
+      :eventTime,
+      :categories,
       :slug
-      # :price, 
+      # :price,
       # :ticket_url,
       # :default_lang
     ]
-    event = Hash[keys.map{|sym| [sym, params[sym]] if params.key?(sym.to_s) || params.key?(sym)}.compact] # This line is to allow modifying each field indipendently form the others  
+    event = Hash[keys.map{|sym| [sym, params[sym]] if params.key?(sym.to_s) || params.key?(sym)}.compact] # This line is to allow modifying each field indipendently form the others
     event[:id] ||= SecureRandom.uuid
     event[:user_id] ||= user_id
     event[:eventTime] = Util.arrayify_hash(event[:eventTime])
@@ -54,9 +54,9 @@ class Event
   end
 
   def mandatory
-    [ 
+    [
       # :profile_id, ---> Already checked by check_profile_ownership! in controller
-      :name, 
+      :name,
       :texts,
       :eventTime,
       :categories,
@@ -66,10 +66,12 @@ class Event
   end
 
   def check_fields user_id, params
+    # Check each mandatory field exists and is not nil
+    # Note: empty arrays are valid (e.g., categories can be [])
     raise Pard::Invalid::Params if (
-      mandatory.any?{|field| params[field].blank?}
+      mandatory.any?{|field| params[field].nil?}
     )
   end
 
-    
+
 end

@@ -2,13 +2,13 @@ require_relative './gems'
 require_relative './ours'
 require 'active_support/core_ext/integer/time'
 
-Faye::WebSocket.load_adapter('thin')
+# Faye::WebSocket.load_adapter('thin') # removed thin, now using puma
 
 class Array
   def blank?
     obj = self
     return true if !obj || obj.empty?
-    obj.reject!{|el| el.empty?} if obj.is_a? Array
+    obj.reject!{|el| el.respond_to?(:empty?) && el.empty?} if obj.is_a? Array
     obj.empty?
   end
 end
@@ -21,7 +21,7 @@ end
 
 class BaseController < Sinatra::Base
   set :environment, (ENV['RACK_ENV'].to_sym || :production) rescue :production
-  set server: 'thin', connections: []
+  set server: 'puma', connections: []
 
   register Sinatra::ConfigFile
 
@@ -51,12 +51,12 @@ class BaseController < Sinatra::Base
   set :assets_css_compressor, :sass
   set :assets_js_compressor, Uglifier.new(harmony: true)
 
-  register Sinatra::AssetPipeline
+  # register Sinatra::AssetPipeline # removed: gem is not compatible with Sinatra 4.x and has been removed
 
   configure do
     use Rack::Session::Cookie, {
       :key => 'rack.session',
-      :secret => 'my_secret_cookie_session'
+      :secret => ENV['SESSION_SECRET'] || 'b7e2c1a4e5f6d7c8b9a0f1e2d3c4b5a6e7f8d9c0b1a2e3f4d5c6b7a8e9f0d1c2b3a4e5f6d7c8b9a0f1e2d3c4b5a6e7f8d9c0b1a2e3f4d5c6b7a8e9f0d1c2' # 128 chars
     }
   end
 
@@ -78,15 +78,17 @@ class BaseController < Sinatra::Base
   configure :development, :test do #Run only when the environment (APP_ENV environment variable) is set to :development or :test
     puts "ENV['RACK_ENV'] --> #{ENV['RACK_ENV']}"
 
-    Pony.override_options = {:via => :test}
-    puts 'configured Pony for development, test (dt)'
+    # Pony configuration removed - now using ActionMailer (Rails 8)
+    # Email delivery is configured in config/environments/*.rb
+    puts 'Email configured via ActionMailer for development, test'
   end
 
   configure :production, :deployment do #Run on :production or :deployment
     puts "ENV['RACK_ENV'] --> #{ENV['RACK_ENV']}"
 
-    Pony.override_options = options
-    puts 'configured Pony for production/deployment (pdd)'
+    # Pony configuration removed - now using ActionMailer (Rails 8)
+    # Email delivery is configured in config/application.rb
+    puts 'Email configured via ActionMailer for production/deployment'
 
   end
 
@@ -130,6 +132,19 @@ class BaseController < Sinatra::Base
   configure do
     # it allows cross-origin frame (iframe a page)
     set :protection, except: [:frame_options]
+  end
+
+  # Helper for image paths (since asset pipeline is removed)
+  helpers do
+    def image_path(filename)
+      "/assets/images/#{filename}"
+    end
+    def stylesheet_tag(filename)
+      %Q{<link rel="stylesheet" href="/assets/stylesheets/#{filename}">}
+    end
+    def javascript_tag(filename)
+      %Q{<script src="/assets/javascripts/#{filename}"></script>}
+    end
   end
 
 

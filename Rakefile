@@ -1,15 +1,11 @@
-require 'bundler'
+# Add your own tasks in files placed in lib/tasks ending in .rake,
+# for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
-Bundler.require(:default, :test)
+require_relative 'config/application'
 
-require 'sinatra/asset_pipeline/task'
-require './config/config'
+Rails.application.load_tasks
 
-
-Sinatra::Sprockets::Manifest = Sprockets::Manifest
-Sinatra::AssetPipeline::Task.define! BaseController
-
-
+# Legacy test namespace (preserve for backward compatibility)
 namespace :test do
   begin
     require "rspec/core/rake_task"
@@ -53,4 +49,3 @@ task :test => ["test:spec"]
 task :actions => ['db:drop_actions']
 
 task :default => [:test]
-

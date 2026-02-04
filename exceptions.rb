@@ -52,6 +52,24 @@ module Pard
     end
   end
 
+  class Invalid::Email < Invalid
+    def message
+      'invalid_email'
+    end
+  end
+
+  class Invalid::Unauthorized < Invalid
+    def message
+      'unauthorized'
+    end
+  end
+
+  class Invalid::Authentication < Invalid
+    def message
+      'unauthorized'
+    end
+  end
+
   class Invalid::Unvalidated < Invalid
     def message
       'not_validated_user'

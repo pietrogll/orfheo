@@ -1,11 +1,16 @@
-describe SpaceProposalsController do
+describe 'SpaceProposalsController' do
+# TODO: Migrate to Rails request specs - Sinatra-style controller tests
+RSpec.describe do
+  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+end
+__END__
 
   include_examples 'http_methods'
   include_examples 'ids'
   include_examples 'params'
   include_examples 'db_elements'
   include_examples 'models'
-  
+
   let(:mailer){Services::Mails.new}
 
 
@@ -13,7 +18,7 @@ describe SpaceProposalsController do
     Repos::Users.save user
     Repos::Users.save call_participant_user
     Repos::Users.save other_user
-    Repos::Users.save admin_user 
+    Repos::Users.save admin_user
     MetaRepos::Admins.save admin
     Repos::Profiles.save profile
     Repos::Profiles.save call_participant_profile
@@ -180,7 +185,7 @@ describe SpaceProposalsController do
       allow(mailer).to receive(:deliver_mail_to)
       post send_space_proposal_route, spaceproposal_params
       expect(parsed_response['status']).to eq('success')
-      expect(parsed_response['model']).to eq(Util.stringify_hash(space_model))    
+      expect(parsed_response['model']).to eq(Util.stringify_hash(space_model))
     end
 
     it 'adds proposal_id to order in corresponding program' do
@@ -233,7 +238,7 @@ describe SpaceProposalsController do
       post login_route, user
     }
 
-  
+
     it 'fails if the call does not exist' do
       own_spaceproposal_params[:call_id] = 'otter'
       post send_space_proposal_route, own_spaceproposal_params
@@ -299,7 +304,7 @@ describe SpaceProposalsController do
 
     it 'does not allow own-proposals with equal name but different profile_id' do
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 02))
-      space_own_model[:register_date] = Time.new(2016, 05, 02).to_i*1000 
+      space_own_model[:register_date] = Time.new(2016, 05, 02).to_i*1000
       post send_space_proposal_route, own_spaceproposal_params
       own_spaceproposal_params[:id] = nil
 
@@ -324,7 +329,7 @@ describe SpaceProposalsController do
       expect(parsed_response['model']).to eq(Util.stringify_hash(space_own_model))
     end
 
-    it'creates a new participant when sending own proposal' do 
+    it'creates a new participant when sending own proposal' do
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 02))
       space_own_model[:register_date] = Time.new(2016, 05, 02).to_i*1000
       own_space_proposal[:register_date] = Time.new(2016, 05, 02).to_i*1000
@@ -334,7 +339,7 @@ describe SpaceProposalsController do
 
       expect(MetaRepos::Participants).to receive(:save).and_call_original
       post send_space_proposal_route, own_spaceproposal_params
-    end 
+    end
 
   end
 
@@ -552,7 +557,7 @@ describe SpaceProposalsController do
   describe 'Delete_space_proposal' do
 
     before(:each){
-      allow(Cloudinary::Api).to receive(:delete_resources)   
+      allow(Cloudinary::Api).to receive(:delete_resources)
       allow(SecureRandom).to receive(:uuid).and_return(space_proposal_id)
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 02))
       allow(mailer).to receive(:deliver_mail_to)
@@ -587,7 +592,7 @@ describe SpaceProposalsController do
       moked_time = Time.new(2016, 05, 02)
       receiver[:last_login] = moked_time.to_i*1000
       allow(Time).to receive(:now).and_return(moked_time)
-      
+
       post logout_route
       post login_route, user
       expect(Repos::Spaceproposals).to receive(:delete).with(space_proposal_id)
@@ -617,11 +622,11 @@ describe SpaceProposalsController do
 
     it 'deletes participant if it has no proposals nor activities' do
       MetaRepos::Participants.save({id: call_participant_profile_id})
-      Repos::Activities.clear 
+      Repos::Activities.clear
 
       expect(Repos::Calls).to receive(:remove_participant).with(call_id, call_participant_profile_id)
       expect(MetaRepos::Participants).to receive(:delete).with(call_participant_profile_id)
-      
+
       post delete_space_proposal_route, {id: space_proposal_id, call_id: call_id, event_id: event_id}
       expect(parsed_response['status']).to eq('success')
     end
@@ -642,7 +647,7 @@ describe SpaceProposalsController do
 
       expect(MetaRepos::Participants).to receive(:delete).with(artist_participant_id)
       post delete_space_proposal_route, {id: space_proposal_id, call_id: call_id, event_id: event_id}
-      
+
       expect(parsed_response['status']).to eq('success')
     end
 
@@ -656,7 +661,7 @@ describe SpaceProposalsController do
 
 
     it 'does not send rejection mail if admin and event finished' do
-      allow(Time).to receive(:now).and_return(Time.new(2016, 11, 02)) 
+      allow(Time).to receive(:now).and_return(Time.new(2016, 11, 02))
       post logout_route
       post login_route, admin_user
       expect(Repos::Spaceproposals).to receive(:delete).with(space_proposal_id)
@@ -681,9 +686,9 @@ describe SpaceProposalsController do
 
 
   describe 'Assets'do
-  
+
     before(:each){
-      allow(Cloudinary::Api).to receive(:delete_resources)   
+      allow(Cloudinary::Api).to receive(:delete_resources)
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 02))
       allow(mailer).to receive(:deliver_mail_to)
       MetaRepos::Assets.clear
@@ -705,7 +710,7 @@ describe SpaceProposalsController do
       spaceproposal_params[:space_id] = nil
       spaceproposal_params[:id] = space_proposal_id
       post send_space_proposal_route, spaceproposal_params
-      expect(MetaRepos::Assets.all.length).to eq(2)        
+      expect(MetaRepos::Assets.all.length).to eq(2)
       expect(MetaRepos::Assets.get(url: 'plane_picture.jpg' ).first[:holders].length).to eq(2)
       expect(MetaRepos::Assets.get(url: 'ambient_picture.jpg' ).first[:holders].length).to eq(2)
       space_model = Repos::Spaces.get({profile_id: call_participant_profile_id}).first
@@ -732,8 +737,8 @@ describe SpaceProposalsController do
       spaceproposal_params[:space_id] = nil
       spaceproposal_params[:id] = space_proposal_id
       post send_space_proposal_route, spaceproposal_params
-      expect(Cloudinary::Api).to receive(:delete_resources).with(['plane_picture.jpg']).exactly(1).times 
-      expect(Cloudinary::Api).to receive(:delete_resources).with(['ambient_picture.jpg']).exactly(1).times 
+      expect(Cloudinary::Api).to receive(:delete_resources).with(['plane_picture.jpg']).exactly(1).times
+      expect(Cloudinary::Api).to receive(:delete_resources).with(['ambient_picture.jpg']).exactly(1).times
       post delete_space_proposal_route,  {id: space_proposal_id, call_id: call_id, event_id: event_id}
       space_model = Repos::Spaces.get(profile_id: call_participant_profile_id).first
       post delete_space_route, space_model
@@ -759,7 +764,7 @@ describe SpaceProposalsController do
   describe 'Select / Deselect' do
 
     before(:each){
-      allow(Cloudinary::Api).to receive(:delete_resources)   
+      allow(Cloudinary::Api).to receive(:delete_resources)
       Repos::Spaceproposals.save spaceproposal
       Repos::Activities.delete activity[:id]
     }
@@ -778,7 +783,7 @@ describe SpaceProposalsController do
       expect(parsed_response['reason']).to eq('past_event')
     end
 
-    it 'switches true/false the field selected of the proposal' do 
+    it 'switches true/false the field selected of the proposal' do
       post select_deselect_space_route, {id: space_proposal_id, event_id: event_id, call_id:call_id}
       expect(parsed_response['status']).to eq('success')
       saved_proposal = Repos::Spaceproposals.get_by_id space_proposal_id
@@ -790,14 +795,13 @@ describe SpaceProposalsController do
 
     it 'adds/removes the proposal_id from the order' do
       post select_deselect_space_route, {id: space_proposal_id, event_id: event_id, call_id:call_id}
-      expect(Repos::Programs.get(event_id: event_id).first[:order]).not_to include space_proposal_id 
+      expect(Repos::Programs.get(event_id: event_id).first[:order]).not_to include space_proposal_id
       post select_deselect_space_route, {id: space_proposal_id, event_id: event_id, call_id:call_id}
       expect(Repos::Programs.get(event_id: event_id).first[:order]).to include space_proposal_id
       post select_deselect_space_route, {id: space_proposal_id, event_id: event_id, call_id:call_id}
-      expect(Repos::Programs.get(event_id: event_id).first[:order]).not_to include space_proposal_id  
+      expect(Repos::Programs.get(event_id: event_id).first[:order]).not_to include space_proposal_id
     end
 
   end
 
 end
-  

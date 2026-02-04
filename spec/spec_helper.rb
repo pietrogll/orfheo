@@ -15,6 +15,13 @@ require File.join File.dirname(__FILE__), './rack_session_helper'
 require File.join(File.dirname(__FILE__), '..', 'config', 'config')
 require File.join(File.dirname(__FILE__), '..', 'workers', 'workers_index')
 
+# Load ActionMailer and mailer classes for controller specs
+require 'action_mailer'
+require File.join(File.dirname(__FILE__), '..', 'app', 'mailers', 'application_mailer')
+require File.join(File.dirname(__FILE__), '..', 'app', 'mailers', 'user_mailer')
+require File.join(File.dirname(__FILE__), '..', 'app', 'mailers', 'proposal_mailer')
+require File.join(File.dirname(__FILE__), '..', 'app', 'mailers', 'contact_mailer')
+
 # Cloudinary test config to prevent real API calls and errors
 Cloudinary.config do |config|
   config.cloud_name = 'test'
@@ -23,7 +30,9 @@ Cloudinary.config do |config|
 end
 
 def app
-  Rack::Builder.parse_file(File.expand_path('../../config.ru', __FILE__)).first
+  # Rack::Builder.parse_file returns the app directly in newer Rack versions
+  parsed = Rack::Builder.parse_file(File.expand_path('../../config.ru', __FILE__))
+  parsed.is_a?(Array) ? parsed.first : parsed
 end
 
 def session

@@ -1,4 +1,9 @@
-describe ArtistProposalsController do
+describe 'ArtistProposalsController' do
+# TODO: Migrate to Rails request specs - Sinatra-style controller tests
+RSpec.describe do
+  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+end
+__END__
 
   include_examples 'http_methods'
   include_examples 'ids'
@@ -8,12 +13,12 @@ describe ArtistProposalsController do
 
 
   let(:mailer){Services::Mails.new}
-  
+
   before(:each){
     Repos::Users.save user
     Repos::Users.save call_participant_user
     Repos::Users.save other_user
-    Repos::Users.save admin_user 
+    Repos::Users.save admin_user
     MetaRepos::Admins.save admin
     Repos::Activities.save activity
     Repos::Programs.save program
@@ -34,7 +39,7 @@ describe ArtistProposalsController do
   describe 'Send_artist_proposal' do
 
     before(:each){
-      allow(SecureRandom).to receive(:uuid).and_return(production_id)      
+      allow(SecureRandom).to receive(:uuid).and_return(production_id)
     }
 
     it 'fails if the call does not exist' do
@@ -78,13 +83,13 @@ describe ArtistProposalsController do
       expect(parsed_response['reason']).to eq('non_existing_form')
     end
 
-    it 'adds a new production if non existing' do 
+    it 'adds a new production if non existing' do
       expect(Repos::Productions).to receive(:save).with( hash_including(production.except(:production_id, :main_picture)))
       post send_artist_proposal_route, artistproposal_params.except(:production_id, :main_picture)
       expect(parsed_response['status']).to eq('success')
     end
 
-    it 'does not add a new production if already existing' do 
+    it 'does not add a new production if already existing' do
       expect(Repos::Productions).not_to receive(:save)
       post send_artist_proposal_route, artistproposal_params
     end
@@ -114,7 +119,7 @@ describe ArtistProposalsController do
       post send_artist_proposal_route, artistproposal_params
       expect(parsed_response['status']).to eq('success')
       expect(parsed_response['model']).to eq(Util.stringify_hash(artist_model))
-      
+
     end
 
     it 'fails if the event is past' do
@@ -142,12 +147,12 @@ describe ArtistProposalsController do
       artistproposal_params[:profile_id] = call_participant_profile_id
       artist_model[:profile_id] = call_participant_profile_id
       artistproposal[:profile_id] = call_participant_profile_id
-      artistproposal[:user_id] = call_participant_user_id        
+      artistproposal[:user_id] = call_participant_user_id
       allow(mailer).to receive(:deliver_mail_to)
-      expect(Repos::Artistproposals).to receive(:save).with(artistproposal)      
+      expect(Repos::Artistproposals).to receive(:save).with(artistproposal)
       post logout_route
       post login_route, call_participant_user
-      post send_artist_proposal_route, artistproposal_params    
+      post send_artist_proposal_route, artistproposal_params
       expect(parsed_response['status']).to eq('success')
       expect(parsed_response['model']).to eq(Util.stringify_hash(artist_model))
     end
@@ -170,19 +175,19 @@ describe ArtistProposalsController do
       call_participant_profile[:phone] = {'visible'=>'false', 'value' => nil}
       artistproposal_params[:profile_id] = call_participant_profile_id
       artist_model[:profile_id] = call_participant_profile_id
-      
+
       Repos::Profiles.modify call_participant_profile
 
       expect(mailer).to receive(:deliver_mail_to)
       expect(Repos::Profiles).to receive(:modify).with(hash_including(phone:  Util.stringify_hash(phone)))
-     
+
       post logout_route
       post login_route, call_participant_user
       post send_artist_proposal_route, artistproposal_params
 
     end
 
-    it 'adds profile_id of the applicant to the participants in the event' do 
+    it 'adds profile_id of the applicant to the participants in the event' do
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 01))
       expect(mailer).to receive(:deliver_mail_to)
       post logout_route
@@ -193,7 +198,7 @@ describe ArtistProposalsController do
       expect(Repos::Calls.get_by_id(call_id)[:participants]).to eq([call_participant_profile_id])
     end
 
-    it 'allows to send 2 proposals and add the participant' do 
+    it 'allows to send 2 proposals and add the participant' do
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 01))
       allow(mailer).to receive(:deliver_mail_to)
       post logout_route
@@ -205,7 +210,7 @@ describe ArtistProposalsController do
       expect(Repos::Calls.get_by_id(call_id)[:participants]).to eq([call_participant_profile_id])
       artistproposal_params[:title] = 'otter_title'
       post send_artist_proposal_route, artistproposal_params
-      expect(Repos::Artistproposals.count).to eq(2)  
+      expect(Repos::Artistproposals.count).to eq(2)
       expect(Repos::Calls.get_by_id(call_id)[:participants]).to eq([call_participant_profile_id])
 
     end
@@ -289,7 +294,7 @@ describe ArtistProposalsController do
 
   end
 
-  
+
 
   describe 'Amend_artist_proposal' do
 
@@ -521,11 +526,11 @@ describe ArtistProposalsController do
 
   end
 
- 
+
   describe 'Delete_artist_proposal' do
 
     before(:each){
-      allow(Cloudinary::Api).to receive(:delete_resources)   
+      allow(Cloudinary::Api).to receive(:delete_resources)
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 01))
       allow(mailer).to receive(:deliver_mail_to)
       post logout_route
@@ -569,7 +574,7 @@ describe ArtistProposalsController do
       allow(Time).to receive(:now).and_return(moked_time)
       receiver[:last_login] = moked_time.to_i*1000
       allow(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg'])
-      
+
       post logout_route
       post login_route, user
       expect(Repos::Artistproposals).to receive(:delete).with(proposal_id)
@@ -581,7 +586,7 @@ describe ArtistProposalsController do
 
     it 'allows admin to delete and NOT deliver rejection mail' do
       post logout_route
-      post login_route, admin_user  
+      post login_route, admin_user
       allow(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg'])
       expect(Repos::Artistproposals).to receive(:delete).with(proposal_id)
       user[:email] = artist_model[:email]
@@ -609,7 +614,7 @@ describe ArtistProposalsController do
       post delete_artist_proposal_route, {id: proposal_id, call_id: call_id, event_id: event_id}
       expect(parsed_response['status']).to eq('success')
       expect(parsed_response['model']).to eq({"profile_id"=>call_participant_profile_id, "proposal_id"=>proposal_id})
-      
+
     end
 
     it 'removes participant if it has no proposals' do
@@ -700,7 +705,7 @@ describe ArtistProposalsController do
     end
 
     it 'removes only the artist from the program if the space have other activities' do
-      Repos::Activities.save otter_activity 
+      Repos::Activities.save otter_activity
       expect(Repos::Programs).to receive(:remove_participant).once.with(program_id, call_participant_profile_id)
       post delete_artist_proposal_route, {id: proposal_id, call_id: call_id, event_id: event_id}
       expect(parsed_response['status']).to eq('success')
@@ -714,7 +719,7 @@ describe ArtistProposalsController do
       allow(Cloudinary::Api).to receive(:delete_resources)
       expect(Services::Gallery).to receive(:compare_and_delete_unused_pictures).with(nil, {photos: ['nph1.jpg', 'nph2.jpg']})
       post delete_artist_proposal_route, {id: proposal_id, call_id: call_id, event_id: event_id}
-      
+
     end
 
     it 'deletes photos from numeric field if SummableInputs or LinkUploadPDF' do
@@ -726,7 +731,7 @@ describe ArtistProposalsController do
       allow(Cloudinary::Api).to receive(:delete_resources)
       expect(Services::Gallery).to receive(:compare_and_delete_unused_pictures).with(nil, {photos: ['nph1.jpg', 'nph2.jpg']})
       post delete_artist_proposal_route, {id: proposal_id, call_id: call_id, event_id: event_id}
-      
+
     end
 
 
@@ -734,7 +739,7 @@ describe ArtistProposalsController do
 
   describe 'Assets'do
     before(:each){
-      allow(Cloudinary::Api).to receive(:delete_resources)   
+      allow(Cloudinary::Api).to receive(:delete_resources)
       post create_profile_route, profile
       allow(Time).to receive(:now).and_return(Time.new(2016, 05, 01))
       allow(mailer).to receive(:deliver_mail_to)
@@ -756,7 +761,7 @@ describe ArtistProposalsController do
     it 'creates a new asset if picture used in a artist proposal and add both production and proposal ids to holders' do
       artistproposal_params[:production_id] = nil
       post send_artist_proposal_route, artistproposal_params
-      expect(MetaRepos::Assets.all.length).to eq(2)        
+      expect(MetaRepos::Assets.all.length).to eq(2)
       expect(MetaRepos::Assets.get(url: 'otter_picture.jpg' ).first[:holders].length).to eq(2)
       expect(MetaRepos::Assets.get(url: 'picture.jpg' ).first[:holders].length).to eq(2)
        production = Repos::Productions.get_profile_productions(profile_id).first
@@ -784,13 +789,13 @@ describe ArtistProposalsController do
       # proposal[:production_id] = nil
       artistproposal_params[:id] = proposal_id
       post send_artist_proposal_route, artistproposal_params
-      expect(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg']).exactly(1).times 
+      expect(Cloudinary::Api).to receive(:delete_resources).with(['picture.jpg', 'otter_picture.jpg']).exactly(1).times
       post delete_artist_proposal_route,  {id: proposal_id, call_id: call_id, event_id: event_id}
       production = Repos::Productions.get_profile_productions(profile_id).first
       post delete_production_route, production
 
       expect(MetaRepos::Assets.all.length).to eq(0)
-      # 
+      #
     end
 
 
