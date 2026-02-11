@@ -1,5 +1,5 @@
 <div id='react-root'></div>
-<script src="/assets/bundle.js"></script>
+<%= javascript_include_tag 'bundle' %>
 <script>
-  Pard.UserStatus['status'] = <%= status %>
+  Pard.UserStatus['status'] = <%= raw status %>
 </script>

@@ -21,7 +21,11 @@ require 'sinatra'
 require_relative '../../controllers/base'
 
 # Load infrastructure actions
+# Load infrastructure actions
 require_relative '../../infrastructure/actions_index'
+
+# Load workers
+require_relative '../../workers/sidekiq_workers'
 
 # Initialize ReposFactory with MongoDB connection
 # This creates Repos::* classes dynamically

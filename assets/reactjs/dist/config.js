@@ -1,12 +1,2 @@
-/******/ (() => { // webpackBootstrap
-/*!***********************!*\
-  !*** ./src/config.js ***!
-  \***********************/
-$.cloudinary.config({
-  cloud_name: "hxgvncv7u",
-  api_key: "844974134959653",
-  use_filename: true
-});
-/******/ })()
-;
+$.cloudinary.config({cloud_name:"hxgvncv7u",api_key:"844974134959653",use_filename:!0});
 //# sourceMappingURL=config.js.map

@@ -31,23 +31,9 @@ module Orfheo
 
     # Autoload paths for existing architecture (preserved from Sinatra)
     # NOTE: Repos are loaded manually by ReposFactory, not by Zeitwerk
-    # config.autoload_paths << Rails.root.join('repos') # REMOVED - causes Zeitwerk naming conflicts
-    config.autoload_paths << Rails.root.join('infrastructure')
-    config.autoload_paths << Rails.root.join('services')
-    config.autoload_paths << Rails.root.join('lib')
-    config.autoload_paths << Rails.root.join('workers')
-
-    # Exclude legacy Sinatra controllers and repos from autoloading (manual loading in config.rb)
-    Rails.autoloaders.main.ignore(Rails.root.join('controllers'))
-    Rails.autoloaders.main.ignore(Rails.root.join('repos'))
-
-    # Eager load paths for production
-    # NOTE: Repos are loaded manually by ReposFactory, not by Zeitwerk
-    # config.eager_load_paths << Rails.root.join('repos') # REMOVED - causes Zeitwerk naming conflicts
-    config.eager_load_paths << Rails.root.join('infrastructure')
-    config.eager_load_paths << Rails.root.join('services')
-    config.eager_load_paths << Rails.root.join('lib')
-
+    # Legacy paths are loaded manually in config/initializers/load_sinatra_config.rb
+    # because they do not follow Zeitwerk naming conventions.
+    
     # Middleware stack configuration
     config.middleware.use Rack::Deflater # Compression
 

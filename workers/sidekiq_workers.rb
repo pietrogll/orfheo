@@ -1,4 +1,4 @@
-require_relative '../config/config'
+require_relative '../config/environment'
 
 module Workers
 

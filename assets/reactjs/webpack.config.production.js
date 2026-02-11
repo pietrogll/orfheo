@@ -12,7 +12,7 @@ module.exports = {
     bundle: path.join(__dirname, 'src', 'main.js'),
     reactForJQuery: path.join(__dirname, 'src', 'reactForJQuery.js'),
     config: path.join(__dirname, 'src', 'config.js'),
-    cable: path.join(__dirname, 'src', 'cable.js')
+    action_cable_bundle: path.join(__dirname, 'src', 'action_cable_bundle.js')
   },
   output: {
     path: path.join(__dirname, 'dist'),
