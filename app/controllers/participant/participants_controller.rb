@@ -23,9 +23,6 @@ class Participant::ParticipantsController < ApplicationController
   end
 
   def broadcast_websocket(event_id, event_type, data)
-    ProgramChannel.broadcast_to(
-      "event_#{event_id}",
-      { event: event_type, data: data }
-    )
+    send_web_socket_message("event:#{event_id}", event_type, data)
   end
 end

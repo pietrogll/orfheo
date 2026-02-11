@@ -5,7 +5,7 @@ ruby '3.4.4'
 # Rails 8.1.2 Framework
 gem 'rails', '~> 8.1.2'
 gem 'puma', '~> 6.0'
-gem 'propshaft' # Rails 8 default asset pipeline
+
 gem 'rack-cors' # CORS middleware
 
 # Database & Background Jobs (preserved from Sinatra)
@@ -29,8 +29,10 @@ gem 'dotenv'
 # Sinatra dependencies (will be removed after migration)
 gem 'sinatra', '~> 4.1', require: false
 gem 'sinatra-contrib', '~> 4.1', '>= 4.1.1', require: false
+gem 'sprockets-rails'
 gem 'sprockets-helpers'
 gem 'sprockets-es6'
+gem 'sassc-rails'
 gem 'uglifier'
 # gem 'pony' - Migrated to ActionMailer (Rails 8)
 gem 'faye-websocket' # Will migrate to Action Cable
@@ -39,7 +41,6 @@ gem 'sorted_set'
 
 # gem 'newrelic_rpm' #Gem for monitoring memory leak
 
-gem 'pry'
 
 group :development, :test do
   gem 'rspec-rails', '~> 7.0' # Rails-specific RSpec support

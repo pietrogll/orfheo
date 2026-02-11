@@ -1,3 +1,5 @@
+
+
 module Actions
 
 	module Search
@@ -9,7 +11,7 @@ module Actions
   			def run pull_params, db_key, query
           pull_params = parse(pull_params)
           query = prepare(query)
-  				Services::Search.get_results pull_params, db_key, query
+  				::Services::Search.get_results pull_params, db_key, query
   			end
 
         private

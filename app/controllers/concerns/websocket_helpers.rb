@@ -5,7 +5,7 @@ module WebsocketHelpers
   extend ActiveSupport::Concern
 
   def send_web_socket_message(websocket_channel, event_to_trigger, model, signature = nil)
-    message = { status: 'success', data: { event: event_to_trigger, model: model } }
+    message = { status: 'success', event: event_to_trigger, model: model }
 
     # Broadcast to Action Cable channel
     ActionCable.server.broadcast(websocket_channel, message)

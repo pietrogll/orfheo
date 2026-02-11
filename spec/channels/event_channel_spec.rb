@@ -40,7 +40,7 @@ RSpec.describe EventChannel, type: :channel do
     it 'receives broadcasted messages' do
       subscribe(event_id: event_id)
 
-      message = { status: 'success', data: { event: 'event_updated', model: { id: event_id } } }
+      message = { status: 'success', event: 'event_updated', model: { id: event_id } }
 
       expect {
         ActionCable.server.broadcast("event:#{event_id}", message)

@@ -14,9 +14,10 @@ require_relative '../../repos/repos_index'
 require_relative '../../lib/libs_index'
 
 # Load services (now autoloaded by Zeitwerk, but ensure they're available)
-# require_relative '../../services/services_index' # Skip - autoloaded by Zeitwerk
+require_relative '../../services/services_index' # LEGACY: Load manually as they don't follow Zeitwerk conventions
 
 # Load BaseController and Guards (needed by Actions)
+require 'sinatra'
 require_relative '../../controllers/base'
 
 # Load infrastructure actions

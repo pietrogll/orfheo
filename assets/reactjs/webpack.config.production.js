@@ -1,6 +1,6 @@
 'use strict'
 
-const path    = require('path')
+const path = require('path')
 const webpack = require('webpack')
 const TerserPlugin = require('terser-webpack-plugin')
 const Dotenv = require('dotenv-webpack')
@@ -11,7 +11,8 @@ module.exports = {
   entry: {
     bundle: path.join(__dirname, 'src', 'main.js'),
     reactForJQuery: path.join(__dirname, 'src', 'reactForJQuery.js'),
-    config: path.join(__dirname, 'src', 'config.js')
+    config: path.join(__dirname, 'src', 'config.js'),
+    cable: path.join(__dirname, 'src', 'cable.js')
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -28,7 +29,7 @@ module.exports = {
     ]
   },
   resolve: {
-     extensions: ['*', '.js', '.jsx']
+    extensions: ['*', '.js', '.jsx']
   },
   plugins: [
     new Dotenv({
