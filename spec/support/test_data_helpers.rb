@@ -25,13 +25,14 @@ module TestDataHelpers
 
   def create_profile(overrides = {})
     profile_id = SecureRandom.uuid
+    user_id = overrides[:user_id] || create_user[:id]
     profile_data = {
       id: profile_id,
-      owner_id: overrides[:owner_id] || create_user[:id],
+      user_id: user_id,
       name: "Profile #{SecureRandom.hex(4)}",
       type: 'artist',
       description: 'Test profile'
-    }.merge(overrides.except(:owner_id))
+    }.merge(overrides.except(:user_id))
 
     result = Repos::Profiles.save(profile_data)
     Repos::Profiles.get({ _id: result.inserted_id }).first
@@ -39,14 +40,20 @@ module TestDataHelpers
 
   def create_event(overrides = {})
     event_id = SecureRandom.uuid
+    user_id = overrides[:user_id] || create_user[:id]
     event_data = {
       id: event_id,
-      owner_id: overrides[:owner_id] || create_user[:id],
+      user_id: user_id,
       name: "Event #{SecureRandom.hex(4)}",
+      texts: { es: 'Event description' },
+      eventTime: [{ date: '2025-01-01', time: %w[10:00 12:00] }],
+      categories: ['arts'],
+      place: 'Test Place',
+      type: 'festival',
       public: true,
       date_start: (Time.now + 1.day).to_i * 1000,
       date_end: (Time.now + 2.days).to_i * 1000
-    }.merge(overrides.except(:owner_id))
+    }.merge(overrides.except(:user_id))
 
     result = Repos::Events.save(event_data)
     Repos::Events.get({ _id: result.inserted_id }).first
@@ -93,13 +100,16 @@ module TestDataHelpers
 
   def create_call(overrides = {})
     call_id = SecureRandom.uuid
+    user_id = overrides[:user_id] || create_user[:id]
     call_data = {
       id: call_id,
-      profile_id: overrides[:profile_id] || create_profile[:id],
-      event_id: overrides[:event_id] || create_event[:id],
+      user_id: user_id,
+      profile_id: overrides[:profile_id] || create_profile(user_id: user_id)[:id],
+      event_id: overrides[:event_id] || create_event(user_id: user_id)[:id],
       title: "Call #{SecureRandom.hex(4)}",
+      start: (Time.now - 1.day).to_i * 1000,
       deadline: (Time.now + 30.days).to_i * 1000
-    }.merge(overrides.except(:profile_id, :event_id))
+    }.merge(overrides.except(:profile_id, :event_id, :user_id))
 
     result = Repos::Calls.save(call_data)
     Repos::Calls.get({ _id: result.inserted_id }).first

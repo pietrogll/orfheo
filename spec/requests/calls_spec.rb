@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Calls API', type: :request do
   let(:user) { create_user }
   let(:admin) { create_admin }
-  let(:profile) { create_profile(owner_id: user[:id]) }
-  let(:call) { create_call(profile_id: profile[:id]) }
+  let(:profile) { create_profile(user_id: user[:id]) }
+  let(:call) { create_call(user_id: user[:id], profile_id: profile[:id]) }
 
   describe 'GET /users/call' do
     context 'when admin' do
@@ -41,8 +41,11 @@ RSpec.describe 'Calls API', type: :request do
     it 'creates a new call' do
       params = {
         profile_id: profile[:id],
+        event_id: create_event[:id],
         title: 'Test Call',
-        description: 'Test Description'
+        description: 'Test Description',
+        start: Time.now.to_i * 1000,
+        deadline: (Time.now + 30.days).to_i * 1000
       }
 
       post '/users/create_call', params: params
@@ -53,12 +56,13 @@ RSpec.describe 'Calls API', type: :request do
     end
 
     it 'requires profile ownership' do
-      other_profile = create_profile(owner_id: create_user[:id])
+      other_profile = create_profile(user_id: create_user[:id])
       params = { profile_id: other_profile[:id], title: 'Test' }
 
-      expect do
-        post '/users/create_call', params: params
-      end.to raise_error(Pard::Invalid)
+      post '/users/create_call', params: params
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
+      expect(json[:reason]).to eq('you_dont_have_permission')
     end
   end
 
@@ -79,11 +83,12 @@ RSpec.describe 'Calls API', type: :request do
     end
 
     it 'requires call ownership' do
-      other_call = create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])
+      other_call = create_call(user_id: create_user[:id])
 
-      expect do
-        post '/users/modify_call', params: { id: other_call[:id], title: 'Updated' }
-      end.to raise_error(Pard::Invalid)
+      post '/users/modify_call', params: { id: other_call[:id], title: 'Updated' }
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
+      expect(json[:reason]).to eq('you_dont_have_permission')
     end
   end
 

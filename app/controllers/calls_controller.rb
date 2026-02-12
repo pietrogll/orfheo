@@ -72,15 +72,6 @@ class CallsController < ApplicationController
 
   private
 
-  def check_call_ownership!(call_id)
-    raise Pard::Invalid, 'non_existing_call' unless Repos::Calls.exists?(call_id)
-
-    owner_id = Repos::Calls.get_owner(call_id)
-    raise Pard::Invalid, 'call_ownership' unless owner_id == current_user_id || admin?
-
-    owner_id
-  end
-
   def broadcast_websocket(event_id, event_type, data)
     send_web_socket_message("event:#{event_id}", event_type, data)
   end

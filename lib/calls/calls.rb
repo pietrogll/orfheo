@@ -34,6 +34,8 @@ class Call
       deadline
       conditions
       texts
+      title
+      description
     ]
     call = Hash[keys.map { |sym|
       # This line is to allow modifying each field indipendently form the others

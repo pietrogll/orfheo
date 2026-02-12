@@ -12,7 +12,9 @@ module Actions
 
   class UserModifiesCall
     def self.run(user_id, params)
-      call = Call.new(user_id, params).to_h
+      existing_call = Repos::Calls.get_by_id(params[:id])
+      merged_params = existing_call.merge(params)
+      call = Call.new(user_id, merged_params).to_h
       Repos::Calls.modify call
       call
     end

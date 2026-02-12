@@ -60,10 +60,10 @@ module Guards
 
   # Call ownership
   def check_call_ownership!(call_id)
-    raise Pard::Invalid, 'non_existing_call' unless Repos::Calls.exists?(call_id)
+    raise Pard::Invalid::UnexistingCall unless Repos::Calls.exists?(call_id)
 
     owner_id = Repos::Calls.get_owner(call_id)
-    raise Pard::Invalid, 'call_ownership' unless owner_id == session[:identity] || admin?
+    raise Pard::Invalid::CallOwnership unless owner_id == session[:identity] || admin?
 
     owner_id
   end
