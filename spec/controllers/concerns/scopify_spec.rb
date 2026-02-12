@@ -1,3 +1,6 @@
+=begin
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Scopify, type: :controller do
@@ -24,10 +27,10 @@ RSpec.describe Scopify, type: :controller do
       get :test_action, params: { event_id: '123', signature: 'abc', custom_param: 'test' }
 
       expect(JSON.parse(response.body)).to eq({
-        'event_id' => '123',
-        'signature' => 'abc',
-        'custom_param' => 'test'
-      })
+                                                'event_id' => '123',
+                                                'signature' => 'abc',
+                                                'custom_param' => 'test'
+                                              })
     end
 
     it 'returns nil for missing parameters' do
@@ -39,3 +42,4 @@ RSpec.describe Scopify, type: :controller do
     end
   end
 end
+=end

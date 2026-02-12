@@ -1,23 +1,22 @@
+# frozen_string_literal: true
+
 describe User do
+  let(:user_id) { '5c41cf77-32b0-4df2-9376-0960e64a654a' }
+  let(:validation_code) { '3c61cf77-32b0-4df2-9376-0960e64a654a' }
 
-  let(:user_id){'5c41cf77-32b0-4df2-9376-0960e64a654a'}
-  let(:validation_code){'3c61cf77-32b0-4df2-9376-0960e64a654a'}
-
-  let(:user_hash){
+  let(:user_hash) do
     {
       email: 'email@test.com',
-      password: 'password',
+      password: 'password'
     }
-  }
+  end
 
-  let(:user){User.new user_hash}
-  let(:register_date){Time.new(2222, 01, 25)}
-
+  let(:user) { User.new user_hash }
+  let(:register_date) { Time.new(2222, 0o1, 25) }
 
   describe 'Registration' do
-
     it 'adds user_id to a user' do
-      expect(UUID.validate user[:id]).to eq(true)
+      expect(UUID.validate(user[:id])).to eq(true)
     end
 
     it 'adds validation: false to a user' do
@@ -25,7 +24,7 @@ describe User do
     end
 
     it 'adds validation_code: uuid to a user' do
-      expect(UUID.validate user[:validation_code]).to eq(true)
+      expect(UUID.validate(user[:validation_code])).to eq(true)
     end
 
     it 'encrypts the password' do
@@ -39,8 +38,7 @@ describe User do
 
     it 'saves the register date' do
       allow(Time).to receive(:now).and_return(register_date)
-      expect(user[:register_date]).to be register_date.to_i*1000     
+      expect(user[:register_date]).to be register_date.to_i * 1000
     end
-
   end
 end

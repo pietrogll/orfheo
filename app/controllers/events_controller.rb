@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 # EventsController - Manages cultural events
 # Migrated from controllers/events.rb
 
 class EventsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create, :update, :destroy, :update_partners, :create_slug]
-  before_action :require_login!, except: [:show, :show_by_slug, :index]
+  skip_before_action :verify_authenticity_token, only: %i[create update destroy update_partners create_slug]
+  before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility
-  def self.action_encoding_template(action_name)
+  def self.action_encoding_template(_action_name)
     'utf-8'
   end
 
@@ -48,7 +50,8 @@ class EventsController < ApplicationController
   # GET /event_manager?id=xxx - Event manager page
   def manager
     owner = Actions::UserGetsEventOwner.run(params[:id])
-    raise Pard::Unexisting unless (owner == session[:identity] || admin?)
+    raise Pard::Unexisting unless owner == session[:identity] || admin?
+
     status = status_for(owner)
 
     respond_to do |format|
@@ -75,7 +78,10 @@ class EventsController < ApplicationController
     events = Actions::UserGetsEvents.run
 
     respond_to do |format|
-      format.html { @events = events; render :index }
+      format.html do
+        @events = events
+        render :index
+      end
       format.json { render json: { status: 'success', events: events } }
     end
   end
@@ -136,6 +142,7 @@ class EventsController < ApplicationController
 
   def user_lang
     return nil unless logged_in?
+
     user = Repos::Users.get_by_id(session[:identity])
     user[:lang]
   end

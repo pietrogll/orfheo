@@ -1,51 +1,51 @@
+=begin
+# frozen_string_literal: true
+
 # Legacy Sinatra controller specs - disabled during Rails migration
 # These specs test the old Sinatra WelcomeController which has been migrated to Rails.
 # The legacy Sinatra routes are disabled in config.ru during migration.
 # TODO: Rewrite as Rails request specs (see spec/requests/ for examples)
-describe 'WelcomeController', skip: "Legacy Sinatra controller - needs migration to Rails request specs" do
+describe 'WelcomeController', skip: 'Legacy Sinatra controller - needs migration to Rails request specs' do
+  let(:login_route) { '/login/login' }
+  let(:tech_support_route) { '/techSupport' }
 
-  let(:login_route){'/login/login'}
-  let(:tech_support_route){'/techSupport'}
-
-
-  let(:user_hash){
+  let(:user_hash) do
     {
       email: 'email@test.com',
       password: 'password'
     }
-  }
+  end
 
-  let(:user_id){'5c41cf77-32b0-4df2-9376-0960e64a654a'}
-  let(:validation_code){'3c61cf77-32b0-4df2-9376-0960e64a654a'}
-  let(:otter_user_id){'5c41cf77-32b0-4df2-9376-0960e64a65aa'}
-  let(:admin_id){'00000000-32b0-4df2-9376-000000000000'}
+  let(:user_id) { '5c41cf77-32b0-4df2-9376-0960e64a654a' }
+  let(:validation_code) { '3c61cf77-32b0-4df2-9376-0960e64a654a' }
+  let(:otter_user_id) { '5c41cf77-32b0-4df2-9376-0960e64a65aa' }
+  let(:admin_id) { '00000000-32b0-4df2-9376-000000000000' }
 
-  let(:admin){
+  let(:admin) do
     {
       id: admin_id
     }
-  }
+  end
 
-  let(:admin_user){
+  let(:admin_user) do
     {
       id: admin_id,
       email: 'admin@test.com',
       password: 'admin_passwd',
-      validation: true,
+      validation: true
     }
-  }
+  end
 
-  let(:otter_user){
+  let(:otter_user) do
     {
       id: otter_user_id,
       email: 'otter_email@test.com',
       password: 'otter_password',
-      validation: true,
+      validation: true
     }
-  }
+  end
 
-
-  let(:user){
+  let(:user) do
     {
       id: user_id,
       email: 'email@test.com',
@@ -54,25 +54,24 @@ describe 'WelcomeController', skip: "Legacy Sinatra controller - needs migration
       validation: false,
       validation_code: validation_code
     }
-  }
+  end
 
-  let(:params_tech_support){
+  let(:params_tech_support) do
     {
-      :email => 'email@email.email',
-      :subject => 'email_subject',
-      :name => 'sender_name',
-      :message => 'email_message'
+      email: 'email@email.email',
+      subject: 'email_subject',
+      name: 'sender_name',
+      message: 'email_message'
     }
-  }
+  end
 
-  before(:each){
+  before(:each) do
     Repos::Users.save user
     Repos::Users.validate validation_code
     Repos::Users.save otter_user
     Repos::Users.save admin_user
     MetaRepos::Admins.save admin
-  }
-
+  end
 
   describe 'Access' do
     it 'redirects to users page if already logged in' do
@@ -90,21 +89,19 @@ describe 'WelcomeController', skip: "Legacy Sinatra controller - needs migration
       expect(Actions::UpdateLoginTime).to receive(:run).with(user_id, current_time)
       get '/'
     end
-
   end
 
-
   describe '/techSupport' do
-
-    let(:mailer){Services::Mails.new}
+    let(:mailer) { Services::Mails.new }
 
     it 'calls the mailer service' do
       allow(Services::Mails).to receive(:new).and_return(mailer)
 
       expect(mailer).to receive(:deliver_mail_to).once.with(
-        {:email => 'tech@orfheo.org'},
+        { email: 'tech@orfheo.org' },
         :techSupport,
-        {:browser=>nil, :email =>"email@email.email",:message=>"email_message",:name=>"sender_name", :profile=>nil, :subject=>"email_subject"}
+        { browser: nil, email: 'email@email.email', message: 'email_message', name: 'sender_name', profile: nil,
+          subject: 'email_subject' }
       )
 
       post tech_support_route, params_tech_support
@@ -115,8 +112,6 @@ describe 'WelcomeController', skip: "Legacy Sinatra controller - needs migration
       post tech_support_route, params_tech_support
       expect(parsed_response['status']).to eq('success')
     end
-
-
   end
-
 end
+=end

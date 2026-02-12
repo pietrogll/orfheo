@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 # ProfilesController - Manages artist/organization profiles
 # Migrated from controllers/profiles.rb
 
 class ProfilesController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create, :update, :destroy, :check_name]
-  before_action :require_login!, except: [:show, :show_by_slug, :index]
+  skip_before_action :verify_authenticity_token, only: %i[create update destroy check_name]
+  before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility
-  def self.action_encoding_template(action_name)
+  def self.action_encoding_template(_action_name)
     'utf-8'
   end
 
@@ -90,13 +92,14 @@ class ProfilesController < ApplicationController
   # Check if user owns the profile (through profile ownership or admin)
   def check_profile_ownership!(profile_id)
     owner_id = Repos::Profiles.get_owner(profile_id)
-    raise Pard::Invalid.new('profile_ownership') unless (owner_id == current_user_id || admin?)
+    raise Pard::Invalid, 'profile_ownership' unless owner_id == current_user_id || admin?
+
     owner_id
   end
 
   # Check if profile exists
   def check_profile_exists!(profile_id)
-    raise Pard::Unexisting.new('profile') unless Repos::Profiles.exists?(profile_id)
+    raise Pard::Unexisting, 'profile' unless Repos::Profiles.exists?(profile_id)
   end
 
   # Get profile owner user ID
@@ -108,12 +111,13 @@ class ProfilesController < ApplicationController
   def status_for(owner_id)
     return :admin if admin?
     return :owner if owner_id == current_user_id
+
     :visitor
   end
 
   # Check if user is owner or admin
   def is_owner?(status)
-    status == :owner || status == :admin
+    %i[owner admin].include?(status)
   end
 
   # Generate meta tags for profile page

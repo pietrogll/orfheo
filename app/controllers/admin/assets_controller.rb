@@ -8,7 +8,7 @@ module Admin
       repo: MetaRepos::Assets,
       singular: 'asset',
       plural: 'assets',
-      attributes: [:url, :holders]
+      attributes: %i[url holders]
     )
   end
 end

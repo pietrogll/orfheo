@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'boot'
 
 require 'rails'
@@ -33,7 +35,7 @@ module Orfheo
     # NOTE: Repos are loaded manually by ReposFactory, not by Zeitwerk
     # Legacy paths are loaded manually in config/initializers/load_sinatra_config.rb
     # because they do not follow Zeitwerk naming conventions.
-    
+
     # Middleware stack configuration
     config.middleware.use Rack::Deflater # Compression
 
@@ -49,8 +51,8 @@ module Orfheo
       allow do
         origins '*'
         resource '*',
-          headers: :any,
-          methods: [:get, :post, :put, :patch, :delete, :options, :head]
+                 headers: :any,
+                 methods: %i[get post put patch delete options head]
       end
     end
 

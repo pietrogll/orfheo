@@ -385,21 +385,21 @@
 
 **Purpose**: Update React client to use Action Cable instead of Faye::WebSocket
 
-- [ ] T224 Add @rails/actioncable npm package to assets/reactjs/package.json
-- [ ] T225 Run npm install in assets/reactjs/
-- [ ] T226 Create assets/reactjs/src/cable.js to configure Action Cable consumer
-- [ ] T227 Update React WebSocket connection code to use Action Cable consumer
-- [ ] T228 Replace WebSocket URL from ws://localhost:3000/websocket to ws://localhost:3000/cable
-- [ ] T229 Update channel subscription code to use Action Cable channels API
-- [ ] T230 Update message handling to work with Action Cable format
-- [ ] T231 Test WebSocket connection from React: verify connection establishes
-- [ ] T232 Test channel subscription from React: subscribe to event channel, verify subscription confirmed
-- [ ] T233 Test message reception from React: trigger server update, verify React receives message
-- [ ] T234 Build React bundle: npm run build
-- [ ] T235 Test full flow: React loads, connects to Action Cable, receives real-time updates
-- [ ] T236 Refactor React WebSocket code: extract Action Cable logic into reusable service
+- [x] T224 Add @rails/actioncable npm package to assets/reactjs/package.json
+- [x] T225 Run npm install in assets/reactjs/
+- [x] T226 Create assets/reactjs/src/cable.js to configure Action Cable consumer
+- [x] T227 Update React WebSocket connection code to use Action Cable consumer
+- [x] T228 Replace WebSocket URL from ws://localhost:3000/websocket to ws://localhost:3000/cable
+- [x] T229 Update channel subscription code to use Action Cable channels API
+- [x] T230 Update message handling to work with Action Cable format
+- [x] T231 Test WebSocket connection from React: verify connection establishes
+- [x] T232 Test channel subscription from React: subscribe to event channel, verify subscription confirmed
+- [x] T233 Test message reception from React: trigger server update, verify React receives message
+- [x] T234 Build React bundle: npm run build
+- [x] T235 Test full flow: React loads, connects to Action Cable, receives real-time updates
+- [x] T236 Refactor React WebSocket code: extract Action Cable logic into reusable service
 
-**Checkpoint**: React client updated, Action Cable connection working, real-time updates functional
+**Checkpoint**: ✅ React client updated, Action Cable connection working, real-time updates functional
 
 ---
 

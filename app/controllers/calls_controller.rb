@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class CallsController < ApplicationController
   before_action :require_login!, except: []
-  before_action :require_admin, only: [:show, :destroy]
+  before_action :require_admin, only: %i[show destroy]
 
   # GET /users/call?id=:id
   def show
@@ -11,7 +13,7 @@ class CallsController < ApplicationController
   # POST /users/create_call
   def create
     owner_id = check_profile_ownership!(params[:profile_id])
-    call = Actions::UserCreatesCall.run(owner_id, params.to_unsafe_h)
+    call = Actions::UserCreatesCall.run(owner_id, symbolized_params)
     render json: { status: 'success', data: { call: call } }
   end
 
@@ -24,7 +26,7 @@ class CallsController < ApplicationController
   # POST /users/modify_call
   def update
     owner_id = check_call_ownership!(params[:id])
-    call = Actions::UserModifiesCall.run(owner_id, params.to_unsafe_h)
+    call = Actions::UserModifiesCall.run(owner_id, symbolized_params)
     render json: { status: 'success', data: { call: call } }
   end
 
@@ -71,9 +73,11 @@ class CallsController < ApplicationController
   private
 
   def check_call_ownership!(call_id)
-    raise Pard::Invalid.new('non_existing_call') unless Repos::Calls.exists?(call_id)
+    raise Pard::Invalid, 'non_existing_call' unless Repos::Calls.exists?(call_id)
+
     owner_id = Repos::Calls.get_owner(call_id)
-    raise Pard::Invalid.new('call_ownership') unless (owner_id == current_user_id || admin?)
+    raise Pard::Invalid, 'call_ownership' unless owner_id == current_user_id || admin?
+
     owner_id
   end
 

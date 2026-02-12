@@ -22,7 +22,7 @@ RSpec.describe EventChannel, type: :channel do
       subscribe(event_id: nil)
 
       expect(subscription).to be_confirmed
-      expect(subscription).not_to have_stream_from("event:")
+      expect(subscription).not_to have_stream_from('event:')
     end
   end
 
@@ -42,9 +42,9 @@ RSpec.describe EventChannel, type: :channel do
 
       message = { status: 'success', event: 'event_updated', model: { id: event_id } }
 
-      expect {
+      expect do
         ActionCable.server.broadcast("event:#{event_id}", message)
-      }.to have_broadcasted_to("event:#{event_id}").with(message)
+      end.to have_broadcasted_to("event:#{event_id}").with(message)
     end
   end
 end

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 # SessionsController - Handles authentication and session management
 # Migrated from controllers/login.rb
 
 class SessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create, :register, :destroy, :forgotten_password]
+  skip_before_action :verify_authenticity_token, only: %i[create register destroy forgotten_password]
 
   # POST /register - Register a new user
   def register
@@ -20,9 +22,7 @@ class SessionsController < ApplicationController
   def validate
     user_id, saved_login_time = Actions::UserValidatesUser.run(params[:id])
 
-    unless user_id
-      redirect_to root_path and return
-    end
+    redirect_to root_path and return unless user_id
 
     register_session(user_id, saved_login_time)
 
@@ -108,7 +108,7 @@ class SessionsController < ApplicationController
 
   # Validation helpers (from BaseController)
   def check_invalid_email(email)
-    raise Pard::Invalid::Email unless email && email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i)
+    raise Pard::Invalid::Email unless email&.match?(/\A[\w+\-.]+@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i)
   end
 
   def check_invalid_password(password)

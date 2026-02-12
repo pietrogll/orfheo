@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Custom session store for test environment that avoids rack-session-2.1.1 issues
 # This middleware provides a simple hash-based session that works with Rails
 
@@ -7,9 +9,7 @@ class SimpleTestSession < Hash
     @id = SecureRandom.hex(16)
   end
 
-  def id
-    @id
-  end
+  attr_reader :id
 
   def enabled?
     true

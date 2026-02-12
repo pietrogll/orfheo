@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './users'
 require_relative './profiles'
 require_relative './productions'

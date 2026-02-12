@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file is used by Rack-based servers to start the application.
 
 require_relative 'config/environment'
@@ -34,8 +36,7 @@ Rails.application.load_server
 #   run ParticipantsController
 # end
 
-$stdout.sync = true #Necessary for logging puts in heroku console
-
+$stdout.sync = true # Necessary for logging puts in heroku console
 
 # putting here the Updater, it is executed when loading a page for first time
 # require './updater_events'

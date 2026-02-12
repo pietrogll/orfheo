@@ -22,7 +22,7 @@ RSpec.describe ProgramChannel, type: :channel do
       subscribe(program_id: nil)
 
       expect(subscription).to be_confirmed
-      expect(subscription).not_to have_stream_from("program:")
+      expect(subscription).not_to have_stream_from('program:')
     end
   end
 
@@ -42,9 +42,9 @@ RSpec.describe ProgramChannel, type: :channel do
 
       message = { status: 'success', data: { event: 'program_updated', model: { id: program_id } } }
 
-      expect {
+      expect do
         ActionCable.server.broadcast("program:#{program_id}", message)
-      }.to have_broadcasted_to("program:#{program_id}").with(message)
+      end.to have_broadcasted_to("program:#{program_id}").with(message)
     end
   end
 end

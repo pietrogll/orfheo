@@ -1,13 +1,14 @@
+# frozen_string_literal: true
+
 describe 'get_public_info for Events' do
+  let(:event_id) { 'fce01c94-4a2b-49ff-b6b6-dfd53e45bb80' }
+  let(:profile_id) { 'fce01c94-4a2b-49ff-b6b6-dfd53e45bb83' }
 
-  let(:event_id){'fce01c94-4a2b-49ff-b6b6-dfd53e45bb80'}
-  let(:profile_id){'fce01c94-4a2b-49ff-b6b6-dfd53e45bb83'}
+  let(:tag_id) { 'fff01c94-4a2b-49ff-b6b6-dfd53e45bb81' }
+  let(:otter_tag_id) { 'eee01c94-4a2b-49ff-b6b6-dfd53e45bb82' }
+  let(:other_tag_id) { 'ccc01c94-4a2b-49ff-b6b6-dfd53e45bb83' }
 
-  let(:tag_id){'fff01c94-4a2b-49ff-b6b6-dfd53e45bb81'}
-  let(:otter_tag_id){'eee01c94-4a2b-49ff-b6b6-dfd53e45bb82'}
-  let(:other_tag_id){'ccc01c94-4a2b-49ff-b6b6-dfd53e45bb83'}
-
-  let(:event){
+  let(:event) do
     {
       user_id: 'user_id',
       profile_id: profile_id,
@@ -24,47 +25,45 @@ describe 'get_public_info for Events' do
       address: 'dirección',
       eventTime: [
         {
-         "date": "2019-04-25",
-         "time": [ 
-            "1493136000000", 
-            "1493157600000"
+          "date": '2019-04-25',
+          "time": %w[
+            1493136000000
+            1493157600000
           ]
         },
         {
-          "date": "2019-04-26",
-          "time": [ 
-            "1493222400000", 
-            "1493244000000"
+          "date": '2019-04-26',
+          "time": %w[
+            1493222400000
+            1493244000000
           ]
         }
       ]
     }
-  }
+  end
 
-  let(:profile){
+  let(:profile) do
     {
       id: profile_id,
-      name: "profile_name",
-      color: "profile_color"
+      name: 'profile_name',
+      color: 'profile_color'
     }
-  }
+  end
 
-  
-  before(:each){
+  before(:each) do
     Repos::Events.save event
     Repos::Profiles.save profile
-  }
+  end
 
   describe 'get_public_info' do
-
-    let(:wanted_keys){ [:profile_id, :id, :name, :texts, :img, :profile_name, :color, :professional, :eventTime, :address, :categories, :place, :type] }
+    let(:wanted_keys) do
+      %i[profile_id id name texts img profile_name color professional eventTime address categories place type]
+    end
 
     it 'retrieves all the wanted_keys' do
       event = Services::DbElement.get_public_info :events, event_id
-      
-      expect( event.keys.sort ).to eq(wanted_keys.sort)
+
+      expect(event.keys.sort).to eq(wanted_keys.sort)
     end
-
   end
-
 end

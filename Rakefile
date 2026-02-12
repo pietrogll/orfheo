@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Add your own tasks in files placed in lib/tasks ending in .rake,
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
@@ -7,45 +9,39 @@ Rails.application.load_tasks
 
 # Legacy test namespace (preserve for backward compatibility)
 namespace :test do
-  begin
-    require "rspec/core/rake_task"
-    desc "Run all examples"
-    RSpec::Core::RakeTask.new(:spec) do |t|
-      t.rspec_opts = %w[--color]
-      t.pattern = 'spec/**/*_spec.rb'
-    end
-  rescue LoadError
+  require 'rspec/core/rake_task'
+  desc 'Run all examples'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.rspec_opts = %w[--color]
+    t.pattern = 'spec/**/*_spec.rb'
   end
+rescue LoadError
 end
 
 namespace :db do
   desc 'drop collections'
   task :drop do
-    begin
-      print 'dropping collections :'
-      Mongo::Connection.new['cg_dev'].collections.each do |c|
-        c.drop
-        print ' .'
-      end
-      puts ' done ;)'
-    rescue StandardError => e
-      p e
+    print 'dropping collections :'
+    Mongo::Connection.new['cg_dev'].collections.each do |c|
+      c.drop
+      print ' .'
     end
+    puts ' done ;)'
+  rescue StandardError => e
+    p e
   end
   desc 'drop actions collection'
   task :drop_actions do
-    begin
-      Mongo::Connection.new['cg_dev']['actions'].drop
-      puts 'actions cleared'
-    rescue StandardError => e
-      p e
-    end
+    Mongo::Connection.new['cg_dev']['actions'].drop
+    puts 'actions cleared'
+  rescue StandardError => e
+    p e
   end
 end
 
-desc "Run all test suites"
-task :test => ["test:spec"]
+desc 'Run all test suites'
+task test: ['test:spec']
 
-task :actions => ['db:drop_actions']
+task actions: ['db:drop_actions']
 
-task :default => [:test]
+task default: [:test]

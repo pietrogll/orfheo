@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Scopify concern - provides dynamic parameter accessor methods
 # Ported from controllers/base.rb helper
 

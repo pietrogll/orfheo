@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProposalMailer < ApplicationMailer
   # Artist proposal notification
   def artist_proposal_email(user, proposal_data)

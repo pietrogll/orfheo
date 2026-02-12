@@ -1,6 +1,7 @@
-class Asset
+# frozen_string_literal: true
 
-  def initialize url, holder_id
+class Asset
+  def initialize(url, holder_id)
     # check_fields params
     asset = {
       url: url,
@@ -17,7 +18,7 @@ class Asset
   #   }
   # end
 
-  def [] key
+  def [](key)
     asset[key]
   end
 
@@ -26,8 +27,6 @@ class Asset
   end
 
   private
+
   attr_reader :asset
-
-
-
 end

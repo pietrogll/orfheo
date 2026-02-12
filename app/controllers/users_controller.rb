@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 # UsersController - Handles user profile and account management
 # Migrated from controllers/users.rb
 
 class UsersController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:modify_password, :save_interests, :delete_user, :modify_lang]
-  before_action :require_login!, except: [:modify_lang]
+  skip_before_action :verify_authenticity_token, only: %i[header modify_password save_interests delete_user modify_lang]
+  before_action :require_login!, except: %i[modify_lang save_interests]
 
   # GET /users - User's profile page (requires login)
   def index
@@ -22,8 +24,15 @@ class UsersController < ApplicationController
 
   # POST /users/header - Get user header data (profiles, events, admin status)
   def header
-    profiles, events, interests = Actions::UserGetsHeader.run(session[:identity])
-    is_admin = admin?
+    if session[:identity].present?
+      profiles, events, interests = Actions::UserGetsHeader.run(session[:identity])
+      is_admin = admin?
+    else
+      profiles = []
+      events = []
+      interests = []
+      is_admin = false
+    end
 
     render json: {
       status: 'success',
@@ -49,9 +58,7 @@ class UsersController < ApplicationController
     scopify :lang
     check_lang!(lang)
 
-    if session[:identity].blank?
-      render json: { status: 'success' } and return
-    end
+    render json: { status: 'success' } and return if session[:identity].blank?
 
     Actions::UserModifiesLanguage.run(session[:identity], lang)
 
@@ -62,9 +69,7 @@ class UsersController < ApplicationController
   def save_interests
     scopify :interests
 
-    if session[:identity].blank?
-      render json: { status: 'success' } and return
-    end
+    render json: { status: 'success' } and return if session[:identity].blank?
 
     Actions::UserModifiesInterests.run(session[:identity], interests)
 
@@ -94,12 +99,13 @@ class UsersController < ApplicationController
   end
 
   # Validation helpers
+  # Redundant with Guards concern, can be removed if strictly using Guards version
+  # But ensuring consistency for now
   def check_invalid_password(password)
-    raise Pard::Invalid::Password if password.blank? || password.length < 6
+    raise Pard::Invalid, 'incorrect_password' if password.blank? || password.length < 6
   end
 
   def check_lang!(lang)
-    valid_langs = %w[en es fr ca pt]
-    raise Pard::Invalid::Language unless valid_langs.include?(lang)
+    raise Pard::Invalid, 'invalid_language' unless %w[en es fr ca pt].include?(lang)
   end
 end

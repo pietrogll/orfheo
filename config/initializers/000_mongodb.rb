@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # MongoDB connection configuration for Rails
 # Connects to MongoDB using the mongo gem (not Mongoid/ActiveRecord)
 
@@ -6,7 +8,9 @@ require 'mongo'
 # Configure MongoDB client
 mongodb_uri = ENV.fetch('MONGOLAB_URI', 'mongodb://localhost:27017/orfheo')
 
-MONGO_CLIENT = Mongo::Client.new(mongodb_uri)
+unless defined?(MONGO_CLIENT)
+  MONGO_CLIENT = Mongo::Client.new(mongodb_uri)
+end
 
 # Make globally accessible for existing repository pattern
 $db = MONGO_CLIENT

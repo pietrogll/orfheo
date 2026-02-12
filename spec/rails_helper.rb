@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Rails-specific RSpec configuration
 # This file is loaded by RSpec for Rails integration tests
 
@@ -8,7 +10,7 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 
 # Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
 
@@ -28,7 +30,7 @@ RSpec.configure do |config|
   # Configure DatabaseCleaner for MongoDB
   config.before(:suite) do
     # Get the MongoDB database connection
-    require_relative '../config/initializers/mongodb'
+    require_relative '../config/initializers/000_mongodb'
     db = $db # Use the global $db set by mongodb initializer
 
     DatabaseCleaner[:mongo].db = db
@@ -37,12 +39,10 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
-    DatabaseCleaner[:mongo].start
-  end
-
-  config.after(:each) do
     DatabaseCleaner[:mongo].clean
   end
+
+  # Removed after(:each) cleaning to avoid "database is being dropped" race conditions
 
   # Helper to parse JSON responses
   config.include Module.new {

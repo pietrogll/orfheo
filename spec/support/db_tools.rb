@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module Pard
   module Test
     module DbTools
-
       def mongo_uri
         ENV['MONGOLAB_URI']
       end
@@ -15,9 +16,7 @@ module Pard
 
       def empty_collections
         connection = Mongo::Client.new(mongo_uri, retry_writes: false)
-        connection.collections.each{ |c|
-          c.delete_many
-        }
+        connection.collections.each(&:delete_many)
         connection.close
       end
 

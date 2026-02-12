@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Profile Management', type: :request do
@@ -77,13 +79,13 @@ RSpec.describe 'Profile Management', type: :request do
           phone: { visible: 'false', value: '555-1234' },
           profile_picture: ['profile.jpg'],
           buttons: [{ text: 'Website', links: 'https://example.com' }],
-          menu: [
-            "free_block",
-            "upcoming",
-            "space",
-            "description",
-            "portfolio",
-            "history"
+          menu: %w[
+            free_block
+            upcoming
+            space
+            description
+            portfolio
+            history
           ]
         }
 
@@ -240,13 +242,13 @@ RSpec.describe 'Profile Management', type: :request do
       phone: { visible: 'false', value: '555-0000' },
       profile_picture: ['test.jpg'],
       buttons: [{ text: 'Website', links: 'https://test.com' }],
-      menu: [
-        "free_block",
-        "upcoming",
-        "space",
-        "description",
-        "portfolio",
-        "history"
+      menu: %w[
+        free_block
+        upcoming
+        space
+        description
+        portfolio
+        history
       ],
       relations: [],
       created_at: Time.now

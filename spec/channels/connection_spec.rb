@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ApplicationCable::Connection, type: :channel do
@@ -12,17 +14,17 @@ RSpec.describe ApplicationCable::Connection, type: :channel do
 
     context 'without authenticated session' do
       it 'rejects connection' do
-        expect {
+        expect do
           connect '/cable'
-        }.to have_rejected_connection
+        end.to have_rejected_connection
       end
     end
 
     context 'with nil identity' do
       it 'rejects connection' do
-        expect {
+        expect do
           connect '/cable', session: { identity: nil }
-        }.to have_rejected_connection
+        end.to have_rejected_connection
       end
     end
   end

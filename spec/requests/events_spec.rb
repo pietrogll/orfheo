@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Event Management', type: :request do
@@ -59,9 +61,9 @@ RSpec.describe 'Event Management', type: :request do
 
     context 'when not logged in' do
       it 'raises unauthorized error' do
-        expect {
+        expect do
           get "/event_manager?id=#{event[:_id]}"
-        }.to raise_error(Pard::Invalid::Unauthorized)
+        end.to raise_error(Pard::Invalid::Unauthorized)
       end
     end
 
@@ -70,9 +72,9 @@ RSpec.describe 'Event Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
+        expect do
           get "/event_manager?id=#{event[:_id]}"
-        }.to raise_error(Pard::Unexisting)
+        end.to raise_error(Pard::Unexisting)
       end
     end
 
@@ -130,23 +132,23 @@ RSpec.describe 'Event Management', type: :request do
         other_profile = create_test_profile(other_user[:_id])
         login_as(user[:_id])
 
-        expect {
+        expect do
           post '/users/create_event', params: {
             profile_id: other_profile[:_id],
             name: 'New Event'
           }
-        }.to raise_error(Pard::Invalid::ProfileOwnership)
+        end.to raise_error(Pard::Invalid::ProfileOwnership)
       end
     end
 
     context 'when not logged in' do
       it 'raises unauthorized error' do
-        expect {
+        expect do
           post '/users/create_event', params: {
             profile_id: profile[:_id],
             name: 'New Event'
           }
-        }.to raise_error(Pard::Invalid::Unauthorized)
+        end.to raise_error(Pard::Invalid::Unauthorized)
       end
     end
   end
@@ -173,12 +175,12 @@ RSpec.describe 'Event Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
+        expect do
           post '/users/modify_event', params: {
             id: event[:_id],
             name: 'Updated Event Name'
           }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        end.to raise_error(Pard::Invalid::EventOwnership)
       end
     end
   end
@@ -201,9 +203,9 @@ RSpec.describe 'Event Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
+        expect do
           post '/users/delete_event', params: { id: event[:_id] }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        end.to raise_error(Pard::Invalid::EventOwnership)
       end
     end
   end
@@ -243,11 +245,11 @@ RSpec.describe 'Event Management', type: :request do
       id: user_id,
       email: email,
       password: BCrypt::Password.create('password123'),
-      validation: true,  # Use 'validation' not 'validated'
+      validation: true, # Use 'validation' not 'validated'
       created_at: Time.now
     }
     Repos::Users.save(user_data)
-    user_data.merge(_id: user_id)  # Add _id for compatibility
+    user_data.merge(_id: user_id) # Add _id for compatibility
   end
 
   def create_test_profile(owner_id, name: 'Test Profile')
@@ -261,7 +263,7 @@ RSpec.describe 'Event Management', type: :request do
       created_at: Time.now
     }
     Repos::Profiles.save(profile_data)
-    profile_data.merge(_id: profile_id)  # Add _id for compatibility
+    profile_data.merge(_id: profile_id) # Add _id for compatibility
   end
 
   def create_test_event(owner_id, profile_id, slug: nil, professional: true)
@@ -274,7 +276,7 @@ RSpec.describe 'Event Management', type: :request do
       description: 'Test Description',
       date_from: '2025-12-01',
       date_to: '2025-12-31',
-      professional: professional,  # Make professional by default for viewing
+      professional: professional, # Make professional by default for viewing
       created_at: Time.now
     }
     event_data[:slug] = slug if slug
@@ -282,11 +284,11 @@ RSpec.describe 'Event Management', type: :request do
 
     # Create associated gallery
     MetaRepos::Galleries.save({
-      id: event_id,
-      photos: []
-    })
+                                id: event_id,
+                                photos: []
+                              })
 
-    event_data.merge(_id: event_id)  # Add _id for compatibility
+    event_data.merge(_id: event_id) # Add _id for compatibility
   end
 
   def login_as(user_id)

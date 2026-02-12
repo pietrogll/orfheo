@@ -1,12 +1,12 @@
-class Event
+# frozen_string_literal: true
 
-  def initialize user_id, params
+class Event
+  def initialize(user_id, params)
     check_fields user_id, params
     @event = new_event user_id, params
   end
 
-
-  def [] key
+  def [](key)
     event[key]
   end
 
@@ -23,8 +23,10 @@ class Event
   end
 
   private
+
   attr_reader :event
-  def new_event user_id, params
+
+  def new_event(user_id, params)
     keys = [
       :id,
       :user_id,
@@ -46,7 +48,10 @@ class Event
       # :ticket_url,
       # :default_lang
     ]
-    event = Hash[keys.map{|sym| [sym, params[sym]] if params.key?(sym.to_s) || params.key?(sym)}.compact] # This line is to allow modifying each field indipendently form the others
+    event = Hash[keys.map { |sym|
+      # This line is to allow modifying each field indipendently form the others
+      [sym, params[sym]] if params.key?(sym.to_s) || params.key?(sym)
+    }.compact]
     event[:id] ||= SecureRandom.uuid
     event[:user_id] ||= user_id
     event[:eventTime] = Util.arrayify_hash(event[:eventTime])
@@ -65,13 +70,9 @@ class Event
     ]
   end
 
-  def check_fields user_id, params
+  def check_fields(_user_id, params)
     # Check each mandatory field exists and is not nil
     # Note: empty arrays are valid (e.g., categories can be [])
-    raise Pard::Invalid::Params if (
-      mandatory.any?{|field| params[field].nil?}
-    )
+    raise Pard::Invalid::Params if mandatory.any? { |field| params[field].nil? }
   end
-
-
 end

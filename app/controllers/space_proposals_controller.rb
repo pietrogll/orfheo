@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SpaceProposalsController < ApplicationController
   before_action :require_login!
 
@@ -52,7 +54,7 @@ class SpaceProposalsController < ApplicationController
     owner_id = check_proposal_ownership!(params[:id], params[:call_id])
     check_future_event!(params[:event_id])
 
-    selected = Actions::UserSelectsSpaceProposal.run(owner_id, current_user_id, params.to_unsafe_h)
+    Actions::UserSelectsSpaceProposal.run(owner_id, current_user_id, params.to_unsafe_h)
 
     broadcast_websocket(params[:event_id], 'selectSpace', { proposal_id: params[:id] })
     render json: { status: 'success' }
@@ -74,7 +76,8 @@ class SpaceProposalsController < ApplicationController
   def check_proposal_ownership!(proposal_id, call_id)
     check_existence!(proposal_id)
     owner_id = Repos::Spaceproposals.get_owner(proposal_id)
-    raise Pard::Invalid::ProposalOwnership unless (owner_id == current_user_id || admin? || is_my_call?(call_id))
+    raise Pard::Invalid::ProposalOwnership unless owner_id == current_user_id || admin? || is_my_call?(call_id)
+
     owner_id
   end
 
@@ -84,7 +87,7 @@ class SpaceProposalsController < ApplicationController
 
   def check_program!(event_id, proposal_id)
     spaceprogram = Repos::Activities.get_space_activities(event_id, proposal_id)
-    raise Pard::Invalid::ProgrammedSpace if spaceprogram.count > 0
+    raise Pard::Invalid::ProgrammedSpace if spaceprogram.count.positive?
   end
 
   def is_my_call?(call_id)

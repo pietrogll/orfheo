@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Activity Management', type: :request do
@@ -15,8 +17,8 @@ RSpec.describe 'Activity Management', type: :request do
           event_id: event[:_id],
           program_id: program[:_id],
           performances: [
-            { name: 'Performance 1', start_time: '18:00', duration: 60 },
-            { name: 'Performance 2', start_time: '20:00', duration: 90 }
+            { name: 'Performance 1', start_time: '18:00', duration: 60, phone: { value: '123' }, email: 'p1@ex.com' },
+            { name: 'Performance 2', start_time: '20:00', duration: 90, phone: { value: '456' }, email: 'p2@ex.com' }
           ],
           signature: 'test-sig'
         }
@@ -33,27 +35,33 @@ RSpec.describe 'Activity Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
-          post '/users/create_performances', params: {
-            event_id: event[:_id],
-            program_id: program[:_id],
-            performances: [{ name: 'Performance 1' }],
-            signature: 'test-sig'
-          }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/create_performances', params: {
+          event_id: event[:_id],
+          program_id: program[:_id],
+          performances: [{ name: 'Performance 1' }],
+          signature: 'test-sig'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
+        expect(json[:reason]).to eq('you_dont_have_permission')
       end
     end
 
     context 'when not logged in' do
       it 'raises unauthorized error' do
-        expect {
-          post '/users/create_performances', params: {
-            event_id: event[:_id],
-            program_id: program[:_id],
-            performances: [{ name: 'Performance 1' }],
-            signature: 'test-sig'
-          }
-        }.to raise_error(Pard::Invalid::Unauthorized)
+        post '/users/create_performances', params: {
+          event_id: event[:_id],
+          program_id: program[:_id],
+          performances: [{ name: 'Performance 1' }],
+          signature: 'test-sig'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
+        expect(json[:reason]).to eq('unauthorized')
       end
     end
   end
@@ -68,7 +76,7 @@ RSpec.describe 'Activity Management', type: :request do
         post '/users/modify_performances', params: {
           event_id: event[:_id],
           performances: [
-            { id: activity[:_id], name: 'Updated Performance', start_time: '19:00' }
+            { id: activity[:_id], name: 'Updated Performance', start_time: '19:00', phone: { value: '123' }, email: 'p1@ex.com' }
           ],
           signature: 'test-sig'
         }
@@ -85,13 +93,16 @@ RSpec.describe 'Activity Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
-          post '/users/modify_performances', params: {
-            event_id: event[:_id],
-            performances: [{ id: activity[:_id], name: 'Updated' }],
-            signature: 'test-sig'
-          }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/modify_performances', params: {
+          event_id: event[:_id],
+          performances: [{ id: activity[:_id], name: 'Updated' }],
+          signature: 'test-sig'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
+        expect(json[:reason]).to eq('you_dont_have_permission')
       end
     end
   end
@@ -121,25 +132,31 @@ RSpec.describe 'Activity Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
-          post '/users/delete_performances', params: {
-            event_id: event[:_id],
-            performance_ids: [activity[:_id]],
-            signature: 'test-sig'
-          }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/delete_performances', params: {
+          event_id: event[:_id],
+          performance_ids: [activity[:_id]],
+          signature: 'test-sig'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
+        expect(json[:reason]).to eq('you_dont_have_permission')
       end
     end
 
     context 'when not logged in' do
       it 'raises unauthorized error' do
-        expect {
-          post '/users/delete_performances', params: {
-            event_id: event[:_id],
-            performance_ids: [activity[:_id]],
-            signature: 'test-sig'
-          }
-        }.to raise_error(Pard::Invalid::Unauthorized)
+        post '/users/delete_performances', params: {
+          event_id: event[:_id],
+          performance_ids: [activity[:_id]],
+          signature: 'test-sig'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
+        expect(json[:reason]).to eq('unauthorized')
       end
     end
   end
@@ -205,9 +222,11 @@ RSpec.describe 'Activity Management', type: :request do
       id: activity_id,
       program_id: program_id,
       event_id: event_id,
+      participant_id: SecureRandom.uuid,
+      host_id: profile[:_id],
       name: 'Test Activity',
-      start_time: '18:00',
-      duration: 60,
+      dateTime: [{ date: '2025-12-01', time: '18:00' }],
+      permanent: false,
       created_at: Time.now
     }
     Repos::Activities.save(activity_data)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Users', type: :request do
@@ -12,13 +14,13 @@ RSpec.describe 'Users', type: :request do
 
     # Create a validated test user
     Repos::Users.save({
-      id: user_id,
-      email: user_email,
-      password: BCrypt::Password.create(user_password),
-      lang: user_lang,
-      validation: true,
-      created_at: Time.now.to_i
-    })
+                        id: user_id,
+                        email: user_email,
+                        password: BCrypt::Password.create(user_password),
+                        lang: user_lang,
+                        validation: true,
+                        created_at: Time.now.to_i
+                      })
   end
 
   describe 'Protected Routes - require login' do
@@ -147,7 +149,7 @@ RSpec.describe 'Users', type: :request do
 
     context 'POST /users/save_interests' do
       it 'saves user interests' do
-        interests = ['music', 'theatre', 'dance']
+        interests = %w[music theatre dance]
 
         post '/users/save_interests', params: {
           interests: interests
@@ -227,11 +229,11 @@ RSpec.describe 'Users', type: :request do
     before do
       # Create a test profile owned by user
       Repos::Profiles.save({
-        id: profile_id,
-        name: 'Test Profile',
-        owner: user_id,
-        created_at: Time.now.to_i
-      })
+                             id: profile_id,
+                             name: 'Test Profile',
+                             owner: user_id,
+                             created_at: Time.now.to_i
+                           })
 
       post '/login', params: {
         email: user_email,

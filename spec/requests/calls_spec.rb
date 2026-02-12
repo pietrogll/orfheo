@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Calls API', type: :request do
@@ -54,9 +56,9 @@ RSpec.describe 'Calls API', type: :request do
       other_profile = create_profile(owner_id: create_user[:id])
       params = { profile_id: other_profile[:id], title: 'Test' }
 
-      expect {
+      expect do
         post '/users/create_call', params: params
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -79,9 +81,9 @@ RSpec.describe 'Calls API', type: :request do
     it 'requires call ownership' do
       other_call = create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])
 
-      expect {
+      expect do
         post '/users/modify_call', params: { id: other_call[:id], title: 'Updated' }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -114,5 +116,4 @@ RSpec.describe 'Calls API', type: :request do
       expect(json[:data]).to have_key(:available)
     end
   end
-
 end

@@ -8,7 +8,7 @@ module Admin
       repo: MetaRepos::Participants,
       singular: 'participant',
       plural: 'participants',
-      attributes: [:name, :email, :phone, :address, :facets, :color, :user_id]
+      attributes: %i[name email phone address facets color user_id]
     )
   end
 end

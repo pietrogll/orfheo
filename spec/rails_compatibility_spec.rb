@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Simple Rails 8.1 compatibility test
 require 'rails_helper'
 

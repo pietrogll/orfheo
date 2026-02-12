@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Space Management', type: :request do
@@ -23,8 +25,8 @@ RSpec.describe 'Space Management', type: :request do
             {
               name: 'Exhibition Hall',
               description: 'Main exhibition space',
-              allowed_formats: ['exhibition', 'performance'],
-              allowed_categories: ['visual', 'arts']
+              allowed_formats: %w[exhibition performance],
+              allowed_categories: %w[visual arts]
             }
           ]
         }
@@ -195,8 +197,8 @@ RSpec.describe 'Space Management', type: :request do
           id: SecureRandom.uuid,
           name: 'Main Hall',
           description: 'The main performance space',
-          allowed_formats: ['concert', 'performance'],
-          allowed_categories: ['music', 'arts']
+          allowed_formats: %w[concert performance],
+          allowed_categories: %w[music arts]
         }
       ],
       created_at: Time.now

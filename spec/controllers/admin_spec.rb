@@ -1,89 +1,90 @@
+=begin
+# frozen_string_literal: true
+
 require 'sidekiq/testing'
 
 # Legacy Sinatra controller specs - disabled during Rails migration
 # These specs test the old Sinatra AdminController which has been migrated to Rails.
 # The legacy Sinatra routes are disabled in config.ru during migration.
 # TODO: Rewrite as Rails request specs (see spec/requests/ for examples)
-describe 'AdminController', skip: "Legacy Sinatra controller - needs migration to Rails request specs" do
+describe 'AdminController', skip: 'Legacy Sinatra controller - needs migration to Rails request specs' do
+  let(:login_route) { '/login/login' }
+  let(:logout_route) { '/login/logout' }
+  let(:admin_route) { '/admin/' }
+  let(:open_call_email_route) { '/admin/open_call_email' }
+  let(:send_generic_email_route) { '/admin/send_email' }
+  let(:delete_user_route) { '/admin/delete_user' }
 
-  let(:login_route){'/login/login'}
-  let(:logout_route){'/login/logout'}
-  let(:admin_route){'/admin/'}
-  let(:open_call_email_route){'/admin/open_call_email'}
-  let(:send_generic_email_route){'/admin/send_email'}
-  let(:delete_user_route){'/admin/delete_user'}
+  let(:otter_user_id) { '5c41cf77-32b0-4df2-9376-0960e64a65aa' }
+  let(:user_id) { '5c41cf77-32b0-4df2-9376-0960e64a0000' }
+  let(:admin_id) { '00000000-32b0-4df2-9376-000000000000' }
+  let(:event_id) { '11112222-32b0-4df2-9376-000000000000' }
 
-  let(:otter_user_id){'5c41cf77-32b0-4df2-9376-0960e64a65aa'}
-  let(:user_id){'5c41cf77-32b0-4df2-9376-0960e64a0000'}
-  let(:admin_id){'00000000-32b0-4df2-9376-000000000000'}
-  let(:event_id){'11112222-32b0-4df2-9376-000000000000'}
-
-  let(:admin){
+  let(:admin) do
     {
       id: admin_id
     }
-  }
+  end
 
-  let(:admin_user){
+  let(:admin_user) do
     {
       id: admin_id,
       email: 'admin@test.com',
       password: 'admin_passwd',
       validation: true,
       lang: 'es',
-      interests: {event_call: {categories: ""}}
+      interests: { event_call: { categories: '' } }
     }
-  }
+  end
 
-  let(:otter_user){
+  let(:otter_user) do
     {
       id: otter_user_id,
       email: 'otter_email@test.com',
       password: 'otter_password',
       validation: true,
       lang: 'ca',
-      interests: {event_call: {categories:['arts', 'music']}}
+      interests: { event_call: { categories: %w[arts music] } }
     }
-  }
+  end
 
-
-  let(:user){
+  let(:user) do
     {
       id: user_id,
       email: 'email@test.com',
       password: 'password',
       validation: true,
       lang: 'en',
-      interests: {event_call: {categories:['arts', 'health']}}
+      interests: { event_call: { categories: %w[arts health] } }
     }
-  }
+  end
 
-  let(:event){
+  let(:event) do
     {
       id: event_id,
       name: 'Event Demo',
-      categories:{artist: ['music']},
+      categories: { artist: ['music'] },
       address: 'address',
       call_id: 'call_id',
       profile_id: 'profile_id'
     }
-  }
+  end
 
-  let(:profile_organizer){
+  let(:profile_organizer) do
     {
       id: 'profile_id',
-      email: {value: 'email'}
+      email: { value: 'email' }
     }
-  }
+  end
 
-  let(:call){
+  let(:call) do
     {
       id: 'call_id',
       deadline: '1540245600000'
     }
-  }
+  end
 
-  before(:each){
+  before(:each) do
     Repos::Users.save otter_user
     Repos::Users.save user
     Repos::Users.save admin_user
@@ -92,10 +93,9 @@ describe 'AdminController', skip: "Legacy Sinatra controller - needs migration t
     Repos::Profiles.save profile_organizer
     MetaRepos::Admins.save admin
     allow(Services::Encryptor).to receive(:check_equality).and_return(true)
-  }
+  end
 
   describe 'Admin Access' do
-
     it 'redirects the user to NOT FOUND if not logged in' do
       get admin_route
       expect(last_response.body).to include('Not Found')
@@ -115,14 +115,13 @@ describe 'AdminController', skip: "Legacy Sinatra controller - needs migration t
   end
 
   describe 'Open call' do
-
-    before(:each){
+    before(:each) do
       post login_route, admin_user
-    }
+    end
 
     it 'returns a hash with text including deadline, event name and event_id, the event categories, the event address and the email_type ' do
-      post open_call_email_route, {event_id: event_id}
-      expect(parsed_response['text'].keys).to eq( ["es", "ca","en"])
+      post open_call_email_route, { event_id: event_id }
+      expect(parsed_response['text'].keys).to eq(%w[es ca en])
       expect(parsed_response['text']['es']['subject']).to include('Event Demo')
       expect(parsed_response['text']['es']['body']).to include('Event Demo')
       expect(parsed_response['text']['es']['body']).to include('23-10-2018')
@@ -131,125 +130,112 @@ describe 'AdminController', skip: "Legacy Sinatra controller - needs migration t
       expect(parsed_response['address']).to eq('address')
       expect(parsed_response['email_type']).to eq('event_call')
     end
-
   end
 
-
   describe 'Generic mail' do
-
-    let(:mailer){Services::Mails.new}
+    let(:mailer) { Services::Mails.new }
 
     def run_eventmachine
       Thread.new { EM.run } unless EM.reactor_running?
       Thread.pass until EM.reactor_running?
     end
 
-    before(:each){
+    before(:each) do
       post login_route, admin_user
       allow(Services::Mails).to receive(:new).and_return(mailer)
       Sidekiq::Worker.clear_all
       run_eventmachine
-    }
-
+    end
 
     it 'does not send email to users not validate' do
-
-
       expect(mailer).to receive(:deliver_mail_to).exactly(1)
-      Repos::Users.modify({id: user[:id], validation: false})
-      Repos::Users.modify({id: otter_user[:id], validation: false})
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, target: 'interets', delivery_status: 'init'}
+      Repos::Users.modify({ id: user[:id], validation: false })
+      Repos::Users.modify({ id: otter_user[:id], validation: false })
+      post send_generic_email_route,
+           { es: { body: 'cuerpo', subject: 'sujeto' }, target: 'interets', delivery_status: 'init' }
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'sends email to all users if not receiver specified nor email_type' do
       expect(mailer).to receive(:deliver_mail_to).exactly(3).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, target: 'interets', delivery_status: 'init'}
+      post send_generic_email_route,
+           { es: { body: 'cuerpo', subject: 'sujeto' }, target: 'interets', delivery_status: 'init' }
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'sends email to all users if not receiver specified nor target' do
       expect(mailer).to receive(:deliver_mail_to).exactly(3).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, email_type: 'event_call'}
+      post send_generic_email_route, { es: { body: 'cuerpo', subject: 'sujeto' }, email_type: 'event_call' }
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'filters all users by event_call interests and sends emails' do
       expect(mailer).to receive(:deliver_mail_to).exactly(1).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, email_type: 'event_call', target: {'categories' => ['health'] }}
+      post send_generic_email_route,
+           { es: { body: 'cuerpo', subject: 'sujeto' }, email_type: 'event_call',
+             target: { 'categories' => ['health'] } }
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'returns delivery_status init' do
       expect(mailer).to receive(:deliver_mail_to).exactly(1).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, email_type: 'event_call', target: {'categories' => ['health'] }}
+      post send_generic_email_route,
+           { es: { body: 'cuerpo', subject: 'sujeto' }, email_type: 'event_call',
+             target: { 'categories' => ['health'] } }
       expect(parsed_response['status']).to eq('success')
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'sends email to all users if not receiver specified nor target' do
       expect(mailer).to receive(:deliver_mail_to).exactly(3).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, email_type: 'event_call'}
+      post send_generic_email_route, { es: { body: 'cuerpo', subject: 'sujeto' }, email_type: 'event_call' }
 
       Sidekiq::Worker.drain_all
-
     end
 
     it 'sends email to specified receiver' do
       expect(mailer).to receive(:deliver_mail_to).exactly(1).times.and_call_original
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, receivers: ['test@test.test']}
+      post send_generic_email_route, { es: { body: 'cuerpo', subject: 'sujeto' }, receivers: ['test@test.test'] }
 
       Sidekiq::Worker.drain_all
-
     end
-
 
     it 'handles errors for unexisting receiver' do
       allow_any_instance_of(Mail::Message).to receive(:deliver_now).and_raise(Net::SMTPFatalError)
-      post send_generic_email_route, {es: {body: 'cuerpo', subject: 'sujeto'}, receivers: ['test@test.test']}
+      post send_generic_email_route, { es: { body: 'cuerpo', subject: 'sujeto' }, receivers: ['test@test.test'] }
       expect(parsed_response['status']).to eq('success')
     end
-
-
-
   end
 
   describe 'Admin deletes user' do
-
-    before(:each){
+    before(:each) do
       post login_route, admin_user
-    }
+    end
 
     it 'fails if not admin' do
       post logout_route
       post login_route, otter_user
-      post delete_user_route, {email: 'otter_email@test.com'}
+      post delete_user_route, { email: 'otter_email@test.com' }
       expect(parsed_response['status']).to eq('fail')
       expect(parsed_response['reason']).to eq('invalid_admin')
     end
 
     it 'fails if user does not exist' do
-      post delete_user_route, {email: 'noexisting@test.com'}
+      post delete_user_route, { email: 'noexisting@test.com' }
       expect(parsed_response['status']).to eq('fail')
       expect(parsed_response['reason']).to eq('non_existing_user')
     end
 
     it 'deletes the user' do
       expect(Actions::UserDeletesUser).to receive(:run).with(otter_user_id)
-      post delete_user_route, {email: 'otter_email@test.com'}
+      post delete_user_route, { email: 'otter_email@test.com' }
       expect(parsed_response['status']).to eq('success')
     end
-
   end
-
 end
+=end

@@ -1,24 +1,23 @@
+# frozen_string_literal: true
+
 # ActionMailer adapter for orfheo
 # Migrated from Pony to ActionMailer (Rails 8)
 module Services
-
   class Mails
-
     def initialize(mailer_api = ActionMailerAdapter)
       @mailer = mailer_api
     end
 
     def deliver_mail_to(user, mail_type, payload = {})
-      begin
-        @mailer.deliver_to(user, mail_type, payload)
-      rescue Errno::ECONNREFUSED, Net::SMTPAuthenticationError, Net::SMTPServerBusy, Net::SMTPSyntaxError, Net::SMTPFatalError, Net::SMTPUnknownError => e
-        puts e
-        puts "email_not_sent_to #{user[:email]}"
-      end
+      @mailer.deliver_to(user, mail_type, payload)
+    rescue Errno::ECONNREFUSED, Net::SMTPAuthenticationError, Net::SMTPServerBusy, Net::SMTPSyntaxError,
+           Net::SMTPFatalError, Net::SMTPUnknownError => e
+      puts e
+      puts "email_not_sent_to #{user[:email]}"
     end
 
     def deliver_to_mailing_list(mailing_list, params, email_type = :generic_email)
-      receivers_done = mailing_list.inject([]) do |receivers_done_arr, receiver|
+      mailing_list.inject([]) do |receivers_done_arr, receiver|
         with_delay(1) do
           deliver_mail_to(receiver, email_type, params)
           receivers_done_arr.push(receiver)

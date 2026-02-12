@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 # Shared test helpers for creating test data
@@ -12,7 +14,7 @@ module TestDataHelpers
       password: BCrypt::Password.create('password123'),
       validated: true,
       lang: 'es',
-      interests: { event_call: { categories: "" } }
+      interests: { event_call: { categories: '' } }
     }.merge(overrides)
 
     result = Repos::Users.save(user_data)
@@ -157,10 +159,10 @@ module TestDataHelpers
   def create_admin(overrides = {})
     # Create a user first if not provided
     user = if overrides[:user_id]
-      Repos::Users.get({ id: overrides[:user_id] }).first
-    else
-      create_user(overrides)
-    end
+             Repos::Users.get({ id: overrides[:user_id] }).first
+           else
+             create_user(overrides)
+           end
 
     admin_data = {
       id: SecureRandom.uuid,

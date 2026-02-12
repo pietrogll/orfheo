@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ContactMailer < ApplicationMailer
   # Feedback email
   def feedback_email(recipient_email, feedback_data)

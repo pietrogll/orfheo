@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './translator'
 require_relative './encryptor'
 require_relative './mails'

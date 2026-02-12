@@ -22,7 +22,7 @@ RSpec.describe ProfileChannel, type: :channel do
       subscribe(profile_id: nil)
 
       expect(subscription).to be_confirmed
-      expect(subscription).not_to have_stream_from("profile:")
+      expect(subscription).not_to have_stream_from('profile:')
     end
   end
 
@@ -42,9 +42,9 @@ RSpec.describe ProfileChannel, type: :channel do
 
       message = { status: 'success', data: { event: 'profile_updated', model: { id: profile_id } } }
 
-      expect {
+      expect do
         ActionCable.server.broadcast("profile:#{profile_id}", message)
-      }.to have_broadcasted_to("profile:#{profile_id}").with(message)
+      end.to have_broadcasted_to("profile:#{profile_id}").with(message)
     end
   end
 end

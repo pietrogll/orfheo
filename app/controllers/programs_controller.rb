@@ -1,12 +1,15 @@
+# frozen_string_literal: true
+
 # ProgramsController - Manages programs (spaces/venues) within events
 # Migrated from controllers/programs.rb
 
 class ProgramsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create, :update, :destroy, :space_order, :publish, :artist_subcategories_price, :set_permanents]
+  skip_before_action :verify_authenticity_token,
+                     only: %i[create update destroy space_order publish artist_subcategories_price set_permanents]
   before_action :require_login!
 
   # Rails 8.1 compatibility
-  def self.action_encoding_template(action_name)
+  def self.action_encoding_template(_action_name)
     'utf-8'
   end
 
@@ -94,30 +97,32 @@ class ProgramsController < ApplicationController
   # Check if user owns the program (through event ownership)
   def check_program_ownership!(program_id)
     owner_id = Repos::Programs.get_owner(program_id)
-    raise Pard::Invalid.new('program_ownership') unless (owner_id == session[:identity] || admin?)
+    raise Pard::Invalid, 'program_ownership' unless owner_id == session[:identity] || admin?
+
     owner_id
   end
 
   # Validate permanent activities exist
   def check_permanents!(permanents)
     return unless permanents
+
     permanents.each do |activity_id|
-      raise Pard::Invalid.new('permanent_activity_not_found') unless Repos::Activities.exists?(activity_id)
+      raise Pard::Invalid, 'permanent_activity_not_found' unless Repos::Activities.exists?(activity_id)
     end
   end
 
   # Check if event is in the future (can't modify past events)
   def check_future_event!(resource_id, resource_type)
     event_id = case resource_type
-                when 'program'
-                  program = Repos::Programs.get(resource_id)
-                  program[:event_id]
-                when 'event'
-                  resource_id
-                end
+               when 'program'
+                 program = Repos::Programs.get(resource_id)
+                 program[:event_id]
+               when 'event'
+                 resource_id
+               end
 
     event = Repos::Events.get(event_id)
     event_date = event[:date_from]
-    raise Pard::Invalid.new('past_event') if event_date && Time.parse(event_date) < Time.now
+    raise Pard::Invalid, 'past_event' if event_date && Time.parse(event_date) < Time.now
   end
 end

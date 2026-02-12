@@ -16,6 +16,7 @@ module Admin
 
     def admin?
       return false unless session[:identity]
+
       # MetaRepos::Admins stores admins by email in the 'email' field
       # Query by email to check if user is admin
       admins = MetaRepos::Admins.get(email: session[:identity])

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistProposalsController < ApplicationController
   before_action :require_login!
 
@@ -62,7 +64,8 @@ class ArtistProposalsController < ApplicationController
   # POST /users/modify_param_proposal
   # Shared method for both artist and space proposals
   def modify_param
-    raise Pard::Invalid::ProposalOwnership unless (admin? || is_my_call?(params[:call_id]))
+    raise Pard::Invalid::ProposalOwnership unless admin? || is_my_call?(params[:call_id])
+
     check_future_event!(params[:event_id])
 
     proposaldb = {
@@ -76,12 +79,12 @@ class ArtistProposalsController < ApplicationController
     )
 
     broadcast_websocket(params[:event_id], 'modifyParamProposal', {
-      proposal_id: params[:id],
-      param: params[:param],
-      value: params[:value],
-      profile_id: params[:profile_id],
-      type: params[:type]
-    })
+                          proposal_id: params[:id],
+                          param: params[:param],
+                          value: params[:value],
+                          profile_id: params[:profile_id],
+                          type: params[:type]
+                        })
 
     render json: { status: 'success' }
   end
@@ -91,7 +94,8 @@ class ArtistProposalsController < ApplicationController
   def check_proposal_ownership!(proposal_id, call_id)
     check_existence!(proposal_id)
     owner_id = Repos::Artistproposals.get_owner(proposal_id)
-    raise Pard::Invalid::ProposalOwnership unless (owner_id == current_user_id || admin? || is_my_call?(call_id))
+    raise Pard::Invalid::ProposalOwnership unless owner_id == current_user_id || admin? || is_my_call?(call_id)
+
     owner_id
   end
 

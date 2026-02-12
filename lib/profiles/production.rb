@@ -1,18 +1,19 @@
-class Production
+# frozen_string_literal: true
 
-  def initialize user_id, params
+class Production
+  def initialize(user_id, params)
     check_fields params
     @production = new_production user_id, params
   end
 
-  def check_fields params
-    raise Pard::Invalid::Params if mandatory(params).any?{ |field|
+  def check_fields(params)
+    raise Pard::Invalid::Params if mandatory(params).any? do |field|
       params[field].blank?
-    }
+    end
     raise Pard::Invalid::Category unless correct_category? params[:category]
   end
 
-  def [] key
+  def [](key)
     production[key]
   end
 
@@ -21,8 +22,10 @@ class Production
   end
 
   private
+
   attr_reader :production
-  def new_production user_id, params
+
+  def new_production(user_id, params)
     photos = params[:photos] || []
     main_picture = params[:main_picture] || [photos[0]].compact
     {
@@ -40,22 +43,22 @@ class Production
       photos: params[:photos],
       links: params[:links],
       children: params[:children],
-      cache: params[:cache] || {value: nil, visible: false, comment: nil}
+      cache: params[:cache] || { value: nil, visible: false, comment: nil }
     }
   end
 
-  def mandatory params
-    [ 
-      :profile_id,
-      :format,
-      :category,
-      :title,
-      :description,
-      :short_description
+  def mandatory(_params)
+    %i[
+      profile_id
+      format
+      category
+      title
+      description
+      short_description
     ]
   end
 
-  def correct_category? category
+  def correct_category?(category)
     ApiStorage.production_categories.include? category
   end
 end

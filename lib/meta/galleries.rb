@@ -1,8 +1,11 @@
-class Gallery
+# frozen_string_literal: true
 
-  def initialize params, source #has the same id of the corresponding element
+class Gallery
+  # has the same id of the corresponding element
+  def initialize(params, source)
     check_fields params
-    return @gallery = {} if needed.all?{|field| params[field].blank?}
+    return @gallery = {} if needed.all? { |field| params[field].blank? }
+
     gallery = MetaRepos::Galleries.mapped_class.from_hash(params)
     gallery.profile_id = params[:profile_id] || params[:id]
     gallery.name = params[:name] || params[:title]
@@ -11,17 +14,17 @@ class Gallery
     @gallery = gallery
   end
 
-  def check_fields params
-    raise Pard::Invalid::Params if mandatory.any?{ |field|
+  def check_fields(params)
+    raise Pard::Invalid::Params if mandatory.any? do |field|
       params[field].blank?
-    }
+    end
   end
 
-  def get_photos params
-   Services::Gallery.get_photos_array params
+  def get_photos(params)
+    Services::Gallery.get_photos_array params
   end
 
-  def [] key
+  def [](key)
     gallery[key]
   end
 
@@ -30,15 +33,16 @@ class Gallery
   end
 
   private
+
   attr_reader :gallery
 
   def needed
-    [
-      :photos,
-      :links,
-      :profile_picture, 
-      :plane_picture,
-      :img
+    %i[
+      photos
+      links
+      profile_picture
+      plane_picture
+      img
     ]
   end
 
@@ -47,6 +51,4 @@ class Gallery
       :id
     ]
   end
-
-
 end

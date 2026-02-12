@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 describe Services::Mails do
+  let(:user_id) { '5c41cf77-32b0-4df2-9376-0960e64a654a' }
+  let(:validation_code) { '3c61cf77-32b0-4df2-9376-0960e64a654a' }
+  let(:event_id) { 'a5bc4203-9379-4de0-856a-55e1e5f3fac6' }
 
-  let(:user_id){'5c41cf77-32b0-4df2-9376-0960e64a654a'}
-  let(:validation_code){'3c61cf77-32b0-4df2-9376-0960e64a654a'}
-  let(:event_id){'a5bc4203-9379-4de0-856a-55e1e5f3fac6'}
-
-  let(:user){
+  let(:user) do
     {
       id: user_id,
       email: 'email@test.com',
@@ -13,24 +14,24 @@ describe Services::Mails do
       validation: false,
       validation_code: validation_code
     }
-  }
+  end
 
-  let(:event_info){
+  let(:event_info) do
     {
       event_id: event_id,
       event_name: 'event_name'
     }
-  }
+  end
 
-  let(:rejection){
+  let(:rejection) do
     {
       organizer: 'organizer',
       title: 'title',
       event_name: 'event_name'
     }
-  }
+  end
 
-  let(:artistProposal){
+  let(:artistProposal) do
     {
       event_id: event_id,
       event_name: 'event_name',
@@ -39,9 +40,9 @@ describe Services::Mails do
       profile_name: 'profile_name',
       profile_id: 'profile_id'
     }
-  }
+  end
 
-  let(:spaceProposal){
+  let(:spaceProposal) do
     {
       event_id: event_id,
       event_name: 'event_name',
@@ -50,17 +51,17 @@ describe Services::Mails do
       profile_name: 'profile_name',
       profile_id: 'profile_id'
     }
-  }
+  end
 
-  let(:feedback){
+  let(:feedback) do
     {
       email: 'contacter@contact',
       name: 'contacter',
       message: 'message'
     }
-  }
+  end
 
-  let(:techSupport){
+  let(:techSupport) do
     {
       email: 'contacter@contact',
       name: 'contacter',
@@ -69,9 +70,9 @@ describe Services::Mails do
       browser: 'firefox',
       message: 'help'
     }
-  }
+  end
 
-  let(:business){
+  let(:business) do
     {
       email: 'contacter@contact',
       name: 'contacter',
@@ -83,73 +84,63 @@ describe Services::Mails do
       links: 'links',
       message: 'message'
     }
-  }
+  end
 
-  let(:mailer){Services::Mails.new}
-
+  let(:mailer) { Services::Mails.new }
 
   describe 'Delivers mail' do
-
-    let(:welcome_mail){mailer.deliver_mail_to user, :welcome}
-
+    let(:welcome_mail) { mailer.deliver_mail_to user, :welcome }
 
     it 'renders the receiver email' do
       expect(welcome_mail.to).to eq(['email@test.com'])
     end
   end
 
-
-
-
   describe 'Welcome mail' do
-
-    let(:welcome_mail){mailer.deliver_mail_to user, :welcome}
+    let(:welcome_mail) { mailer.deliver_mail_to user, :welcome }
 
     it 'renders the subject' do
       expect(welcome_mail.subject).to eq('Bienvenido/a a orfheo')
     end
 
     it 'renders the sender' do
-      expect(welcome_mail.from).to eq(["notification@orfheo.org"])
+      expect(welcome_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the validation code to the body' do
       expect(welcome_mail.body).to include(validation_code)
     end
 
-
     it 'assigns the footer to the body' do
-      expect(welcome_mail.body).to include("Este correo ha sido generado automáticamente.")
+      expect(welcome_mail.body).to include('Este correo ha sido generado automáticamente.')
     end
-
   end
 
   describe 'Event mail' do
-    let(:event_mail){ mailer.deliver_mail_to user, :event, event_info}
+    let(:event_mail) { mailer.deliver_mail_to user, :event, event_info }
 
     it 'renders the subject' do
       expect(event_mail.subject).to eq('Bienvenido/a a orfheo')
     end
 
     it 'renders the sender' do
-      expect(event_mail.from).to eq(["notification@orfheo.org"])
+      expect(event_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the validation code and event code to the body' do
-      expect(event_mail.body).to include(validation_code + '&event_id=' + event_id)
+      expect(event_mail.body).to include("#{validation_code}&event_id=#{event_id}")
     end
   end
 
   describe 'Password mail' do
-
-    let(:password_mail){ mailer.deliver_mail_to user, :forgotten_password}
+    let(:password_mail) { mailer.deliver_mail_to user, :forgotten_password }
 
     it 'renders the subject' do
       expect(password_mail.subject).to eq('Recupera tu cuenta')
     end
 
     it 'renders the sender' do
-      expect(password_mail.from).to eq(["notification@orfheo.org"])
+      expect(password_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the validation code to the body' do
@@ -158,35 +149,30 @@ describe Services::Mails do
   end
 
   describe 'Rejected' do
-
-    let(:rejected_mail){ mailer.deliver_mail_to user, :rejected, rejection}
+    let(:rejected_mail) { mailer.deliver_mail_to user, :rejected, rejection }
 
     it 'renders the subject' do
       expect(rejected_mail.subject).to eq('Propuesta cancelada')
     end
 
     it 'renders the sender' do
-      expect(rejected_mail.from).to eq(["notification@orfheo.org"])
+      expect(rejected_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the message to the body' do
       expect(rejected_mail.body).to include("organizer ha cancelado la propuesta 'title' que enviaste a la convocatoria de event_name. Para más informaciones contacta directamente con la organización del evento.")
     end
-
-
   end
 
-
   describe 'artist proposal mail' do
-
-    let(:proposal_mail){ mailer.deliver_mail_to user, :artist_proposal, artistProposal}
+    let(:proposal_mail) { mailer.deliver_mail_to user, :artist_proposal, artistProposal }
 
     it 'renders the subject' do
       expect(proposal_mail.subject).to eq('Propuesta enviada a event_name')
     end
 
     it 'renders the sender' do
-      expect(proposal_mail.from).to eq(["notification@orfheo.org"])
+      expect(proposal_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the message to the body' do
@@ -194,22 +180,19 @@ describe Services::Mails do
     end
 
     it 'assigns the footer to the body' do
-      expect(proposal_mail.body).to include("Este correo ha sido generado automáticamente. Por favor, no respondas directamente a este mensaje, no hay nadie controlando este buzón. En caso")
+      expect(proposal_mail.body).to include('Este correo ha sido generado automáticamente. Por favor, no respondas directamente a este mensaje, no hay nadie controlando este buzón. En caso')
     end
-
   end
 
-
   describe 'space proposal mail' do
-
-    let(:proposal_mail){ mailer.deliver_mail_to user, :space_proposal, spaceProposal}
+    let(:proposal_mail) { mailer.deliver_mail_to user, :space_proposal, spaceProposal }
 
     it 'renders the subject' do
       expect(proposal_mail.subject).to eq('Propuesta enviada a event_name')
     end
 
     it 'renders the sender' do
-      expect(proposal_mail.from).to eq(["notification@orfheo.org"])
+      expect(proposal_mail.from).to eq(['notification@orfheo.org'])
     end
 
     it 'assigns the message to the body' do
@@ -217,14 +200,12 @@ describe Services::Mails do
     end
 
     it 'renders the receiver' do
-      expect(proposal_mail.to).to eq(["email@test.com"])
+      expect(proposal_mail.to).to eq(['email@test.com'])
     end
-
   end
 
   describe 'Feedback' do
-
-    let(:feedback_mail){ mailer.deliver_mail_to({:email=>'info@orfheo.org'}, :feedback, feedback)}
+    let(:feedback_mail) { mailer.deliver_mail_to({ email: 'info@orfheo.org' }, :feedback, feedback) }
 
     it 'renders the subject' do
       expect(feedback_mail.subject).to eq('feedback')
@@ -235,18 +216,16 @@ describe Services::Mails do
     end
 
     it 'assigns the message to the body' do
-      expect(feedback_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Email:</b> contacter@contact</p><p><p><b>Mensaje:</b> message</p>")
+      expect(feedback_mail.body).to include('<p><b>Nombre:</b> contacter</p><p><b>Email:</b> contacter@contact</p><p><p><b>Mensaje:</b> message</p>')
     end
 
     it 'renders the receiver to be info@orfheo.org' do
       expect(feedback_mail.to).to eq(['info@orfheo.org'])
     end
-
   end
 
   describe 'TechSupport' do
-
-    let(:tech_mail){ mailer.deliver_mail_to({:email=>'tech@orfheo.org'}, :techSupport, techSupport)}
+    let(:tech_mail) { mailer.deliver_mail_to({ email: 'tech@orfheo.org' }, :techSupport, techSupport) }
 
     it 'renders the subject' do
       expect(tech_mail.subject).to eq('techSupport: need_help')
@@ -257,7 +236,7 @@ describe Services::Mails do
     end
 
     it 'assigns the message to the body' do
-      expect(tech_mail.body).to include("<p><b>Nombre:</b> contacter</p><p><b>Perfil:</b> my_profile</p><p><b>Email:</b> contacter@contact</p><p><b>Navegador:</b> firefox</p><p><b>Mensaje:</b> help</p>")
+      expect(tech_mail.body).to include('<p><b>Nombre:</b> contacter</p><p><b>Perfil:</b> my_profile</p><p><b>Email:</b> contacter@contact</p><p><b>Navegador:</b> firefox</p><p><b>Mensaje:</b> help</p>')
     end
 
     it 'renders the receiver to be tech@orfheo.org' do
@@ -267,13 +246,10 @@ describe Services::Mails do
     it 'uses sender email as from address' do
       expect(tech_mail.from).to eq([techSupport[:email]])
     end
-
-
   end
 
   describe 'Business' do
-
-    let(:business_mail){ mailer.deliver_mail_to({:email=>'info@orfheo.org'}, :business, business)}
+    let(:business_mail) { mailer.deliver_mail_to({ email: 'info@orfheo.org' }, :business, business) }
 
     it 'renders the subject' do
       expect(business_mail.subject).to eq('services: business')
@@ -290,20 +266,18 @@ describe Services::Mails do
     it 'renders the receiver to be info@orfheo.org' do
       expect(business_mail.to).to eq(['info@orfheo.org'])
     end
-
   end
 
   describe 'Generic Mail' do
-
     # let(:generic_email){mailer.deliver_mail_to user, :generic_email}
-    let(:payload){
+    let(:payload) do
       {
-        es:{
+        es: {
           body: 'generic_email body',
           subject: 'generic_email subject'
         }
       }
-    }
+    end
 
     it 'renders the generic_footer if email_type nil' do
       expect(mailer.deliver_mail_to(user, :generic_email, payload).body).not_to include(user_id)
@@ -314,53 +288,47 @@ describe Services::Mails do
       expect(mailer.deliver_mail_to(user, :generic_email, payload).body).to include('Ajustes')
     end
 
-
     it 'renders the subject' do
       payload[:email_type] = 'event_call'
       expect(mailer.deliver_mail_to(user, :generic_email, payload).subject).to include('generic_email subject')
     end
 
-
     it 'renders the body' do
       payload[:email_type] = 'event_call'
       expect(mailer.deliver_mail_to(user, :generic_email, payload).body).to include('generic_email body')
     end
-
-
   end
 
   describe 'Call deleted mail' do
-
     it 'renders the event_call footer if email_type is event_call' do
       payload = {}
       payload[:event_name] = 'event_name'
-      expect(mailer.deliver_mail_to(user, :deleted_call, payload).body).to include('event_name ha cancelado la correspondiente')
+      expect(mailer.deliver_mail_to(user, :deleted_call,
+                                    payload).body).to include('event_name ha cancelado la correspondiente')
       expect(mailer.deliver_mail_to(user, :deleted_call, payload).body).to include(Dictionary[:es][:foot_note_standard])
     end
-
   end
 
-
   describe 'deliver_to_mailing_list' do
-    let(:receiver_1){
+    let(:receiver_1) do
       {
-        email: "email_1@email.email",
+        email: 'email_1@email.email',
         lang: 'es'
       }
-    }
-    let(:receiver_2){
+    end
+    let(:receiver_2) do
       {
-        email: "email_2@email.email",
+        email: 'email_2@email.email',
         lang: 'es'
       }
-    }
-    let(:receiver_3){
+    end
+    let(:receiver_3) do
       {
-        email: "email_3@email.email",
+        email: 'email_3@email.email',
         lang: 'es'
       }
-    }
-    let(:mailing_list){[receiver_1, receiver_2, receiver_3]}
+    end
+    let(:mailing_list) { [receiver_1, receiver_2, receiver_3] }
 
     it 'delivers one email per time to all receivers of the mailing list' do
       expect(mailer).to receive(:deliver_mail_to).exactly(3).times
@@ -378,9 +346,5 @@ describe Services::Mails do
       expect(@count).to be 3
       expect(@receivers_done).to eq mailing_list
     end
-
   end
-
-
-
 end

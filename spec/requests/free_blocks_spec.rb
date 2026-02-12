@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'FreeBlocks API', type: :request do
@@ -25,9 +27,9 @@ RSpec.describe 'FreeBlocks API', type: :request do
     it 'requires profile ownership' do
       other_profile = create_profile(owner_id: create_user[:id])
 
-      expect {
+      expect do
         post '/users/create_free_block', params: { profile_id: other_profile[:id] }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -51,9 +53,9 @@ RSpec.describe 'FreeBlocks API', type: :request do
     it 'requires free block ownership' do
       other_free_block = create_free_block(profile_id: create_profile(owner_id: create_user[:id])[:id])
 
-      expect {
+      expect do
         post '/users/modify_free_block', params: { id: other_free_block[:id] }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -70,12 +72,11 @@ RSpec.describe 'FreeBlocks API', type: :request do
     it 'requires free block ownership' do
       other_free_block = create_free_block(profile_id: create_profile(owner_id: create_user[:id])[:id])
 
-      expect {
+      expect do
         post '/users/delete_free_block', params: { id: other_free_block[:id] }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
   private
-
 end

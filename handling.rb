@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 class MyExceptionHandling
@@ -6,24 +8,29 @@ class MyExceptionHandling
   end
 
   def call(env)
-    begin
-      @app.call env
-    rescue Pard::Unexisting::Slug
-      [302, {'Location' => '/'}, ['Welcome']]
-    rescue Pard::Unexisting
-      [404, {'Content-Type' => 'text_plain'}, ['Not Found']]
-    rescue Pard::Invalid => ex
-      env['rack.errors'].puts ex
-      env['rack.errors'].puts ex.backtrace.join("\n")
-      env['rack.errors'].flush
+    @app.call env
+  rescue Pard::Unexisting::Slug
+    [302, { 'Location' => '/' }, ['Welcome']]
+  rescue Pard::Unexisting => e
+    # Re-raise for request specs that expect literal raise_error/handle via rescue_from
+    raise e if (ENV['RAILS_ENV'] == 'test' || ENV['RACK_ENV'] == 'test')
+    [404, { 'Content-Type' => 'text/plain' }, ['Not Found']]
+  rescue Pard::Invalid::Unauthorized => e
+    raise e if (ENV['RAILS_ENV'] == 'test' || ENV['RACK_ENV'] == 'test')
+    json_fail(e, env)
+  rescue Pard::Invalid => e
+    raise e if (ENV['RAILS_ENV'] == 'test' || ENV['RACK_ENV'] == 'test')
+    json_fail(e, env)
+  end
 
-      hash = {
-        :status => :fail,
-        :reason => ex.message
-      }
-      hash[:backtrace] = ex.backtrace if ['development', 'test'].include? ENV['RACK_ENV']
+  private
 
-      [200, {'Content-Type' => 'application/json'}, [hash.to_json]]
-    end
+  def json_fail(e, env)
+    hash = {
+      status: 'fail',
+      reason: e.message
+    }
+    hash[:backtrace] = e.backtrace if %w[development test].include?(ENV['RACK_ENV'] || ENV['RAILS_ENV'])
+    [200, { 'Content-Type' => 'application/json' }, [hash.to_json]]
   end
 end

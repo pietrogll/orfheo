@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationCable
   class Connection < ActionCable::Connection::Base
     identified_by :current_user_id
@@ -11,7 +13,7 @@ module ApplicationCable
     def find_verified_user
       # Extract user ID from session/cookies
       # Rails Action Cable uses the same cookie store as the main app
-      if verified_user_id = request.session[:identity]
+      if (verified_user_id = request.session[:identity])
         verified_user_id
       else
         reject_unauthorized_connection

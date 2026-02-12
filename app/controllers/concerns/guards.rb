@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Guards concern - ownership and admin authorization checks
 # Ported from controllers/base.rb helpers
 
@@ -28,14 +30,17 @@ module Guards
 
   def admin?
     return false unless logged_in?
+
     MetaRepos::Admins.exists?(session[:identity])
   end
 
   # Event ownership
   def check_event_ownership!(event_id)
     raise Pard::Invalid::UnexistingEvent unless Repos::Events.exists?(event_id)
+
     owner_id = Repos::Events.get_owner(event_id)
-    raise Pard::Invalid::EventOwnership unless (owner_id == session[:identity] || admin?)
+    raise Pard::Invalid::EventOwnership unless owner_id == session[:identity] || admin?
+
     owner_id
   end
 
@@ -46,16 +51,20 @@ module Guards
   # Profile ownership
   def check_profile_ownership!(profile_id)
     raise Pard::Invalid::UnexistingProfile unless Repos::Profiles.exists?(profile_id)
+
     owner_id = Repos::Profiles.get_owner(profile_id)
-    raise Pard::Invalid::ProfileOwnership unless (owner_id == session[:identity] || admin?)
+    raise Pard::Invalid::ProfileOwnership unless owner_id == session[:identity] || admin?
+
     owner_id
   end
 
   # Call ownership
   def check_call_ownership!(call_id)
-    raise Pard::Invalid.new('non_existing_call') unless Repos::Calls.exists?(call_id)
+    raise Pard::Invalid, 'non_existing_call' unless Repos::Calls.exists?(call_id)
+
     owner_id = Repos::Calls.get_owner(call_id)
-    raise Pard::Invalid.new('call_ownership') unless (owner_id == session[:identity] || admin?)
+    raise Pard::Invalid, 'call_ownership' unless owner_id == session[:identity] || admin?
+
     owner_id
   end
 
@@ -63,7 +72,8 @@ module Guards
   def check_db_element_ownership!(db_key, id)
     check_db_element_exists!(db_key, id)
     owner_id = ApiStorage.repos(db_key).get_owner(id)
-    raise Pard::Invalid::Ownership unless (owner_id == session[:identity] || admin?)
+    raise Pard::Invalid::Ownership unless owner_id == session[:identity] || admin?
+
     owner_id
   end
 
@@ -75,28 +85,29 @@ module Guards
   def status_for(owner)
     return :admin if admin?
     return :owner if owner == session[:identity]
-    return :visitor if (session[:identity].present? && owner != session[:identity])
+    return :visitor if session[:identity].present? && owner != session[:identity]
+
     :outsider
   end
 
   # Validation helpers
   def check_invalid_email(email)
-    raise Pard::Invalid.new('invalid_email') if email.blank? || invalid_email?(email)
+    raise Pard::Invalid, 'invalid_email' if email.blank? || invalid_email?(email)
   end
 
   def check_invalid_password(password)
-    raise Pard::Invalid.new('invalid_password') if invalid_password?(password)
+    raise Pard::Invalid, 'incorrect_password' if password.blank? || password.length < 6
   end
 
   def check_lang!(lang)
-    raise Pard::Invalid.new('invalid_language') unless ['en', 'es', 'ca'].include?(lang)
+    raise Pard::Invalid, 'invalid_language' unless %w[en es ca fr pt].include?(lang)
   end
 
   private
 
   def invalid_email?(email)
     # Basic email validation
-    !email.match?(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i)
+    !email.match?(/\A[\w+\-.]+@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i)
   end
 
   def invalid_password?(password)

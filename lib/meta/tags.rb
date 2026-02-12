@@ -1,13 +1,15 @@
-class Tag
+# frozen_string_literal: true
 
-  def initialize i_tag, holder_id, source
+class Tag
+  def initialize(i_tag, holder_id, source)
     # check_fields params
     tag = {
-      holders:[holder_id],
+      holders: [holder_id],
       source: source,
       text: i_tag
     }
     return @tag = {} if i_tag.blank?
+
     tag = MetaRepos::Tags.mapped_class.from_hash(tag)
     tag.id = SecureRandom.uuid
     @tag = tag
@@ -19,7 +21,7 @@ class Tag
   #   }
   # end
 
-  def [] key
+  def [](key)
     tag[key]
   end
 
@@ -28,6 +30,7 @@ class Tag
   end
 
   private
+
   attr_reader :tag
 
   def needed
@@ -35,6 +38,4 @@ class Tag
       :tag
     ]
   end
-
-
 end

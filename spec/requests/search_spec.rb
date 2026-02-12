@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Search API', type: :request do
@@ -169,5 +171,4 @@ RSpec.describe 'Search API', type: :request do
       expect(json[:data]).to have_key(:items)
     end
   end
-
 end

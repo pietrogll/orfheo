@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Program Management', type: :request do
@@ -25,9 +27,9 @@ RSpec.describe 'Program Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
+        expect do
           get "/program?id=#{program[:_id]}"
-        }.to raise_error(Pard::Invalid)
+        end.to raise_error(Pard::Invalid)
       end
     end
   end
@@ -56,12 +58,12 @@ RSpec.describe 'Program Management', type: :request do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect {
+        expect do
           post '/users/create_program', params: {
             event_id: event[:_id],
             name: 'Main Stage'
           }
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        end.to raise_error(Pard::Invalid::EventOwnership)
       end
     end
   end
@@ -99,12 +101,12 @@ RSpec.describe 'Program Management', type: :request do
         it 'raises error for non-existent permanent activities' do
           login_as(user[:_id])
 
-          expect {
+          expect do
             post '/users/modify_program', params: {
               id: program[:_id],
               permanents: ['non-existent-activity-id']
             }
-          }.to raise_error(Pard::Invalid)
+          end.to raise_error(Pard::Invalid)
         end
       end
     end
@@ -115,12 +117,12 @@ RSpec.describe 'Program Management', type: :request do
         past_program = create_test_program(past_event[:_id], user[:_id])
         login_as(user[:_id])
 
-        expect {
+        expect do
           post '/users/modify_program', params: {
             id: past_program[:_id],
             name: 'Updated'
           }
-        }.to raise_error(Pard::Invalid)
+        end.to raise_error(Pard::Invalid)
       end
     end
   end
@@ -144,9 +146,9 @@ RSpec.describe 'Program Management', type: :request do
       it 'raises admin error' do
         login_as(user[:_id])
 
-        expect {
+        expect do
           post '/users/delete_program', params: { id: program[:_id] }
-        }.to raise_error(Pard::Invalid::Admin)
+        end.to raise_error(Pard::Invalid::Admin)
       end
     end
   end
@@ -204,14 +206,14 @@ RSpec.describe 'Program Management', type: :request do
     it 'validates permanent activities exist' do
       login_as(user[:_id])
 
-      expect {
+      expect do
         post '/users/set_permanents', params: {
           event_id: event[:_id],
           program_id: program[:_id],
           permanents: ['non-existent-id'],
           signature: 'test-sig'
         }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Production Management', type: :request do
@@ -181,7 +183,7 @@ RSpec.describe 'Production Management', type: :request do
       duration: '90 min',
       main_picture: ['prod.jpg'],
       photos: ['prod.jpg', 'prod2.jpg'],
-      tags: ['tag1', 'tag2'],
+      tags: %w[tag1 tag2],
       created_at: Time.now
     }
     Repos::Productions.save(production_data)

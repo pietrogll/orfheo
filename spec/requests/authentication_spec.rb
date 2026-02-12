@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Authentication', type: :request do
@@ -32,14 +34,14 @@ RSpec.describe 'Authentication', type: :request do
       before do
         # Create a test user first
         Repos::Users.save({
-          id: SecureRandom.uuid,
-          email: user_email,
-          password: BCrypt::Password.create(user_password),
-          lang: user_lang,
-          validation: false,
-          validation_code: SecureRandom.uuid,
-          created_at: Time.now.to_i
-        })
+                            id: SecureRandom.uuid,
+                            email: user_email,
+                            password: BCrypt::Password.create(user_password),
+                            lang: user_lang,
+                            validation: false,
+                            validation_code: SecureRandom.uuid,
+                            created_at: Time.now.to_i
+                          })
       end
 
       it 'returns error for duplicate email' do
@@ -93,13 +95,13 @@ RSpec.describe 'Authentication', type: :request do
     before do
       # Create a validated test user
       Repos::Users.save({
-        id: user_id,
-        email: user_email,
-        password: BCrypt::Password.create(user_password),
-        lang: user_lang,
-        validation: true, # User must be validated to login
-        created_at: Time.now.to_i
-      })
+                          id: user_id,
+                          email: user_email,
+                          password: BCrypt::Password.create(user_password),
+                          lang: user_lang,
+                          validation: true, # User must be validated to login
+                          created_at: Time.now.to_i
+                        })
     end
 
     context 'POST /login with valid credentials' do
@@ -208,7 +210,7 @@ RSpec.describe 'Authentication', type: :request do
       end
     end
 
-    # Note: Testing logged-in state requires proper session handling
+    # NOTE: Testing logged-in state requires proper session handling
     # which may need additional configuration in request specs
   end
 
@@ -217,13 +219,13 @@ RSpec.describe 'Authentication', type: :request do
 
     before do
       Repos::Users.save({
-        id: user_id,
-        email: user_email,
-        password: BCrypt::Password.create(user_password),
-        lang: user_lang,
-        validation: true,
-        created_at: Time.now.to_i
-      })
+                          id: user_id,
+                          email: user_email,
+                          password: BCrypt::Password.create(user_password),
+                          lang: user_lang,
+                          validation: true,
+                          created_at: Time.now.to_i
+                        })
     end
 
     context 'POST /forgotten_password with valid email' do

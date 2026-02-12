@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FreeBlocksController < ApplicationController
   before_action :require_login!
 
@@ -25,9 +27,11 @@ class FreeBlocksController < ApplicationController
   private
 
   def check_free_block_ownership!(free_block_id)
-    raise Pard::Invalid.new('non_existing_free_block') unless Repos::FreeBlocks.exists?(free_block_id)
+    raise Pard::Invalid, 'non_existing_free_block' unless Repos::FreeBlocks.exists?(free_block_id)
+
     owner_id = Repos::FreeBlocks.get_owner(free_block_id)
-    raise Pard::Invalid.new('free_block_ownership') unless (owner_id == current_user_id || admin?)
+    raise Pard::Invalid, 'free_block_ownership' unless owner_id == current_user_id || admin?
+
     owner_id
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'ActionMailer Integration', type: :mailer do
@@ -19,9 +21,9 @@ RSpec.describe 'ActionMailer Integration', type: :mailer do
     end
 
     it 'delivers welcome email through ActionMailer' do
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :welcome)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
 
       email = ActionMailer::Base.deliveries.last
       expect(email.to).to eq(['test@example.com'])
@@ -31,74 +33,74 @@ RSpec.describe 'ActionMailer Integration', type: :mailer do
     it 'delivers event email through ActionMailer' do
       event_info = { event_id: 'event123', event_name: 'Test Event' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :event, event_info)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
 
       email = ActionMailer::Base.deliveries.last
       expect(email.to).to eq(['test@example.com'])
     end
 
     it 'delivers forgotten password email through ActionMailer' do
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :forgotten_password)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers artist proposal email through ActionMailer' do
       proposal_data = { proposal_id: 'prop123', profile_name: 'Artist' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :artist_proposal, proposal_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers space proposal email through ActionMailer' do
       proposal_data = { proposal_id: 'prop456', profile_name: 'Space' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :space_proposal, proposal_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers rejection email through ActionMailer' do
       rejection_data = { proposal_id: 'prop789', reason: 'Test reason' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :rejected, rejection_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers deleted call email through ActionMailer' do
       call_data = { call_id: 'call123', call_title: 'Call Title' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :deleted_call, call_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers feedback email through ActionMailer' do
       feedback_data = { email: 'user@example.com', message: 'Feedback' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to({ email: 'info@orfheo.org' }, :feedback, feedback_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers tech support email through ActionMailer' do
       support_data = { email: 'user@example.com', issue: 'Tech issue' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to({ email: 'tech@orfheo.org' }, :techSupport, support_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers business email through ActionMailer' do
       business_data = { email: 'partner@example.com', inquiry: 'Business inquiry' }
 
-      expect {
+      expect do
         mailer.deliver_mail_to({ email: 'info@orfheo.org' }, :business, business_data)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'delivers generic email through ActionMailer' do
@@ -107,9 +109,9 @@ RSpec.describe 'ActionMailer Integration', type: :mailer do
         en: { subject: 'Test', body: 'Test body' }
       }
 
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :generic_email, payload)
-      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      end.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
     it 'handles mailing list delivery' do
@@ -122,9 +124,9 @@ RSpec.describe 'ActionMailer Integration', type: :mailer do
         en: { subject: 'Bulk', body: 'Bulk email' }
       }
 
-      expect {
+      expect do
         mailer.deliver_to_mailing_list(mailing_list, payload, :generic_email)
-      }.to change { ActionMailer::Base.deliveries.count }.by(2)
+      end.to change { ActionMailer::Base.deliveries.count }.by(2)
     end
 
     it 'handles SMTP errors gracefully' do
@@ -134,9 +136,9 @@ RSpec.describe 'ActionMailer Integration', type: :mailer do
       allow(mail_double).to receive(:deliver_now).and_raise(Net::SMTPAuthenticationError.new('test error'))
 
       # Should not raise error, just print to console
-      expect {
+      expect do
         mailer.deliver_mail_to(user, :welcome)
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 end

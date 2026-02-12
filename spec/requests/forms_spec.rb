@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Forms API', type: :request do
@@ -43,9 +45,9 @@ RSpec.describe 'Forms API', type: :request do
     it 'requires call ownership' do
       other_call = create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])
 
-      expect {
+      expect do
         post '/forms/create', params: { call_id: other_call[:id], title: 'Form' }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -68,9 +70,9 @@ RSpec.describe 'Forms API', type: :request do
     it 'requires form ownership' do
       other_form = create_form(call_id: create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])[:id])
 
-      expect {
+      expect do
         post '/forms/modify', params: { id: other_form[:id], title: 'Updated' }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -87,9 +89,9 @@ RSpec.describe 'Forms API', type: :request do
     it 'requires form ownership' do
       other_form = create_form(call_id: create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])[:id])
 
-      expect {
+      expect do
         post '/forms/delete', params: { id: other_form[:id] }
-      }.to raise_error(Pard::Invalid)
+      end.to raise_error(Pard::Invalid)
     end
   end
 
@@ -104,5 +106,4 @@ RSpec.describe 'Forms API', type: :request do
       expect(json[:data]).to have_key(:forms)
     end
   end
-
 end

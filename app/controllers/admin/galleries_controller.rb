@@ -8,7 +8,7 @@ module Admin
       repo: MetaRepos::Galleries,
       singular: 'gallery',
       plural: 'galleries',
-      attributes: [:source, :name, :links, :photos, :profile_id, :user_id]
+      attributes: %i[source name links photos profile_id user_id]
     )
   end
 end

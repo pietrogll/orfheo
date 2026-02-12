@@ -4,7 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'Admin::Admins', type: :request do
   let(:user_data) { { _id: SecureRandom.uuid, id: SecureRandom.uuid, email: 'admin@test.com', password_digest: BCrypt::Password.create('password'), lang: 'en' } }
-  let(:other_user_data) { { _id: SecureRandom.uuid, id: SecureRandom.uuid, email: 'newadmin@test.com', password_digest: BCrypt::Password.create('password'), lang: 'en' } }
+  let(:other_user_data) do
+    { _id: SecureRandom.uuid, id: SecureRandom.uuid, email: 'newadmin@test.com', password_digest: BCrypt::Password.create('password'), lang: 'en' }
+  end
   let(:user) { user_data }
   let(:other_user) { other_user_data }
 

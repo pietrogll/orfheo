@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   # Health check endpoint for monitoring
   get '/health', to: proc { [200, { 'Content-Type' => 'text/plain' }, ['OK']] }
@@ -7,7 +9,7 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 
   # Action Cable WebSocket endpoint
   mount ActionCable.server => '/cable'
@@ -105,12 +107,12 @@ Rails.application.routes.draw do
     get '/', to: 'admin#index', as: :dashboard
 
     # Meta resources
-    resources :tags, only: [:index, :create, :update, :destroy]
-    resources :ambients, only: [:index, :create, :update, :destroy]
-    resources :galleries, only: [:index, :create, :update, :destroy]
-    resources :admins, only: [:index, :create, :destroy]
-    resources :assets, only: [:index, :create, :update, :destroy]
-    resources :participants, only: [:index, :create, :update, :destroy]
+    resources :tags, only: %i[index create update destroy]
+    resources :ambients, only: %i[index create update destroy]
+    resources :galleries, only: %i[index create update destroy]
+    resources :admins, only: %i[index create destroy]
+    resources :assets, only: %i[index create update destroy]
+    resources :participants, only: %i[index create update destroy]
   end
 
   # Calls management (artist/space proposals)

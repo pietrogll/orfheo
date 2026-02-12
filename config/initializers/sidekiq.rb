@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Sidekiq configuration for background job processing
 
 require 'sidekiq'

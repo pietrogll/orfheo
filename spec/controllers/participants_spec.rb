@@ -1,3 +1,4 @@
+=begin
 describe 'ParticipantsController' do
 # TODO: Migrate to Rails request specs - Sinatra-style controller tests
 RSpec.describe do
@@ -95,3 +96,4 @@ __END__
     end
   end
 end
+=end

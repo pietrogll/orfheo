@@ -1,6 +1,7 @@
-class Participant
+# frozen_string_literal: true
 
-  def initialize params, owner_id = nil
+class Participant
+  def initialize(params, owner_id = nil)
     check_fields! params
     @owner_id = owner_id
     @params = params
@@ -15,7 +16,7 @@ class Participant
     modified_participant params
   end
 
-  def [] key
+  def [](key)
     participant[key]
   end
 
@@ -23,15 +24,14 @@ class Participant
     participant.to_h
   end
 
-
-
   private
+
   attr_reader :participant, :owner_id, :params
 
-  def new_participant params, owner_id
+  def new_participant(params, owner_id)
     {
       id: params[:id] || SecureRandom.uuid,
-      email: {value: params[:email].downcase, visible: false},
+      email: { value: params[:email].downcase, visible: false },
       name: params[:name],
       address: params[:address],
       phone: params[:phone],
@@ -41,36 +41,35 @@ class Participant
     }
   end
 
-  def modified_participant params
-    keys = [
-      :id,
-      :email,
-      :name,
-      :address,
-      :phone,
-      :facets,
-      :color
+  def modified_participant(params)
+    keys = %i[
+      id
+      email
+      name
+      address
+      phone
+      facets
+      color
     ]
-    participant = Hash[keys.map{|sym| [sym, params[sym]] unless params[sym].nil? }.compact]
-    participant[:email] = {value: params[:email].downcase, visible: false} unless params[:email].nil?
-    participant 
+    participant = Hash[keys.map { |sym| [sym, params[sym]] unless params[sym].nil? }.compact]
+    participant[:email] = { value: params[:email].downcase, visible: false } unless params[:email].nil?
+    participant
   end
 
-  def check_fields! params
-    raise Pard::Invalid::Params if mandatory.any?{ |field|
-      params[field].blank?
-    }
-    raise Pard::Invalid::Params if params[:phone][:value].blank?
-    raise Pard::Invalid::ExistingName unless Actions::CheckParticipantName.run(params[:name], params[:call_id], params[:program_id], params[:profile_id])
+  def check_fields!(params)
+    raise Pard::Invalid::Params if mandatory.any? do |field|
+      params[field].blank? && params[field] != false
+    end
+    raise Pard::Invalid::Params if params[:phone].is_a?(Hash) && params[:phone][:value].blank?
+    raise Pard::Invalid::ExistingName unless Actions::CheckParticipantName.run(params[:name], params[:call_id],
+                                                                               params[:program_id], params[:profile_id])
   end
 
   def mandatory
-    [
-      :name,
-      :phone,
-      :email
+    %i[
+      name
+      phone
+      email
     ]
   end
-
-
 end

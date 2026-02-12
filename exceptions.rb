@@ -1,273 +1,358 @@
-module Pard
+# frozen_string_literal: true
 
+module Pard
   class Unexisting < StandardError
   end
 
-  class Unexisting::Slug < Unexisting
+  class Unexisting
+    class Slug < Unexisting
+    end
   end
-
 
   class Invalid < StandardError
   end
 
-  class Invalid::UnexistingDbEl < Invalid
-    def message
-      'not_existing_element'
+  class Invalid
+    class UnexistingDbEl < Invalid
+      def message
+        'not_existing_element'
+      end
     end
   end
 
-  class Invalid::ExistingUser < Invalid
-    def message
-      'already_registered'
+  class Invalid
+    class ExistingUser < Invalid
+      def message
+        'already_registered'
+      end
     end
   end
 
-  class Invalid::UnexistingUser < Invalid
-    def message
-      'non_existing_user'
+  class Invalid
+    class UnexistingUser < Invalid
+      def message
+        'non_existing_user'
+      end
     end
   end
 
-  class Invalid::Params < Invalid
-    def message
-      'invalid_parameters'
+  class Invalid
+    class Params < Invalid
+      def message
+        'invalid_parameters'
+      end
     end
   end
 
-  class Invalid::Blocks < Invalid
-    def message
-      'invalid_blocks'
+  class Invalid
+    class Blocks < Invalid
+      def message
+        'invalid_blocks'
+      end
     end
   end
 
-  class Invalid::FormsTexts < Invalid
-    def message
-      'invalid_forms_texts'
+  class Invalid
+    class FormsTexts < Invalid
+      def message
+        'invalid_forms_texts'
+      end
     end
   end
 
-  class Invalid::Password < Invalid
-    def message
-      'incorrect_password'
+  class Invalid
+    class Password < Invalid
+      def message
+        'incorrect_password'
+      end
     end
   end
 
-  class Invalid::Email < Invalid
-    def message
-      'invalid_email'
+  class Invalid
+    class Email < Invalid
+      def message
+        'invalid_email'
+      end
     end
   end
 
-  class Invalid::Unauthorized < Invalid
-    def message
-      'unauthorized'
+  class Invalid
+    class Unauthorized < Invalid
+      def message
+        'unauthorized'
+      end
     end
   end
 
-  class Invalid::Authentication < Invalid
-    def message
-      'unauthorized'
+  class Invalid
+    class Authentication < Invalid
+      def message
+        'unauthorized'
+      end
     end
   end
 
-  class Invalid::Unvalidated < Invalid
-    def message
-      'not_validated_user'
+  class Invalid
+    class Unvalidated < Invalid
+      def message
+        'not_validated_user'
+      end
     end
   end
 
-  class Invalid::Type < Invalid
-    def message
-      'invalid_type'
+  class Invalid
+    class Type < Invalid
+      def message
+        'invalid_type'
+      end
     end
   end
 
-  class Invalid::Category < Invalid
-    def message
-      'invalid_category'
+  class Invalid
+    class Category < Invalid
+      def message
+        'invalid_category'
+      end
     end
   end
 
-  class Invalid::Form < Invalid
-    def message
-      'invalid_form'
+  class Invalid
+    class Form < Invalid
+      def message
+        'invalid_form'
+      end
     end
   end
 
-  class Invalid::ExistingProfile < Invalid
-    def message
-      'existing_profile'
+  class Invalid
+    class ExistingProfile < Invalid
+      def message
+        'existing_profile'
+      end
     end
   end
 
-  class Invalid::UnexistingProfile < Invalid
-    def message
-      'non_existing_profile'
+  class Invalid
+    class UnexistingProfile < Invalid
+      def message
+        'non_existing_profile'
+      end
     end
   end
 
-
-  class Invalid::ExistingName < Invalid
-    def message
-      'existing_name'
+  class Invalid
+    class ExistingName < Invalid
+      def message
+        'existing_name'
+      end
     end
   end
 
-  class Invalid::UnexistingProduction < Invalid
-    def message
-      'non_existing_production'
+  class Invalid
+    class UnexistingProduction < Invalid
+      def message
+        'non_existing_production'
+      end
     end
   end
 
-  class Invalid::UnexistingProposal < Invalid
-    def message
-      'non_existing_proposal'
+  class Invalid
+    class UnexistingProposal < Invalid
+      def message
+        'non_existing_proposal'
+      end
     end
   end
 
-  class Invalid::UnexistingEvent < Invalid
-    def message
-      'non_existing_event'
+  class Invalid
+    class UnexistingEvent < Invalid
+      def message
+        'non_existing_event'
+      end
     end
   end
 
-  class Invalid::UnexistingParticipants < Invalid
-    def message
-      'non_existing_participants'
+  class Invalid
+    class UnexistingParticipants < Invalid
+      def message
+        'non_existing_participants'
+      end
     end
   end
 
-  class Invalid::UnexistingActivity < Invalid
-    def message
-      'non_existing_activity'
+  class Invalid
+    class UnexistingActivity < Invalid
+      def message
+        'non_existing_activity'
+      end
     end
   end
 
-  class Invalid::Ownership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class Ownership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-
-  class Invalid::ProfileOwnership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class ProfileOwnership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-  class Invalid::ProductionOwnership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class ProductionOwnership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-  class Invalid::ProposalOwnership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class ProposalOwnership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-  class Invalid::CallOwnership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class CallOwnership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-  class Invalid::EventOwnership < Invalid
-    def message
-      'you_dont_have_permission'
+  class Invalid
+    class EventOwnership < Invalid
+      def message
+        'you_dont_have_permission'
+      end
     end
   end
 
-  class Invalid::ExistingCall < Invalid
-    def message
-      'existing_call'
+  class Invalid
+    class ExistingCall < Invalid
+      def message
+        'existing_call'
+      end
     end
   end
 
-  class Invalid::UnexistingCall < Invalid
-    def message
-      'non_existing_call'
+  class Invalid
+    class UnexistingCall < Invalid
+      def message
+        'non_existing_call'
+      end
     end
   end
 
-  class Invalid::UnexistingForm < Invalid
-    def message
-      'non_existing_form'
+  class Invalid
+    class UnexistingForm < Invalid
+      def message
+        'non_existing_form'
+      end
     end
   end
 
-  class Invalid::QueryParams < Invalid
-    def message
-      'invalid_query'
+  class Invalid
+    class QueryParams < Invalid
+      def message
+        'invalid_query'
+      end
     end
   end
 
-  class Invalid::FilterParams < Invalid
-    def message
-      'invalid_filters'
+  class Invalid
+    class FilterParams < Invalid
+      def message
+        'invalid_filters'
+      end
     end
   end
 
-  class Invalid::Deadline < Invalid
-    def message
-      'out_of_time_range'
+  class Invalid
+    class Deadline < Invalid
+      def message
+        'out_of_time_range'
+      end
     end
   end
 
-  class Invalid::Language < Invalid
-    def message
-      'invalid_language'
+  class Invalid
+    class Language < Invalid
+      def message
+        'invalid_language'
+      end
     end
   end
 
-  class Invalid::Admin < Invalid
-    def message
-      'invalid_admin'
+  class Invalid
+    class Admin < Invalid
+      def message
+        'invalid_admin'
+      end
     end
   end
 
-  class Invalid::ProgrammedSpace < Invalid
-    def message
-      'space_has_activities'
+  class Invalid
+    class ProgrammedSpace < Invalid
+      def message
+        'space_has_activities'
+      end
     end
   end
 
-  class Invalid::EmptyCall < Invalid
-    def message
-      'call_has_participants'
+  class Invalid
+    class EmptyCall < Invalid
+      def message
+        'call_has_participants'
+      end
     end
   end
 
-  class Invalid::EmptyProposals < Invalid
-    def message
-      'form_has_proposals'
+  class Invalid
+    class EmptyProposals < Invalid
+      def message
+        'form_has_proposals'
+      end
     end
   end
 
-  class Invalid::EmptyProgram < Invalid
-    def message
-      'program_has_activities'
+  class Invalid
+    class EmptyProgram < Invalid
+      def message
+        'program_has_activities'
+      end
     end
   end
 
-  class Invalid::FutureEvent < Invalid
-    def message
-      'past_event'
+  class Invalid
+    class FutureEvent < Invalid
+      def message
+        'past_event'
+      end
     end
   end
 
-  class Invalid::DateTime < Invalid
-    def message
-      'invalid_dateTime'
+  class Invalid
+    class DateTime < Invalid
+      def message
+        'invalid_dateTime'
+      end
     end
   end
 
-  class Invalid::ExistingSlug < Invalid
-    def message
-      'existing_slug'
+  class Invalid
+    class ExistingSlug < Invalid
+      def message
+        'existing_slug'
+      end
     end
   end
-
 end

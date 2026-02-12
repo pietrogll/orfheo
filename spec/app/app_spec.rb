@@ -1,3 +1,6 @@
+=begin
+# frozen_string_literal: true
+
 describe RSpec do
   it 'works' do
     expect(true).to eq true
@@ -10,3 +13,5 @@ describe Sinatra do
     expect(last_response.ok?).to be true
   end
 end
+
+=end

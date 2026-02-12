@@ -12,7 +12,7 @@ RSpec.describe 'Welcome Page', type: :request do
     it 'renders the welcome page HTML' do
       get '/'
       expect(response.body).to include('orfheo')
-      expect(response.content_type).to match(/text\/html/)
+      expect(response.content_type).to match(%r{text/html})
     end
 
     it 'includes the page title in meta tags' do

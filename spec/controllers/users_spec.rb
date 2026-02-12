@@ -1,9 +1,10 @@
+=begin
 describe 'UsersController' do
-# TODO: Migrate to Rails request specs - Sinatra-style controller tests
-RSpec.describe do
-  skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+  it 'is skipped (legacy Sinatra spec)' do
+    skip 'Sinatra-style controller tests - see spec/requests/ for Rails request specs'
+  end
 end
-__END__
+
 
   let(:login_route){'/login/login'}
   let(:create_profile_route){'/users/create_profile'}
@@ -185,4 +186,5 @@ __END__
 
   end
 
-end
+# End of file
+=end

@@ -1,23 +1,21 @@
+# frozen_string_literal: true
+
 describe 'Facets Repo' do
-
-  before(:each) {
+  before(:each) do
     MetaRepos::Facets.clear
-  }
-
+  end
 
   describe 'Modify' do
-    
     xit 'updates an existing element' do
+      MetaRepos::Facets.save({
+                               facet: 'street-light',
+                               id: 'set_id'
+                             })
 
-      MetaRepos::Facets.save ({
-        facet: 'street-light',
-        id: 'set_id'
-      })
-
-      MetaRepos::Facets.modify ({
-        facet: 'incredible',
-        id: 'set_id'
-      })
+      MetaRepos::Facets.modify({
+                                 facet: 'incredible',
+                                 id: 'set_id'
+                               })
 
       saved_facets = MetaRepos::Facets.all
 
@@ -27,16 +25,15 @@ describe 'Facets Repo' do
     end
 
     xit 'fails if the element does not exist' do
+      MetaRepos::Facets.save({
+                               facet: 'street-light',
+                               id: 'set_id'
+                             })
 
-      MetaRepos::Facets.save ({
-        facet: 'street-light',
-        id: 'set_id'
-      })
-
-      MetaRepos::Facets.modify ({
-        facet: 'incredible',
-        id: 'otter_set_id'
-      })
+      MetaRepos::Facets.modify({
+                                 facet: 'incredible',
+                                 id: 'otter_set_id'
+                               })
 
       saved_facets = MetaRepos::Facets.all
 
@@ -46,27 +43,22 @@ describe 'Facets Repo' do
     end
 
     xit 'gets the facet by filter' do
-      MetaRepos::Facets.save ({
-        facet: 'street-light',
-        id: 'set_id'
-      })
+      MetaRepos::Facets.save({
+                               facet: 'street-light',
+                               id: 'set_id'
+                             })
 
-      MetaRepos::Facets.save ({
-        facet: 'incredible',
-        id: 'otter_set_id'
-      })
+      MetaRepos::Facets.save({
+                               facet: 'incredible',
+                               id: 'otter_set_id'
+                             })
 
       got_facet = MetaRepos::Facets.get(facet: 'street-light')
 
       expect(got_facet).to eq([{
-        facet: 'street-light',
-        id: 'set_id'
-      }])
-
+                                facet: 'street-light',
+                                id: 'set_id'
+                              }])
     end
-
-
   end
-
-  
 end

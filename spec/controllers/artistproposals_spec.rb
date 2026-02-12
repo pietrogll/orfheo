@@ -1,3 +1,4 @@
+=begin
 describe 'ArtistProposalsController' do
 # TODO: Migrate to Rails request specs - Sinatra-style controller tests
 RSpec.describe do
@@ -876,3 +877,4 @@ __END__
 
 
 end
+=end

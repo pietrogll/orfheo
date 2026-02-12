@@ -1,3 +1,6 @@
+=begin
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Guards, type: :controller do
@@ -39,9 +42,9 @@ RSpec.describe Guards, type: :controller do
       end
 
       it 'raises Pard::Invalid::Admin exception' do
-        expect {
+        expect do
           get :test_admin_check
-        }.to raise_error(Pard::Invalid::Admin)
+        end.to raise_error(Pard::Invalid::Admin)
       end
     end
   end
@@ -97,10 +100,11 @@ RSpec.describe Guards, type: :controller do
         controller_instance.session[:identity] = 'different_user'
         allow(MetaRepos::Admins).to receive(:exists?).and_return(false)
 
-        expect {
+        expect do
           controller_instance.send(:check_event_ownership!, event_id)
-        }.to raise_error(Pard::Invalid::EventOwnership)
+        end.to raise_error(Pard::Invalid::EventOwnership)
       end
     end
   end
 end
+=end

@@ -1,6 +1,7 @@
-class Ambient
+# frozen_string_literal: true
 
-  def initialize user_id, params
+class Ambient
+  def initialize(user_id, params)
     check_fields params
     new_ambient = MetaRepos::Ambients.mapped_class.from_hash(params)
     new_ambient.id = SecureRandom.uuid unless new_ambient.id
@@ -8,13 +9,13 @@ class Ambient
     @ambient = new_ambient
   end
 
-  def check_fields params
-    raise Pard::Invalid::Params if mandatory.any?{ |field|
+  def check_fields(params)
+    raise Pard::Invalid::Params if mandatory.any? do |field|
       params[field].blank?
-    }
+    end
   end
 
-  def [] key
+  def [](key)
     ambient[key]
   end
 
@@ -23,17 +24,15 @@ class Ambient
   end
 
   private
+
   attr_reader :ambient
 
-
-
   def mandatory
-    [
-      :name,
-      :description,
-      :allowed_formats,
-      :allowed_categories
+    %i[
+      name
+      description
+      allowed_formats
+      allowed_categories
     ]
   end
-
 end

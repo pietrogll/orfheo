@@ -4,7 +4,6 @@
 assets/reactjs/node_modules/
 assets/reactjs/etc/
 assets/reactjs/npm-debug.log
-README.md
 .env
 .env.production
 # Rails artifacts
@@ -25,3 +24,7 @@ README.md
 .github/
 AGENTS.md
 specs/
+.DS_Store
+.ruby-version
+.node-version
+coverage/

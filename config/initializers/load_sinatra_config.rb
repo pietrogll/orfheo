@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Load Sinatra configuration (repos, services, infrastructure, exceptions)
 # This ensures all Sinatra-era code is available in the Rails environment
 
@@ -16,9 +18,7 @@ require_relative '../../lib/libs_index'
 # Load services (now autoloaded by Zeitwerk, but ensure they're available)
 require_relative '../../services/services_index' # LEGACY: Load manually as they don't follow Zeitwerk conventions
 
-# Load BaseController and Guards (needed by Actions)
-require 'sinatra'
-require_relative '../../controllers/base'
+# Sinatra and BaseController removed
 
 # Load infrastructure actions
 # Load infrastructure actions

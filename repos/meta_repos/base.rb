@@ -1,27 +1,29 @@
+# frozen_string_literal: true
+
 module MetaRepo
   module Base
-    def save object
+    def save(object)
       collection.insert_one object.to_h
     end
 
-    def find query
-      collection.find(query).map { |doc|
+    def find(query)
+      collection.find(query).map do |doc|
         mapped_class.from_hash doc
-      }
+      end
     end
 
-    def get query
+    def get(query)
       find(query).map(&:to_h)
     end
 
-    def delete id
-      collection.delete_one(id: id).map { |doc|
+    def delete(id)
+      collection.delete_one(id: id).map do |doc|
         mapped_class.from_hash doc
-      }
+      end
     end
 
     def all
-      self.find({}).map(&:to_h)
+      find({}).map(&:to_h)
     end
 
     def count
@@ -32,32 +34,34 @@ module MetaRepo
       collection.drop
     end
 
-    def modify object   # It does NOT add new field / It substitutes values of already existing fields that are only the ones specified in meta_repos.rb
-      collection.update_one({id: object[:id]},{
-        "$set": object.to_h
-      })
+    # It does NOT add new field / It substitutes values of already existing fields that are only the ones specified in meta_repos.rb
+    def modify(object)
+      collection.update_one({ id: object[:id] }, {
+                              "$set": object.to_h
+                            })
     end
 
-    def exists? id
+    def exists?(id)
       return false unless UUID.validate(id)
-      collection.count(id: id) > 0
+
+      collection.count(id: id).positive?
     end
 
-    def get_owner id
+    def get_owner(id)
       object = get(id: id).first
       object[:user_id]
     end
 
-    def get_by_id id
+    def get_by_id(id)
       get(id: id).first
-    end 
+    end
 
-    def meth name, &block
-      self.define_singleton_method name, &block
+    def meth(name, &block)
+      define_singleton_method name, &block
     end
   end
 
-  def self.for mapped_class, collection, &block
+  def self.for(mapped_class, collection, &block)
     Class.new do |created_class|
       created_class.extend MetaRepo::Base
 
@@ -73,9 +77,6 @@ module MetaRepo
     end
   end
 end
-
-
-
 
 # class X; def initialize xx; @xx=xx; end; def to_h; {xx: @xx}; end; end
 # Mongo::Logger.level = Logger::FATAL
@@ -96,8 +97,6 @@ end
 
 # ap M.methods - M.class.new.methods
 
-
-
 # ap @m.methods - @m.class.new.methods
 # ap @m.class.methods - @m.class.class.new.methods
 
@@ -109,4 +108,3 @@ end
 
 # @m.save x
 # ap @m.all
-

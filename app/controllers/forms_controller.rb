@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class FormsController < ApplicationController
   before_action :require_login!, except: [:index]
 
   # POST /forms/ (list forms for a call)
   def index
     check_call_exists!(params[:call_id])
-    is_owner = (call_owner?(params[:call_id]) == current_user_id || admin?)
+    is_owner = call_owner?(params[:call_id]) == current_user_id || admin?
     forms = Actions::UserGetsForms.run(params[:call_id], params[:lang], current_user_id, is_owner)
     render json: { status: 'success', data: { forms: forms } }
   end
@@ -48,16 +50,20 @@ class FormsController < ApplicationController
   end
 
   def check_call_ownership!(call_id)
-    raise Pard::Invalid.new('non_existing_call') unless Repos::Calls.exists?(call_id)
+    raise Pard::Invalid, 'non_existing_call' unless Repos::Calls.exists?(call_id)
+
     owner_id = Repos::Calls.get_owner(call_id)
-    raise Pard::Invalid.new('call_ownership') unless (owner_id == current_user_id || admin?)
+    raise Pard::Invalid, 'call_ownership' unless owner_id == current_user_id || admin?
+
     owner_id
   end
 
   def check_form_ownership!(form_id)
-    raise Pard::Invalid.new('non_existing_form') unless Repos::Forms.exists?(form_id)
+    raise Pard::Invalid, 'non_existing_form' unless Repos::Forms.exists?(form_id)
+
     owner_id = Repos::Forms.get_owner(form_id)
-    raise Pard::Invalid.new('form_ownership') unless (owner_id == current_user_id || admin?)
+    raise Pard::Invalid, 'form_ownership' unless owner_id == current_user_id || admin?
+
     owner_id
   end
 end

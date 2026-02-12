@@ -1,99 +1,80 @@
+# frozen_string_literal: true
+
 describe Services::Translator do
+  let(:input_key) { :a_key }
+  let(:another_input_key) { :another_key }
 
-	let(:input_key){:a_key}
-	let(:another_input_key){:another_key}
+  let(:nested_key) { 'nested.key' }
 
+  let(:translated_text) { 'Translated text' }
+  ANOTHER_TEXT = 'Another translated text'
+  NESTED_TEXT = 'Nested text'
 
-	let(:nested_key){"nested.key"}
+  let(:dictionary) do
+    {
+      :nested => {
+        key: NESTED_TEXT
+      },
+      input_key => translated_text,
+      another_input_key => ANOTHER_TEXT
+    }
+  end
 
-	let(:translated_text){'Translated text'}
-	ANOTHER_TEXT = 'Another translated text'
-	NESTED_TEXT = 'Nested text'
-	
-	let(:dictionary){
-		{				
-			:nested => {
-				:key => NESTED_TEXT
-			},
-			input_key => translated_text,
-			another_input_key => 	ANOTHER_TEXT
-		}
-	}
+  let(:translator) { Services::Translator.new nil, dictionary }
 
-	let(:translator){Services::Translator.new nil, dictionary}
+  it 'returns a text' do
+    # translator = Services::Translator.new nil, dictionary
 
-	
+    text_translated = translator.translate input_key
 
-	it 'returns a text' do	
-		# translator = Services::Translator.new nil, dictionary
+    expect(text_translated).to eq translated_text
+  end
 
-		text_translated = translator.translate input_key
+  it 'returns a text depending on the input key' do
+    text_translated = translator.translate another_input_key
 
-		expect(text_translated).to eq translated_text
-	end
+    expect(text_translated).to eq ANOTHER_TEXT
+  end
 
-	it 'returns a text depending on the input key' do		
-		text_translated = translator.translate another_input_key
+  it 'can be initiated with a class and a lang' do
+    DICTIONARY = dictionary
 
-		expect(text_translated).to eq ANOTHER_TEXT
-	end
+    class DicClass
+      def self.[](lang)
+        DicClass.send(lang)
+      end
 
-	it 'can be initiated with a class and a lang' do
+      def self.lang
+        DICTIONARY
+      end
+    end
 
-		DICTIONARY = dictionary
+    translator_by_class = Services::Translator.new(:lang, DicClass)
+    text_translated = translator_by_class.translate input_key
 
-		class DicClass
+    expect(text_translated).to eq translated_text
+  end
 
-			def self.[] lang
-				DicClass.send(lang)
-			end
-			
-			def self.lang 
-				DICTIONARY
-			end
-		end
+  it 'dials with nested string keys' do
+    text_translated = translator.translate nested_key
 
-
-		translator_by_class = Services::Translator.new(:lang, DicClass)
-		text_translated = translator_by_class.translate input_key
-
-		expect(text_translated).to eq translated_text
-
-	end
-
-	it 'dials with nested string keys' do
-		
-		text_translated = translator.translate nested_key
-
-		expect(text_translated).to eq NESTED_TEXT
-
-	end
-
-	
-
-
+    expect(text_translated).to eq NESTED_TEXT
+  end
 end
 
-
 describe Dictionary do
+  PAYLOAD = { key: 'payload_value' }.freeze
 
-	PAYLOAD = {:key => 'payload_value'}
-	
-	let(:payload){PAYLOAD}
+  let(:payload) { PAYLOAD }
 
-	it 'returns texts depending the language symbol' do
-		dictionary = Dictionary[:es]
-		expect(dictionary[:email][:welcome][:subject]).to eq 'Bienvenido/a a orfheo'
+  it 'returns texts depending the language symbol' do
+    dictionary = Dictionary[:es]
+    expect(dictionary[:email][:welcome][:subject]).to eq 'Bienvenido/a a orfheo'
+  end
 
-	end
-	
+  it 'can be loaded with payloads' do
+    Dictionary.load(payload)
 
-	it 'can be loaded with payloads' do
-		
-		Dictionary.load(payload)
-	
-		expect(Dictionary.payload).to eq PAYLOAD
-
-	end
-
+    expect(Dictionary.payload).to eq PAYLOAD
+  end
 end

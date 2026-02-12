@@ -8,7 +8,7 @@ module Admin
       repo: MetaRepos::Tags,
       singular: 'tag',
       plural: 'tags',
-      attributes: [:text, :source, :holders]
+      attributes: %i[text source holders]
     )
   end
 end
