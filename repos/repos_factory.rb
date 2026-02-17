@@ -58,7 +58,7 @@ module BaseReposMethods
   end
 
   def delete(id)
-    collection.delete_one(id: id)
+    collection.delete_many(id: id)
   end
 
   def exists?(id)
@@ -98,6 +98,8 @@ module BaseReposMethods
     results = collection.find(query).to_a
     return [] if results.empty?
 
-    Util.symbolize_array results
+    Util.symbolize_array(results).map do |doc|
+      doc.is_a?(Hash) ? doc.reject { |key, _| key == :_id } : doc
+    end
   end
 end

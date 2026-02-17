@@ -97,6 +97,8 @@ module Search
 
     def get_filters(params_filters)
       return {} if params_filters.blank?
+
+      params_filters = params_filters.to_unsafe_h if params_filters.respond_to?(:to_unsafe_h)
       unless params_filters.is_a?(Hash) && params_filters.values.all? { |selections| selections.is_a?(Array) }
         raise Pard::Invalid::FilterParams
       end

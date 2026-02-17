@@ -8,12 +8,15 @@ module MetaRepo
 
     def find(query)
       collection.find(query).map do |doc|
-        mapped_class.from_hash doc
+        mapped_class.from_hash(Util.string_keyed_hash_to_symbolized(doc))
       end
     end
 
     def get(query)
-      find(query).map(&:to_h)
+      find(query).map do |doc|
+        hash = doc.to_h
+        hash.is_a?(Hash) ? hash.reject { |key, _| key == :_id } : hash
+      end
     end
 
     def delete(id)
@@ -23,7 +26,10 @@ module MetaRepo
     end
 
     def all
-      find({}).map(&:to_h)
+      find({}).map do |doc|
+        hash = doc.to_h
+        hash.is_a?(Hash) ? hash.reject { |key, _| key == :_id } : hash
+      end
     end
 
     def count

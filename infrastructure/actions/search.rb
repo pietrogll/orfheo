@@ -16,6 +16,8 @@ module Actions
           return {} if query.blank?
 
           query.keys.each_with_object({}) do |key, parsed_query|
+            next if query[key].blank?
+
             parsed_query.merge!(query_value_for(key.to_sym, query[key]))
           end
         end

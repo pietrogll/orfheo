@@ -48,8 +48,7 @@ describe Repos::Spaces do
     end
 
     it 'modifies a space' do
-      space[:name] = 'otter_name'
-      Repos::Spaces.modify space
+      Repos::Spaces.modify({ id: id, name: 'otter_name' })
       saved_entry = @db['spaces'].find({ id: id }).first
       expect(saved_entry).to include({
                                        'user_id' => user_id,
@@ -67,6 +66,9 @@ describe Repos::Spaces do
   end
 
   describe 'Getters' do
+    before(:each) do
+      Repos::Spaces.modify({ id: id, name: 'name' })
+    end
     it 'retrieves the owner of the space' do
       expect(Repos::Spaces.get_owner(id)).to eq(user_id)
     end

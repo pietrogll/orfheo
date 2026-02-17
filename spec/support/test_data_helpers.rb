@@ -31,7 +31,11 @@ module TestDataHelpers
       user_id: user_id,
       name: "Profile #{SecureRandom.hex(4)}",
       type: 'artist',
-      description: 'Test profile'
+      description: 'Test profile',
+      email: { value: "user_#{SecureRandom.hex}@test.com", visible: 'false' },
+      phone: { value: '123', visible: 'false' },
+      color: 'blue',
+      address: { locality: 'Test City' }
     }.merge(overrides.except(:user_id))
 
     result = Repos::Profiles.save(profile_data)
@@ -108,7 +112,8 @@ module TestDataHelpers
       event_id: overrides[:event_id] || create_event(user_id: user_id)[:id],
       title: "Call #{SecureRandom.hex(4)}",
       start: (Time.now - 1.day).to_i * 1000,
-      deadline: (Time.now + 30.days).to_i * 1000
+      deadline: (Time.now + 30.days).to_i * 1000,
+      whitelist: []
     }.merge(overrides.except(:profile_id, :event_id, :user_id))
 
     result = Repos::Calls.save(call_data)
@@ -145,10 +150,13 @@ module TestDataHelpers
     form_id = SecureRandom.uuid
     form_data = {
       id: form_id,
-      event_id: overrides[:event_id] || create_event[:id],
-      name: "Form #{SecureRandom.hex(4)}",
-      fields: []
-    }.merge(overrides.except(:event_id))
+      call_id: overrides[:call_id] || create_call[:id],
+      type: 'artist',
+      blocks: { en: { title: { label: 'Title' }, description: { label: 'Description' },
+                      short_description: { label: 'Short' }, category: { label: 'Category' },
+                      subcategory: { label: 'Subcategory' }, format: { label: 'Format' } } },
+      texts: { en: { label: "Form #{SecureRandom.hex(4)}" } }
+    }.merge(overrides.except(:call_id))
 
     result = Repos::Forms.save(form_data)
     Repos::Forms.get({ _id: result.inserted_id }).first
@@ -158,9 +166,11 @@ module TestDataHelpers
     block_id = SecureRandom.uuid
     block_data = {
       id: block_id,
-      event_id: overrides[:event_id] || create_event[:id],
-      content: "Block content #{SecureRandom.hex(4)}"
-    }.merge(overrides.except(:event_id))
+      profile_id: overrides[:profile_id] || create_profile[:id],
+      user_id: overrides[:user_id] || create_user[:id],
+      name: "Free block #{SecureRandom.hex(4)}",
+      description: "Block content #{SecureRandom.hex(4)}"
+    }.merge(overrides.except(:profile_id, :user_id))
 
     result = Repos::FreeBlocks.save(block_data)
     Repos::FreeBlocks.get({ _id: result.inserted_id }).first

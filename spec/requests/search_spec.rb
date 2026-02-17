@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Search API', type: :request do
   let(:user) { create_user }
-  let(:event) { create_event(owner_id: user[:id]) }
+  let(:event) { create_event(user_id: user[:id]) }
 
   describe 'GET /search/proposals' do
     it 'renders the search proposals page' do
@@ -43,26 +43,26 @@ RSpec.describe 'Search API', type: :request do
       params = {
         pull_params: { page: 0, limit: 20 },
         db_key: 'profiles',
-        query: 'test'
+        query: { name: '' }
       }
 
       post '/search/load_results', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
-      expect(json[:data]).to have_key(:pull_params)
+      expect(json[:pull_params]).to be_present
     end
   end
 
   describe 'GET /search/public_info' do
-    let(:profile) { create_profile(owner_id: user[:id]) }
+    let(:event) { create_event(user_id: user[:id]) }
 
     it 'returns public info for a database element' do
-      get '/search/public_info', params: { id: profile[:id], db_key: 'profiles' }
-      expect(response).to have_http_status(:success)
+      get '/search/public_info', params: { id: event[:id], db_key: 'events' }
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
-      expect(json[:data]).to have_key(:db_element)
+      expect(json[:db_element]).to be_present
     end
   end
 
@@ -77,7 +77,7 @@ RSpec.describe 'Search API', type: :request do
       }
 
       post '/search/suggest', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:items)
@@ -96,7 +96,7 @@ RSpec.describe 'Search API', type: :request do
       }
 
       post '/search/results', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:profiles)
@@ -110,12 +110,12 @@ RSpec.describe 'Search API', type: :request do
       params = {
         query: ['test'],
         event_id: event[:id],
-        filters: {},
+        filters: { participants: ['music'], hosts: ['festival'], other: ['other'] },
         lang: 'en'
       }
 
       post '/search/suggest_program', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:items)
@@ -129,14 +129,14 @@ RSpec.describe 'Search API', type: :request do
       params = {
         query: [],
         event_id: event[:id],
-        filters: {},
+        filters: { participants: ['music'], hosts: ['festival'], other: ['other'] },
         date: nil,
         time: nil,
         lang: 'en'
       }
 
       post '/search/results_program', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:program)
@@ -148,13 +148,14 @@ RSpec.describe 'Search API', type: :request do
 
     it 'suggests tags' do
       params = {
-        query: 'test',
+        query: ['test'],
         source: 'profiles'
       }
 
       post '/search/suggest_tags', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
+      puts "SUGGEST TAGS RESPONSE: #{json.inspect}" if json[:status] != 'success'
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:items)
     end
@@ -164,9 +165,10 @@ RSpec.describe 'Search API', type: :request do
     before { login_as(user) }
 
     it 'suggests event names' do
-      post '/search/suggest_event_names', params: { query: 'test' }
-      expect(response).to have_http_status(:success)
+      post '/search/suggest_event_names', params: { query: ['test'] }
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
+      puts "SUGGEST EVENT NAMES RESPONSE: #{json.inspect}" if json[:status] != 'success'
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:items)
     end

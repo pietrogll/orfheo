@@ -48,6 +48,15 @@ module Guards
     raise Pard::Invalid::UnexistingEvent unless Repos::Events.exists?(event_id)
   end
 
+  # Check if event is in the future (can't modify past events)
+  def check_future_event!(event_id)
+    event = Repos::Events.get_by_id(event_id)
+    raise Pard::Invalid::UnexistingEvent unless event
+
+    event_date = event[:date_from]
+    raise Pard::Invalid, 'past_event' if event_date && Time.parse(event_date) < Time.now
+  end
+
   # Profile ownership
   def check_profile_ownership!(profile_id)
     raise Pard::Invalid::UnexistingProfile unless Repos::Profiles.exists?(profile_id)

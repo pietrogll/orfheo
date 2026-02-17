@@ -10,7 +10,7 @@ module Services
         # filters: {hosts: ---, participants: ----, other: ----}
         check_lang! lang
         tags = queriable_tags[0...-1]
-        program = Services::Events.get_event_program event_id
+        program = Services::Events.get_event_program(event_id) || []
         matched_performances = query_program program, tags, filters
         results = get_suggestions_for matched_performances, queriable_tags
         sort_results results
@@ -19,7 +19,7 @@ module Services
       def get_program_results(lang, event_id, tags, filters, date, time)
         #  It search for participant_name, host_name, title, locality (city), short_description --> searcheable_fields
         check_lang! lang
-        program = Services::Events.get_event_program event_id
+        program = Services::Events.get_event_program(event_id) || []
         unless date.blank?
           program = program.select do |performance|
             performance[:date] == date

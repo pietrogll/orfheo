@@ -38,7 +38,7 @@ module ApiStorage
         { '$addFields': { profile_color: { '$arrayElemAt': ['$profile.color', 0] },
                           profile_name: { '$arrayElemAt': ['$profile.name', 0] } } },
         { '$project': {
-          _id: 0, user_id: 0, profile: 0
+          _id: 0, user_id: 0, profile: 0, 'ambients._id': 0
         } }
       ]
     end

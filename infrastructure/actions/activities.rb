@@ -109,14 +109,21 @@ module Actions
   end
 
   class UserDeletesActivities
-    def self.run(params, _event_id)
-      CachedEvent.delete params[:event_id]
-      # Handle both 'performances' (array of objects with :id) and 'performance_ids' (array of IDs)
-      performance_ids = if params[:performance_ids].is_a?(Array)
+    def self.run(params, event_id)
+      target_event_id = params.is_a?(Hash) ? params[:event_id] : event_id
+      CachedEvent.delete target_event_id
+      # Handle both legacy array input and hash payloads
+      performance_ids = if params.is_a?(Array)
+                          params.map { |p| p.is_a?(Hash) ? p[:id] : nil }.compact
+                        elsif params[:performance_ids].is_a?(Array)
                           params[:performance_ids]
                         else
                           Util.arrayify_hash(params[:performances]).map { |p| p[:id] }.compact
                         end
+
+      if performance_ids.empty? && params.is_a?(Array)
+        performance_ids = params.map { |p| p.is_a?(Hash) ? p[:id] : nil }.compact
+      end
 
       performance_ids.map do |activity_id|
         activity = Repos::Activities.get_by_id activity_id

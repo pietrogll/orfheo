@@ -4,9 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'Proposals API', type: :request do
   let(:user) { create_user }
-  let(:profile) { create_profile(owner_id: user[:id]) }
-  let(:event) { create_event(owner_id: user[:id]) }
+  let(:profile) do
+    create_profile(user_id: user[:id], email: { value: user[:email], visible: 'false' },
+                   phone: { value: '123', visible: 'false' }, color: 'blue',
+                   name: 'Test Profile', address: { locality: 'Test City' })
+  end
+  let(:event) do
+    create_event(user_id: user[:id], date_start: (Time.now + 10.days).to_i * 1000,
+                 date_end: (Time.now + 20.days).to_i * 1000)
+  end
   let(:call) { create_call(profile_id: profile[:id], event_id: event[:id]) }
+  let(:form) { create_form(call_id: call[:id]) }
 
   describe 'Artist Proposals' do
     describe 'POST /users/send_artist_proposal' do
@@ -17,13 +25,21 @@ RSpec.describe 'Proposals API', type: :request do
           event_id: event[:id],
           profile_id: profile[:id],
           call_id: call[:id],
+          form_id: form[:id],
           own: 'false',
-          title: 'Test Proposal'
+          title: 'Test Proposal',
+          short_description: 'Short',
+          description: 'Full description',
+          category: 'arts',
+          subcategory: 'subcategory',
+          format: 'performance',
+          phone: { value: '123', visible: 'false' }
         }
 
         post '/users/send_artist_proposal', params: params
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
+        puts "CREATE ARTIST PROPOSAL RESPONSE: #{json.inspect}" if json[:status] != 'success'
         expect(json[:status]).to eq('success')
       end
     end
@@ -71,14 +87,25 @@ RSpec.describe 'Proposals API', type: :request do
           event_id: event[:id],
           profile_id: profile[:id],
           call_id: call[:id],
+          form_id: form[:id],
           own: 'false',
-          title: 'Test Space Proposal',
-          ambients: {}
+          space_name: 'Test Space Proposal',
+          address: 'Test City',
+          category: 'home',
+          subcategory: 'home',
+          phone: { value: '123', visible: 'false' },
+          '2': 'mandatory',
+          type: 'space_type',
+          description: 'space_description',
+          single_ambient: 'true',
+          ambients: [{ name: 'Main', description: 'Ambient', allowed_categories: ['music'], allowed_formats: ['concert'],
+                       capacity: '10', photos: ['ambient.jpg'] }]
         }
 
         post '/users/send_space_proposal', params: params
-        expect(response).to have_http_status(:success)
+        expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
+        puts "CREATE SPACE PROPOSAL RESPONSE: #{json.inspect}" if json[:status] != 'success'
         expect(json[:status]).to eq('success')
       end
     end

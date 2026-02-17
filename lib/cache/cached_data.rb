@@ -102,7 +102,7 @@ class CachedEvent < BaseCache
 
     def get_cached_program_hosts(event_id)
       hosts_identifiers = []
-      program(event_id).each_with_object([]) do |performance, accumulator|
+      Array(program(event_id)).each_with_object([]) do |performance, accumulator|
         identifier = performance[:host_id] + performance[:host_name]
         unless hosts_identifiers.include?(identifier)
           accumulator << performance

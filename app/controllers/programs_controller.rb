@@ -115,13 +115,13 @@ class ProgramsController < ApplicationController
   def check_future_event!(resource_id, resource_type)
     event_id = case resource_type
                when 'program'
-                 program = Repos::Programs.get(resource_id)
+                 program = Repos::Programs.get_by_id(resource_id)
                  program[:event_id]
                when 'event'
                  resource_id
                end
 
-    event = Repos::Events.get(event_id)
+    event = Repos::Events.get_by_id(event_id)
     event_date = event[:date_from]
     raise Pard::Invalid, 'past_event' if event_date && Time.parse(event_date) < Time.now
   end

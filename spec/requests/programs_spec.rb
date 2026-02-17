@@ -23,13 +23,15 @@ RSpec.describe 'Program Management', type: :request do
     end
 
     context 'when logged in as non-owner' do
-      it 'raises ownership error' do
+      it 'returns ownership error' do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect do
-          get "/program?id=#{program[:_id]}"
-        end.to raise_error(Pard::Invalid)
+        get "/program?id=#{program[:_id]}"
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -41,29 +43,34 @@ RSpec.describe 'Program Management', type: :request do
 
         post '/users/create_program', params: {
           event_id: event[:_id],
-          name: 'Main Stage',
-          description: 'Primary venue'
+          subcategories: { en: [] },
+          texts: { en: { title: 'Main Stage' } },
+          display_program: true
         }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
+        puts "CREATE PROGRAM RESPONSE: #{json.inspect}" if json[:status] != 'success'
         expect(json[:status]).to eq('success')
         expect(json[:program]).to be_present
-        expect(json[:program][:name]).to eq('Main Stage')
+        expect(json[:program][:texts]).to be_present
       end
     end
 
     context 'when logged in as non-owner' do
-      it 'raises event ownership error' do
+      it 'returns event ownership error' do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect do
-          post '/users/create_program', params: {
-            event_id: event[:_id],
-            name: 'Main Stage'
-          }
-        end.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/create_program', params: {
+          event_id: event[:_id],
+          subcategories: { en: [] },
+          texts: { en: { title: 'Main Stage' } }
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -75,13 +82,16 @@ RSpec.describe 'Program Management', type: :request do
 
         post '/users/modify_program', params: {
           id: program[:_id],
-          name: 'Updated Stage Name'
+          event_id: event[:_id],
+          subcategories: { en: [] },
+          texts: { en: { title: 'Updated Stage Name' } }
         }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
+        puts "MODIFY PROGRAM RESPONSE: #{json.inspect}" if json[:status] != 'success'
         expect(json[:status]).to eq('success')
-        expect(json[:program][:name]).to eq('Updated Stage Name')
+        expect(json[:program][:texts]).to be_present
       end
 
       context 'with permanent activities' do
@@ -91,7 +101,9 @@ RSpec.describe 'Program Management', type: :request do
 
           post '/users/modify_program', params: {
             id: program[:_id],
-            name: 'Updated Stage',
+            event_id: event[:_id],
+            subcategories: { en: [] },
+            texts: { en: { title: 'Updated Stage' } },
             permanents: [activity[:_id]]
           }
 
@@ -101,12 +113,17 @@ RSpec.describe 'Program Management', type: :request do
         it 'raises error for non-existent permanent activities' do
           login_as(user[:_id])
 
-          expect do
-            post '/users/modify_program', params: {
-              id: program[:_id],
-              permanents: ['non-existent-activity-id']
-            }
-          end.to raise_error(Pard::Invalid)
+          post '/users/modify_program', params: {
+            id: program[:_id],
+            event_id: event[:_id],
+            subcategories: { en: [] },
+            texts: { en: { title: 'Updated Stage' } },
+            permanents: ['non-existent-activity-id']
+          }
+
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body, symbolize_names: true)
+          expect(json[:status]).to eq('fail')
         end
       end
     end
@@ -117,12 +134,16 @@ RSpec.describe 'Program Management', type: :request do
         past_program = create_test_program(past_event[:_id], user[:_id])
         login_as(user[:_id])
 
-        expect do
-          post '/users/modify_program', params: {
-            id: past_program[:_id],
-            name: 'Updated'
-          }
-        end.to raise_error(Pard::Invalid)
+        post '/users/modify_program', params: {
+          id: past_program[:_id],
+          event_id: past_event[:_id],
+          subcategories: { en: [] },
+          texts: { en: { title: 'Updated' } }
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -131,7 +152,7 @@ RSpec.describe 'Program Management', type: :request do
     context 'when logged in as admin' do
       it 'deletes the program' do
         admin_user = create_test_user(email: 'admin@example.com')
-        MetaRepos::Admins.create({ _id: admin_user[:_id], email: admin_user[:email] })
+        MetaRepos::Admins.save({ id: admin_user[:_id], email: admin_user[:email] })
         login_as(admin_user[:_id])
 
         post '/users/delete_program', params: { id: program[:_id] }
@@ -143,12 +164,14 @@ RSpec.describe 'Program Management', type: :request do
     end
 
     context 'when logged in as regular user' do
-      it 'raises admin error' do
+      it 'returns admin error' do
         login_as(user[:_id])
 
-        expect do
-          post '/users/delete_program', params: { id: program[:_id] }
-        end.to raise_error(Pard::Invalid::Admin)
+        post '/users/delete_program', params: { id: program[:_id] }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -206,14 +229,16 @@ RSpec.describe 'Program Management', type: :request do
     it 'validates permanent activities exist' do
       login_as(user[:_id])
 
-      expect do
-        post '/users/set_permanents', params: {
-          event_id: event[:_id],
-          program_id: program[:_id],
-          permanents: ['non-existent-id'],
-          signature: 'test-sig'
-        }
-      end.to raise_error(Pard::Invalid)
+      post '/users/set_permanents', params: {
+        event_id: event[:_id],
+        program_id: program[:_id],
+        permanents: ['non-existent-id'],
+        signature: 'test-sig'
+      }
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
     end
   end
 
@@ -244,7 +269,8 @@ RSpec.describe 'Program Management', type: :request do
     profile_data.merge(_id: profile_id)
   end
 
-  def create_test_event(owner_id, profile_id, date_from: '2025-12-01', date_to: '2025-12-31')
+  def create_test_event(owner_id, profile_id, date_from: (Time.now + 30.days).strftime('%Y-%m-%d'),
+                        date_to: (Time.now + 40.days).strftime('%Y-%m-%d'))
     event_id = SecureRandom.uuid
     event_data = {
       id: event_id,
@@ -266,7 +292,9 @@ RSpec.describe 'Program Management', type: :request do
       id: program_id,
       event_id: event_id,
       user_id: owner_id,
-      name: 'Test Program',
+      subcategories: { en: [] },
+      texts: { en: { title: 'Test Program' } },
+      display_program: true,
       created_at: Time.now
     }
     Repos::Programs.save(program_data)

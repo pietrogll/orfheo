@@ -22,7 +22,9 @@ module ExtraReposMethods
       results = collection.aggregate(pipeline, options)
       return [] unless results.count.positive?
 
-      Util.symbolize_array results
+      Util.symbolize_array(results).map do |doc|
+        doc.is_a?(Hash) ? doc.reject { |key, _| key == :_id } : doc
+      end
     end
 
     def get_profile_space(profile_id)
@@ -33,7 +35,9 @@ module ExtraReposMethods
       results = collection.find({ profile_id: profile_id })
       return {} unless results.count.positive?
 
-      Util.symbolize_array(results)
+      Util.symbolize_array(results).map do |doc|
+        doc.is_a?(Hash) ? doc.reject { |key, _| key == :_id } : doc
+      end
     end
   end
 end

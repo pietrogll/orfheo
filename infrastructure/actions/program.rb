@@ -1,6 +1,30 @@
 # frozen_string_literal: true
 
 module Actions
+  class UserGetsProgram
+    def self.run(program_id)
+      Repos::Programs.get_by_id program_id
+    end
+  end
+
+  class UserSpaceOrder
+    def self.run(_owner_id, params)
+      Actions::UserOrdersSpaces.run(params[:program_id], params[:space_order], params[:event_id])
+    end
+  end
+
+  class UserPublishProgram
+    def self.run(_owner_id, params)
+      Actions::UserPublishesProgram.run(params[:program_id], params[:event_id])
+    end
+  end
+
+  class UserSetPermanents
+    def self.run(_owner_id, params)
+      Actions::UserSavesPermanents.run(params[:program_id], params[:permanents], params[:event_id])
+    end
+  end
+
   class UserCreatesProgram
     def self.run(user_id, params)
       program = Program.new(user_id, params).create

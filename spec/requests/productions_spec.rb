@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Production Management', type: :request do
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:id]) }
-  let(:production) { create_test_production(profile[:id]) }
+  let(:production) { create_test_production(profile[:id], tags: nil) }
   let(:other_user) { create_test_user(email: 'other@example.com') }
   let(:other_profile) { create_test_profile(other_user[:id]) }
 
@@ -82,7 +82,9 @@ RSpec.describe 'Production Management', type: :request do
           description: 'Updated description',
           category: production[:category],
           format: production[:format],
-          duration: production[:duration]
+          duration: production[:duration],
+          photos: production[:photos],
+          main_picture: production[:main_picture]
         }
 
         expect(response).to have_http_status(:ok)
@@ -170,7 +172,7 @@ RSpec.describe 'Production Management', type: :request do
     profile_data.merge(_id: profile_id)
   end
 
-  def create_test_production(profile_id, name: 'Test Production')
+  def create_test_production(profile_id, name: 'Test Production', tags: %w[tag1 tag2])
     production_id = SecureRandom.uuid
     production_data = {
       id: production_id,
@@ -183,7 +185,7 @@ RSpec.describe 'Production Management', type: :request do
       duration: '90 min',
       main_picture: ['prod.jpg'],
       photos: ['prod.jpg', 'prod2.jpg'],
-      tags: %w[tag1 tag2],
+      tags: tags,
       created_at: Time.now
     }
     Repos::Productions.save(production_data)

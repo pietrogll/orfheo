@@ -53,6 +53,8 @@ describe 'Actions Activities' do
 
   describe 'UserDeletesActivities' do
     it 'deletes all activities from the repo' do
+      Repos::Activities.save activity
+      Repos::Activities.save otter_activity
       expect(Repos::Activities).to receive(:delete).twice
       Actions::UserDeletesActivities.run activitities, event_id
     end

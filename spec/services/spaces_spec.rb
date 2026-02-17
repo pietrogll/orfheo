@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 describe 'get_public_info for Spaces' do
-  let(:space_id) { 'fce01c94-4a2b-49ff-b6b6-dfd53e45bb80' }
-  let(:profile_id) { 'fce01c94-4a2b-49ff-b6b6-dfd53e45bb83' }
+  let(:space_id) { SecureRandom.uuid }
+  let(:profile_id) { SecureRandom.uuid }
 
-  let(:ambient_id) { 'fff01c94-4a2b-49ff-b6b6-dfd53e45bb81' }
-  let(:otter_ambient_id) { 'eee01c94-4a2b-49ff-b6b6-dfd53e45bb82' }
+  let(:ambient_id) { SecureRandom.uuid }
+  let(:otter_ambient_id) { SecureRandom.uuid }
 
   let(:ambient) do
     {

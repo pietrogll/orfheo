@@ -33,6 +33,9 @@ RSpec.configure do |config|
     require_relative '../config/initializers/000_mongodb'
     db = $db # Use the global $db set by mongodb initializer
 
+    CachedEvent.clear
+    MetaRepos.for(db) unless defined?(MetaRepos::Galleries)
+
     DatabaseCleaner[:mongo].db = db
     DatabaseCleaner[:mongo].strategy = :deletion
     DatabaseCleaner[:mongo].clean_with(:deletion)

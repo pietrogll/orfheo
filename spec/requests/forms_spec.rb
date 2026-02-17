@@ -4,21 +4,22 @@ require 'rails_helper'
 
 RSpec.describe 'Forms API', type: :request do
   let(:user) { create_user }
-  let(:profile) { create_profile(owner_id: user[:id]) }
-  let(:call) { create_call(profile_id: profile[:id]) }
+  let(:profile) { create_profile(user_id: user[:id]) }
+  let(:call) { create_call(profile_id: profile[:id], user_id: user[:id]) }
   let(:form) { create_form(call_id: call[:id]) }
 
   describe 'POST /forms/' do
     before { login_as(user) }
 
     it 'lists forms for a call' do
+      create_form(call_id: call[:id])
       params = {
         call_id: call[:id],
         lang: 'en'
       }
 
       post '/forms/', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
       expect(json[:data]).to have_key(:forms)
@@ -31,23 +32,35 @@ RSpec.describe 'Forms API', type: :request do
     it 'creates a new form' do
       params = {
         call_id: call[:id],
+        type: 'artist',
         title: 'Application Form',
-        fields: []
+        blocks: { en: { title: { label: 'Title' }, description: { label: 'Description' },
+                        short_description: { label: 'Short' }, category: { label: 'Category' },
+                        subcategory: { label: 'Subcategory' }, format: { label: 'Format' } } },
+        texts: { en: { label: 'Form' } }
       }
 
       post '/forms/create', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
-      expect(json[:data][:form][:title]).to eq('Application Form')
+      expect(json[:data][:form][:texts]).to be_present
     end
 
     it 'requires call ownership' do
-      other_call = create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])
+      other_user = create_user
+      other_call = create_call(profile_id: create_profile(user_id: other_user[:id])[:id],
+                               user_id: other_user[:id])
 
-      expect do
-        post '/forms/create', params: { call_id: other_call[:id], title: 'Form' }
-      end.to raise_error(Pard::Invalid)
+      post '/forms/create', params: { call_id: other_call[:id], type: 'artist',
+                                      blocks: { en: { title: { label: 'Title' }, description: { label: 'Description' },
+                                                      short_description: { label: 'Short' }, category: { label: 'Category' },
+                                                      subcategory: { label: 'Subcategory' }, format: { label: 'Format' } } },
+                                      texts: { en: { label: 'Form' } } }
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
     end
   end
 
@@ -55,24 +68,38 @@ RSpec.describe 'Forms API', type: :request do
     before { login_as(user) }
 
     it 'updates a form' do
+      owner_form = create_form(call_id: call[:id], user_id: user[:id])
       params = {
-        id: form[:id],
-        title: 'Updated Form Title'
+        id: owner_form[:id],
+        call_id: owner_form[:call_id],
+        type: 'artist',
+        blocks: { en: { title: { label: 'Title' }, description: { label: 'Description' },
+                        short_description: { label: 'Short' }, category: { label: 'Category' },
+                        subcategory: { label: 'Subcategory' }, format: { label: 'Format' } } },
+        texts: { en: { label: 'Updated' } }
       }
 
       post '/forms/modify', params: params
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
-      expect(json[:data][:form][:title]).to eq('Updated Form Title')
+      expect(json[:data][:form][:texts]).to be_present
     end
 
     it 'requires form ownership' do
-      other_form = create_form(call_id: create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])[:id])
+      other_user = create_user
+      other_form = create_form(call_id: create_call(profile_id: create_profile(user_id: other_user[:id])[:id],
+                                                    user_id: other_user[:id])[:id])
 
-      expect do
-        post '/forms/modify', params: { id: other_form[:id], title: 'Updated' }
-      end.to raise_error(Pard::Invalid)
+      post '/forms/modify', params: { id: other_form[:id], type: 'artist',
+                                      blocks: { en: { title: { label: 'Title' }, description: { label: 'Description' },
+                                                      short_description: { label: 'Short' }, category: { label: 'Category' },
+                                                      subcategory: { label: 'Subcategory' }, format: { label: 'Format' } } },
+                                      texts: { en: { label: 'Updated' } } }
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
     end
   end
 
@@ -80,18 +107,24 @@ RSpec.describe 'Forms API', type: :request do
     before { login_as(user) }
 
     it 'deletes a form' do
-      post '/forms/delete', params: { id: form[:id] }
-      expect(response).to have_http_status(:success)
+      owner_form = create_form(call_id: call[:id], user_id: user[:id])
+
+      post '/forms/delete', params: { id: owner_form[:id] }
+      expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
     end
 
     it 'requires form ownership' do
-      other_form = create_form(call_id: create_call(profile_id: create_profile(owner_id: create_user[:id])[:id])[:id])
+      other_user = create_user
+      other_form = create_form(call_id: create_call(profile_id: create_profile(user_id: other_user[:id])[:id],
+                                                    user_id: other_user[:id])[:id])
 
-      expect do
-        post '/forms/delete', params: { id: other_form[:id] }
-      end.to raise_error(Pard::Invalid)
+      post '/forms/delete', params: { id: other_form[:id] }
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('fail')
     end
   end
 

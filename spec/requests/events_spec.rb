@@ -60,21 +60,25 @@ RSpec.describe 'Event Management', type: :request do
     end
 
     context 'when not logged in' do
-      it 'raises unauthorized error' do
-        expect do
-          get "/event_manager?id=#{event[:_id]}"
-        end.to raise_error(Pard::Invalid::Unauthorized)
+      it 'returns unauthorized error' do
+        get "/event_manager?id=#{event[:_id]}"
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
 
     context 'when logged in as non-owner' do
-      it 'raises unexisting error' do
+      it 'returns unexisting error' do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect do
-          get "/event_manager?id=#{event[:_id]}"
-        end.to raise_error(Pard::Unexisting)
+        get "/event_manager?id=#{event[:_id]}"
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
 
@@ -93,7 +97,10 @@ RSpec.describe 'Event Management', type: :request do
 
   describe 'GET /events' do
     it 'lists all events' do
-      create_test_event(user[:_id], profile[:_id])
+      create_test_profile(user[:_id], name: 'Organizer')
+      create_test_event(user[:_id], profile[:_id],
+                        eventTime: [{ date: '2025-12-01', time: ['10:00'] }],
+                        call_id: nil, program_id: nil)
 
       get '/events'
 
@@ -127,28 +134,32 @@ RSpec.describe 'Event Management', type: :request do
         expect(json[:event][:name]).to eq('New Event')
       end
 
-      it 'requires profile ownership' do
+      it 'returns profile ownership error' do
         other_user = create_test_user(email: 'other@example.com')
         other_profile = create_test_profile(other_user[:_id])
         login_as(user[:_id])
 
-        expect do
-          post '/users/create_event', params: {
-            profile_id: other_profile[:_id],
-            name: 'New Event'
-          }
-        end.to raise_error(Pard::Invalid::ProfileOwnership)
+        post '/users/create_event', params: {
+          profile_id: other_profile[:_id],
+          name: 'New Event'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
 
     context 'when not logged in' do
-      it 'raises unauthorized error' do
-        expect do
-          post '/users/create_event', params: {
-            profile_id: profile[:_id],
-            name: 'New Event'
-          }
-        end.to raise_error(Pard::Invalid::Unauthorized)
+      it 'returns unauthorized error' do
+        post '/users/create_event', params: {
+          profile_id: profile[:_id],
+          name: 'New Event'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -160,7 +171,12 @@ RSpec.describe 'Event Management', type: :request do
 
         post '/users/modify_event', params: {
           id: event[:_id],
-          name: 'Updated Event Name'
+          name: 'Updated Event Name',
+          texts: { en: 'Updated description' },
+          eventTime: [{ date: '2025-12-01', time: ['10:00'] }],
+          categories: [],
+          place: { city: 'Test City' },
+          type: 'festival'
         }
 
         expect(response).to have_http_status(:ok)
@@ -171,16 +187,18 @@ RSpec.describe 'Event Management', type: :request do
     end
 
     context 'when logged in as non-owner' do
-      it 'raises ownership error' do
+      it 'returns ownership error' do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect do
-          post '/users/modify_event', params: {
-            id: event[:_id],
-            name: 'Updated Event Name'
-          }
-        end.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/modify_event', params: {
+          id: event[:_id],
+          name: 'Updated Event Name'
+        }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -190,7 +208,9 @@ RSpec.describe 'Event Management', type: :request do
       it 'deletes the event' do
         login_as(user[:_id])
 
-        post '/users/delete_event', params: { id: event[:_id] }
+        deletable_event = create_test_event(user[:_id], profile[:_id], professional: false)
+
+        post '/users/delete_event', params: { id: deletable_event[:_id] }
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
@@ -199,13 +219,15 @@ RSpec.describe 'Event Management', type: :request do
     end
 
     context 'when logged in as non-owner' do
-      it 'raises ownership error' do
+      it 'returns ownership error' do
         other_user = create_test_user(email: 'other@example.com')
         login_as(other_user[:_id])
 
-        expect do
-          post '/users/delete_event', params: { id: event[:_id] }
-        end.to raise_error(Pard::Invalid::EventOwnership)
+        post '/users/delete_event', params: { id: event[:_id] }
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('fail')
       end
     end
   end
@@ -266,7 +288,8 @@ RSpec.describe 'Event Management', type: :request do
     profile_data.merge(_id: profile_id) # Add _id for compatibility
   end
 
-  def create_test_event(owner_id, profile_id, slug: nil, professional: true)
+  def create_test_event(owner_id, profile_id, slug: nil, professional: true, eventTime: nil, call_id: nil,
+                        program_id: nil)
     event_id = SecureRandom.uuid
     event_data = {
       id: event_id,
@@ -277,7 +300,10 @@ RSpec.describe 'Event Management', type: :request do
       date_from: '2025-12-01',
       date_to: '2025-12-31',
       professional: professional, # Make professional by default for viewing
-      created_at: Time.now
+      created_at: Time.now,
+      eventTime: eventTime,
+      call_id: call_id,
+      program_id: program_id
     }
     event_data[:slug] = slug if slug
     Repos::Events.save(event_data)
