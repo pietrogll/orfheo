@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CallsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: %i[create destroy update add_whitelist delete_whitelist]
   before_action :require_login!, except: []
   before_action :require_admin, only: %i[show destroy]
 
@@ -14,7 +15,7 @@ class CallsController < ApplicationController
   def create
     owner_id = check_profile_ownership!(params[:profile_id])
     call = Actions::UserCreatesCall.run(owner_id, symbolized_params)
-    render json: { status: 'success', data: { call: call } }
+    success(call: call)
   end
 
   # POST /users/delete_call
@@ -27,7 +28,7 @@ class CallsController < ApplicationController
   def update
     owner_id = check_call_ownership!(params[:id])
     call = Actions::UserModifiesCall.run(owner_id, symbolized_params)
-    render json: { status: 'success', data: { call: call } }
+    success(call: call)
   end
 
   # POST /users/checks_participant_name

@@ -3,8 +3,12 @@
 class WelcomeController < ApplicationController
   # Welcome page - serves the main landing page
   def index
-    # No authentication required for welcome page
-    # Page params can be set by views for meta tags
+    if logged_in?
+      redirect_to users_path
+      return
+    end
+
+    @status = status_for(nil)
     @page_params = {
       title: 'orfheo | your cultural community',
       description: 'Muestra y descubre proyectos, lanza tus convocatorias, participa en grandes eventos. Crea en red: tu comunidad cultural te llama.',

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ArtistProposalsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: %i[create amend update destroy select modify_param]
   before_action :require_login!
 
   # POST /users/send_artist_proposal
@@ -17,7 +18,7 @@ class ArtistProposalsController < ApplicationController
     artist = Actions::UserGetsArtistsList.run(proposal).first
 
     broadcast_websocket(params[:event_id], 'addArtist', artist)
-    render json: { status: 'success', data: { proposal: proposal } }
+    success(proposal: proposal)
   end
 
   # POST /users/amend_artist_proposal
@@ -36,7 +37,7 @@ class ArtistProposalsController < ApplicationController
     artist = Actions::UserGetsArtistsList.run(proposal).first
 
     broadcast_websocket(params[:event_id], 'modifyArtist', artist)
-    render json: { status: 'success', data: { proposal: proposal } }
+    success(proposal: proposal)
   end
 
   # POST /users/delete_artist_proposal

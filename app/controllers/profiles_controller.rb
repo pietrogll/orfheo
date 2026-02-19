@@ -18,10 +18,14 @@ class ProfilesController < ApplicationController
     check_profile_exists!(id)
     owner = get_profile_owner(id)
     status = status_for(owner)
-    profile = is_owner?(status) ? Actions::VisitProfileAsOwner.run(id) : Actions::VisitProfile.run(id)
+    @profile = is_owner?(status) ? Actions::VisitProfileAsOwner.run(id) : Actions::VisitProfile.run(id)
+    @status = status
+    @page_params = page_params_for(@profile).to_json
 
-    # Return JSON for now (HTML rendering via React app)
-    render json: { status: 'success', profile: profile, profile_status: status.to_sym }
+    respond_to do |format|
+      format.html
+      format.json { render json: { status: 'success', profile: @profile, profile_status: @status.to_sym } }
+    end
   end
 
   # GET /profile/:slug - Show profile by slug
@@ -105,14 +109,6 @@ class ProfilesController < ApplicationController
   # Get profile owner user ID
   def get_profile_owner(profile_id)
     Repos::Profiles.get_owner(profile_id)
-  end
-
-  # Determine user's relationship to profile (:owner, :admin, or :visitor)
-  def status_for(owner_id)
-    return :admin if admin?
-    return :owner if owner_id == current_user_id
-
-    :visitor
   end
 
   # Check if user is owner or admin

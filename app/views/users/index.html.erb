@@ -1,22 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>User Dashboard | orfheo</title>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-  <%= stylesheet_link_tag 'ours', media: 'all' %>
-</head>
-<body>
-  <div id="users-page" data-profiles="<%= @profiles %>">
-    <h1>User Dashboard</h1>
-    <div id="react-users-root"></div>
-  </div>
-  <%= javascript_include_tag 'ours' %>
-  <script>
-    // Initialize users page with React component
-    if (typeof Pard !== 'undefined' && Pard.Users) {
-      Pard.Users();
-    }
-  </script>
-</body>
-</html>
+<script>
+  Pard.Users(<%= raw @profiles.to_json %>)
+</script>

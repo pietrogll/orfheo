@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class FormsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: %i[create update destroy]
   before_action :require_login!, except: [:index]
 
   # POST /forms/ (list forms for a call)
@@ -22,14 +23,14 @@ class FormsController < ApplicationController
   def create
     owner_id = check_call_ownership!(params[:call_id])
     form = Actions::UserCreatesForm.run(owner_id, params.to_unsafe_h)
-    render json: { status: 'success', data: { form: form } }
+    success(form: form)
   end
 
   # POST /forms/modify
   def update
     owner_id = check_form_ownership!(params[:id])
     form = Actions::UserModifiesForm.run(owner_id, params.to_unsafe_h)
-    render json: { status: 'success', data: { form: form } }
+    success(form: form)
   end
 
   # POST /forms/delete

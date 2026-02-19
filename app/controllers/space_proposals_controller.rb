@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class SpaceProposalsController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: %i[create amend update select destroy]
   before_action :require_login!
 
   # POST /users/send_space_proposal
@@ -23,7 +24,7 @@ class SpaceProposalsController < ApplicationController
     space = Actions::UserGetsSpace.run(proposal)
     broadcast_websocket(params[:event_id], 'addSpace', space)
 
-    render json: { status: 'success', data: { proposal: proposal } }
+    success(proposal: proposal)
   end
 
   # POST /users/amend_space_proposal
@@ -45,7 +46,7 @@ class SpaceProposalsController < ApplicationController
     space = Actions::UserGetsSpace.run(proposal)
 
     broadcast_websocket(params[:event_id], 'modifySpace', space)
-    render json: { status: 'success', data: { proposal: proposal } }
+    success(proposal: proposal)
   end
 
   # POST /users/select_space_proposal

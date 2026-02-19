@@ -2,7 +2,8 @@
 
 module Participant
   class ParticipantsController < ApplicationController
-    before_action :require_login
+    skip_before_action :verify_authenticity_token, only: %i[modify]
+    before_action :require_login!
 
     # POST /participant/modify
     def modify
@@ -12,7 +13,7 @@ module Participant
       participant_for_manager = Actions::ModifiesParticipantForManager.run(params.to_unsafe_h)
 
       broadcast_websocket(params[:event_id], 'modifyParticipant', participant_for_manager)
-      render json: { status: 'success', data: { participant: participant_for_manager } }
+      success(participant: participant_for_manager)
     end
 
     private

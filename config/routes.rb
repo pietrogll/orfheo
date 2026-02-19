@@ -22,6 +22,14 @@ Rails.application.routes.draw do
   get '/validate', to: 'sessions#validate' # Email validation callback
   post '/forgotten_password', to: 'sessions#forgotten_password'
 
+  # Legacy authentication routes (frontend expects /login/ prefixes)
+  scope '/login' do
+    post '/register', to: 'sessions#register'
+    post '/login', to: 'sessions#create'
+    post '/logout', to: 'sessions#destroy'
+    post '/forgotten_password', to: 'sessions#forgotten_password'
+  end
+
   # Current user session info
   get '/login', to: 'sessions#show', as: :current_session
 
@@ -81,11 +89,14 @@ Rails.application.routes.draw do
   end
 
   get '/profiles', to: 'profiles#index', as: :profiles
+  get '/services', to: 'services#index', as: :services
 
   scope '/users' do
     # Profile CRUD
     post '/create_profile', to: 'profiles#create'
     post '/modify_profile', to: 'profiles#update'
+    post '/modify_profile_name', to: 'profiles#update'
+    post '/modify_profile_description', to: 'profiles#update'
     post '/delete_profile', to: 'profiles#destroy'
     post '/check_name', to: 'profiles#check_name'
     post '/list_profiles', to: 'profiles#list_profiles'

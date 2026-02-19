@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
 class FreeBlocksController < ApplicationController
+  skip_before_action :verify_authenticity_token, only: %i[create update destroy]
   before_action :require_login!
 
   # POST /users/create_free_block
   def create
     check_profile_ownership!(params[:profile_id])
     free_block = Actions::UserCreatesFreeBlock.run(current_user_id, params.to_unsafe_h)
-    render json: { status: 'success', data: { free_block: free_block } }
+    success(free_block: free_block)
   end
 
   # POST /users/modify_free_block
   def update
     owner_id = check_free_block_ownership!(params[:id])
     free_block = Actions::UserModifiesFreeBlock.run(owner_id, params.to_unsafe_h)
-    render json: { status: 'success', data: { free_block: free_block } }
+    success(free_block: free_block)
   end
 
   # POST /users/delete_free_block
