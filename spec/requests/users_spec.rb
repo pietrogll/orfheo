@@ -25,13 +25,10 @@ RSpec.describe 'Users', type: :request do
 
   describe 'Protected Routes - require login' do
     context 'GET /users without authentication' do
-      it 'returns unauthorized error' do
+      it 'redirects to the welcome page' do
         get users_path
 
-        expect(response).to have_http_status(:ok) # Pard exceptions return 200
-        json = JSON.parse(response.body, symbolize_names: true)
-        expect(json[:status]).to eq('fail')
-        expect(json[:reason]).to eq('unauthorized')
+        expect(response).to redirect_to(root_path)
       end
     end
 
@@ -92,6 +89,20 @@ RSpec.describe 'Users', type: :request do
         expect(json[:status]).to eq('fail')
         expect(json[:reason]).to eq('incorrect_password')
       end
+    end
+  end
+
+  describe 'Logout redirect behavior' do
+    it 'redirects /users to welcome page after logout' do
+      post '/login', params: {
+        email: user_email,
+        password: user_password
+      }
+
+      post '/logout'
+      get users_path
+
+      expect(response).to redirect_to(root_path)
     end
   end
 

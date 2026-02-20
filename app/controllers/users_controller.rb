@@ -5,7 +5,8 @@
 
 class UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, only: %i[header modify_password save_interests delete_user modify_lang]
-  before_action :require_login!, except: %i[modify_lang save_interests]
+  before_action :redirect_to_welcome_unless_logged_in!, only: :index
+  before_action :require_login!, except: %i[modify_lang save_interests index]
 
   # GET /users - User's profile page (requires login)
   def index
@@ -92,6 +93,12 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def redirect_to_welcome_unless_logged_in!
+    return if logged_in?
+
+    redirect_to root_path
+  end
 
   def clean_session
     session.delete(:identity)
