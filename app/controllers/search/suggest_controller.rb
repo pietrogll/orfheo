@@ -2,7 +2,7 @@
 
 module Search
   class SuggestController < ApplicationController
-    before_action :require_login!
+    before_action :require_login!, except: %i[suggest_event_names suggest_tags]
 
     # POST /search/suggest
     def suggest
@@ -78,7 +78,7 @@ module Search
     # POST /search/suggest_event_names
     def suggest_event_names
       results = Services::Suggest.event_names(params[:query])
-      render json: { status: 'success', data: { items: results } }
+      render json: { status: 'success', items: results }
     end
 
     private

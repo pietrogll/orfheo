@@ -127,6 +127,7 @@ Rails.application.routes.draw do
   end
 
   # Calls management (artist/space proposals)
+  get '/call', to: 'calls#show'
   scope '/users' do
     get '/call', to: 'calls#show'
     post '/create_call', to: 'calls#create'

@@ -20,9 +20,9 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @the_event = event.to_json
-        @status = status.to_json
-        @lang = lang.to_json
+        @the_event = event
+        @status = status
+        @lang = lang
         render :show
       end
       format.json { render json: { status: 'success', event: event, event_status: status, lang: lang } }
@@ -38,9 +38,9 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @the_event = event.to_json
-        @status = status.to_json
-        @lang = lang.to_json
+        @the_event = event
+        @status = status
+        @lang = lang
         render :show
       end
       format.json { render json: { status: 'success', event: event, event_status: status, lang: lang } }
@@ -56,8 +56,8 @@ class EventsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @event_id = params[:id].to_json
-        @status = status.to_json
+        @event_id = params[:id]
+        @status = status
         render :manager
       end
       format.json { render json: { status: 'success', event_id: params[:id], manager_status: status } }
