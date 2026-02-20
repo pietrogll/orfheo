@@ -170,7 +170,7 @@ RSpec.describe 'Search API', type: :request do
       json = JSON.parse(response.body, symbolize_names: true)
       puts "SUGGEST EVENT NAMES RESPONSE: #{json.inspect}" if json[:status] != 'success'
       expect(json[:status]).to eq('success')
-      expect(json[:data]).to have_key(:items)
+      expect(json).to have_key(:items)
     end
   end
 end

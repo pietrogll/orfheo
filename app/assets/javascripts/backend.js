@@ -427,7 +427,14 @@
       {
         id: program_id
       },
-      callback
+      function(data){
+        if (data && data.data && data.data.call && !data.call) {
+          data.call = data.data.call;
+        }
+        if (callback) {
+          callback(data);
+        }
+      }
     )
   } 
   

@@ -15,7 +15,7 @@ RSpec.describe 'Admin::Tags', type: :request do
     Repos::Users.save(non_admin_data)
 
     # Create admin user
-    MetaRepos::Admins.save({ _id: user[:_id], email: user[:email] })
+    MetaRepos::Admins.save({ id: user[:id], email: user[:email] })
 
     # Create test tag
     MetaRepos::Tags.save({ _id: tag_id, id: tag_id, name: 'Test Tag' })
@@ -30,7 +30,7 @@ RSpec.describe 'Admin::Tags', type: :request do
   describe 'GET /admin/tags' do
     context 'when logged in as admin' do
       it 'lists all tags' do
-        login_as(user[:email])
+        login_as(user[:id])
         get '/admin/tags'
 
         expect(response).to have_http_status(:ok)
@@ -43,7 +43,7 @@ RSpec.describe 'Admin::Tags', type: :request do
 
     context 'when logged in as non-admin' do
       it 'returns admin error' do
-        login_as(non_admin[:email])
+        login_as(non_admin[:id])
         get '/admin/tags'
 
         expect(response).to have_http_status(:ok)
@@ -67,7 +67,7 @@ RSpec.describe 'Admin::Tags', type: :request do
   describe 'POST /admin/tags' do
     context 'when logged in as admin' do
       it 'creates a new tag' do
-        login_as(user[:email])
+        login_as(user[:id])
         post '/admin/tags', params: { text: 'New Tag' }
 
         expect(response).to have_http_status(:ok)
@@ -79,7 +79,7 @@ RSpec.describe 'Admin::Tags', type: :request do
 
     context 'when logged in as non-admin' do
       it 'returns admin error' do
-        login_as(non_admin[:email])
+        login_as(non_admin[:id])
         post '/admin/tags', params: { name: 'New Tag' }
 
         expect(response).to have_http_status(:ok)
@@ -92,7 +92,7 @@ RSpec.describe 'Admin::Tags', type: :request do
   describe 'PATCH /admin/tags/:id' do
     context 'when logged in as admin' do
       it 'updates the tag' do
-        login_as(user[:email])
+        login_as(user[:id])
         patch "/admin/tags/#{tag_id}", params: { text: 'Updated Tag' }
 
         expect(response).to have_http_status(:ok)
@@ -104,7 +104,7 @@ RSpec.describe 'Admin::Tags', type: :request do
 
     context 'when logged in as non-admin' do
       it 'returns admin error' do
-        login_as(non_admin[:email])
+        login_as(non_admin[:id])
         patch "/admin/tags/#{tag_id}", params: { name: 'Updated Tag' }
 
         expect(response).to have_http_status(:ok)
@@ -117,7 +117,7 @@ RSpec.describe 'Admin::Tags', type: :request do
   describe 'DELETE /admin/tags/:id' do
     context 'when logged in as admin' do
       it 'deletes the tag' do
-        login_as(user[:email])
+        login_as(user[:id])
         delete "/admin/tags/#{tag_id}"
 
         expect(response).to have_http_status(:ok)
@@ -132,7 +132,7 @@ RSpec.describe 'Admin::Tags', type: :request do
 
     context 'when logged in as non-admin' do
       it 'returns admin error' do
-        login_as(non_admin[:email])
+        login_as(non_admin[:id])
         delete "/admin/tags/#{tag_id}"
 
         expect(response).to have_http_status(:ok)
@@ -144,7 +144,7 @@ RSpec.describe 'Admin::Tags', type: :request do
 
   private
 
-  def login_as(user_email)
-    TestSessionMiddleware.session[:identity] = user_email
+  def login_as(user_id)
+    TestSessionMiddleware.session[:identity] = user_id
   end
 end

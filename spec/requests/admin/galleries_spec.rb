@@ -9,7 +9,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   before do
     Repos::Users.save(user_data)
-    MetaRepos::Admins.save({ _id: user[:_id], email: user[:email] })
+    MetaRepos::Admins.save({ id: user[:id], email: user[:email] })
     MetaRepos::Galleries.save({ _id: gallery_id, id: gallery_id, name: 'Test Gallery' })
   end
 
@@ -21,7 +21,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   describe 'GET /admin/galleries' do
     it 'lists all galleries' do
-      login_as(user[:email])
+      login_as(user[:id])
       get '/admin/galleries'
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -32,7 +32,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   describe 'POST /admin/galleries' do
     it 'creates a new gallery' do
-      login_as(user[:email])
+      login_as(user[:id])
       post '/admin/galleries', params: { name: 'New Gallery' }
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -43,7 +43,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   describe 'PATCH /admin/galleries/:id' do
     it 'updates the gallery' do
-      login_as(user[:email])
+      login_as(user[:id])
       patch "/admin/galleries/#{gallery_id}", params: { name: 'Updated Gallery' }
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -54,7 +54,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   describe 'DELETE /admin/galleries/:id' do
     it 'deletes the gallery' do
-      login_as(user[:email])
+      login_as(user[:id])
       delete "/admin/galleries/#{gallery_id}"
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -65,7 +65,7 @@ RSpec.describe 'Admin::Galleries', type: :request do
 
   private
 
-  def login_as(user_email)
-    TestSessionMiddleware.session[:identity] = user_email
+  def login_as(user_id)
+    TestSessionMiddleware.session[:identity] = user_id
   end
 end

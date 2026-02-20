@@ -8,7 +8,7 @@ class CallsController < ApplicationController
   # GET /users/call?id=:id
   def show
     call = Repos::Calls.get_by_id(params[:id])
-    render json: { status: 'success', call: call }
+    success(call: call)
   end
 
   # POST /users/create_call

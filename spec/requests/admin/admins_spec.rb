@@ -13,7 +13,7 @@ RSpec.describe 'Admin::Admins', type: :request do
   before do
     Repos::Users.save(user_data)
     Repos::Users.save(other_user_data)
-    MetaRepos::Admins.save({ _id: user[:_id], email: user[:email] })
+    MetaRepos::Admins.save({ id: user[:id], email: user[:email] })
   end
 
   after do
@@ -23,7 +23,7 @@ RSpec.describe 'Admin::Admins', type: :request do
 
   describe 'GET /admin/admins' do
     it 'lists all admins' do
-      login_as(user[:email])
+      login_as(user[:id])
       get '/admin/admins'
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -35,7 +35,7 @@ RSpec.describe 'Admin::Admins', type: :request do
 
   describe 'POST /admin/admins' do
     it 'creates a new admin' do
-      login_as(user[:email])
+      login_as(user[:id])
       post '/admin/admins', params: { email: other_user[:email] }
 
       json = JSON.parse(response.body, symbolize_names: true)
@@ -53,22 +53,22 @@ RSpec.describe 'Admin::Admins', type: :request do
   describe 'DELETE /admin/admins/:id' do
     it 'removes admin privileges' do
       # First make other user an admin
-      MetaRepos::Admins.save({ _id: other_user[:_id], email: other_user[:email] })
+      MetaRepos::Admins.save({ id: other_user[:id], email: other_user[:email] })
 
-      login_as(user[:email])
-      delete "/admin/admins/#{other_user[:_id]}"
+      login_as(user[:id])
+      delete "/admin/admins/#{other_user[:id]}"
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
 
       # Verify admin privileges removed
-      expect(MetaRepos::Admins.exists?(other_user[:_id])).to be_falsey
+      expect(MetaRepos::Admins.exists?(other_user[:id])).to be_falsey
     end
   end
 
   private
 
-  def login_as(user_email)
-    TestSessionMiddleware.session[:identity] = user_email
+  def login_as(user_id)
+    TestSessionMiddleware.session[:identity] = user_id
   end
 end

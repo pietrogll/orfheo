@@ -13,7 +13,7 @@ RSpec.describe 'Profile Management', type: :request do
       it 'shows profile with owner status' do
         login_as(user[:id])
 
-        get '/profile', params: { id: profile[:id] }
+        get '/profile', params: { id: profile[:id] }, as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
@@ -27,7 +27,7 @@ RSpec.describe 'Profile Management', type: :request do
       it 'shows profile with visitor status' do
         login_as(user[:id])
 
-        get '/profile', params: { id: other_profile[:id] }
+        get '/profile', params: { id: other_profile[:id] }, as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
@@ -39,7 +39,7 @@ RSpec.describe 'Profile Management', type: :request do
 
     context 'when not logged in' do
       it 'shows profile as visitor' do
-        get '/profile', params: { id: profile[:id] }
+        get '/profile', params: { id: profile[:id] }, as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)

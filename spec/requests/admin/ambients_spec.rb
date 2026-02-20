@@ -12,7 +12,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
   before do
     Repos::Users.save(user_data)
     Repos::Users.save(non_admin_data)
-    MetaRepos::Admins.save({ _id: user[:_id], email: user[:email] })
+    MetaRepos::Admins.save({ id: user[:id], email: user[:email] })
     MetaRepos::Ambients.save({ _id: ambient_id, id: ambient_id, name: 'Test Ambient' })
   end
 
@@ -25,7 +25,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
   describe 'GET /admin/ambients' do
     context 'when logged in as admin' do
       it 'lists all ambients' do
-        login_as(user[:email])
+        login_as(user[:id])
         get '/admin/ambients'
 
         expect(response).to have_http_status(:ok)
@@ -37,7 +37,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
 
     context 'when not admin' do
       it 'returns admin error' do
-        login_as(non_admin[:email])
+        login_as(non_admin[:id])
         get '/admin/ambients'
 
         json = JSON.parse(response.body, symbolize_names: true)
@@ -49,7 +49,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
   describe 'POST /admin/ambients' do
     context 'when logged in as admin' do
       it 'creates a new ambient' do
-        login_as(user[:email])
+        login_as(user[:id])
         post '/admin/ambients', params: { name: 'New Ambient' }
 
         json = JSON.parse(response.body, symbolize_names: true)
@@ -62,7 +62,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
   describe 'PATCH /admin/ambients/:id' do
     context 'when logged in as admin' do
       it 'updates the ambient' do
-        login_as(user[:email])
+        login_as(user[:id])
         patch "/admin/ambients/#{ambient_id}", params: { name: 'Updated Ambient' }
 
         json = JSON.parse(response.body, symbolize_names: true)
@@ -75,7 +75,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
   describe 'DELETE /admin/ambients/:id' do
     context 'when logged in as admin' do
       it 'deletes the ambient' do
-        login_as(user[:email])
+        login_as(user[:id])
         delete "/admin/ambients/#{ambient_id}"
 
         json = JSON.parse(response.body, symbolize_names: true)
@@ -87,7 +87,7 @@ RSpec.describe 'Admin::Ambients', type: :request do
 
   private
 
-  def login_as(user_email)
-    TestSessionMiddleware.session[:identity] = user_email
+  def login_as(user_id)
+    TestSessionMiddleware.session[:identity] = user_id
   end
 end

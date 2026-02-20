@@ -85,8 +85,8 @@ RSpec.describe 'Event Management', type: :request do
     context 'when logged in as admin' do
       it 'shows event manager page' do
         admin_user = create_test_user(email: 'admin@example.com')
-        MetaRepos::Admins.save({ _id: admin_user[:_id], email: admin_user[:email] })
-        login_as(admin_user[:_id])
+        MetaRepos::Admins.save({ id: admin_user[:id], email: admin_user[:email] })
+        login_as(admin_user[:id])
 
         get "/event_manager?id=#{event[:_id]}"
 
