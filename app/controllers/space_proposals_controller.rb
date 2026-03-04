@@ -24,7 +24,7 @@ class SpaceProposalsController < ApplicationController
     space = Actions::UserGetsSpace.run(proposal)
     broadcast_websocket(params[:event_id], 'addSpace', space)
 
-    success(proposal: proposal)
+    success(proposal: proposal, model: proposal)
   end
 
   # POST /users/amend_space_proposal
@@ -46,7 +46,7 @@ class SpaceProposalsController < ApplicationController
     space = Actions::UserGetsSpace.run(proposal)
 
     broadcast_websocket(params[:event_id], 'modifySpace', space)
-    success(proposal: proposal)
+    success(proposal: proposal, model: proposal)
   end
 
   # POST /users/select_space_proposal

@@ -4,7 +4,8 @@
 # Migrated from controllers/events.rb
 
 class EventsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy update_partners create_slug]
+  skip_before_action :verify_authenticity_token,
+                     only: %i[create update destroy update_partners create_slug manager_data check_slug]
   before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility
@@ -70,7 +71,7 @@ class EventsController < ApplicationController
     owner_id = check_event_ownership!(event_id)
     event, forms = Actions::UserGetsManagerData.run(owner_id, event_id, lang)
 
-    render json: { status: 'success', the_event: event, forms: forms }
+    success(the_event: event, forms: forms)
   end
 
   # GET /events - List all events

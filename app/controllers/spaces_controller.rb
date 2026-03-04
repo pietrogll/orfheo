@@ -18,7 +18,7 @@ class SpacesController < ApplicationController
     owner_id = check_profile_ownership!(profile_id)
     space = Actions::UserCreatesSpace.run(owner_id, symbolized_params)
 
-    render json: { status: 'success', space: space }
+    success(space: space)
   end
 
   # POST /users/modify_space - Update space
@@ -27,7 +27,7 @@ class SpacesController < ApplicationController
     owner_id = check_space_ownership!(id)
     space = Actions::UserModifiesSpace.run(owner_id, symbolized_params)
 
-    render json: { status: 'success', space: space }
+    success(space: space)
   end
 
   # POST /users/delete_space - Delete space
@@ -36,7 +36,7 @@ class SpacesController < ApplicationController
     check_space_ownership!(id)
     Actions::UserDeletesSpace.run(id)
 
-    render json: { status: 'success' }
+    success
   end
 
   private

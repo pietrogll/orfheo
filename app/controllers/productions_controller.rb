@@ -18,7 +18,7 @@ class ProductionsController < ApplicationController
     check_profile_ownership!(profile_id)
     production = Actions::UserCreatesProduction.run(current_user_id, symbolized_params)
 
-    render json: { status: 'success', production: production }
+    success(production: production)
   end
 
   # POST /users/modify_production - Update production
@@ -27,7 +27,7 @@ class ProductionsController < ApplicationController
     owner_id = check_production_ownership!(id)
     production = Actions::UserModifiesProduction.run(owner_id, symbolized_params)
 
-    render json: { status: 'success', production: production }
+    success(production: production)
   end
 
   # POST /users/delete_production - Delete production
@@ -36,7 +36,7 @@ class ProductionsController < ApplicationController
     check_production_ownership!(id)
     Actions::UserDeletesProduction.run(id)
 
-    render json: { status: 'success' }
+    success
   end
 
   private

@@ -2,6 +2,7 @@
 
 module Search
   class SearchController < ApplicationController
+    skip_before_action :verify_authenticity_token, only: %i[load_results]
     # HOTFIX: Force load services since we can't restart the server.
     # This ensures Services module is defined for Actions::Search::LoadResults.
     # This can be removed after server restart (config/initializers/load_sinatra_config.rb handles it).
@@ -51,11 +52,7 @@ module Search
         params[:db_key],
         params[:query]
       )
-      render json: {
-        status: 'success',
-        params[:db_key] => results,
-        pull_params: updated_pull_params
-      }
+      success(params[:db_key] => results, pull_params: updated_pull_params)
     end
 
     # GET /search/public_info?id=:id&db_key=:db_key

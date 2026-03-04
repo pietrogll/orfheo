@@ -2,6 +2,7 @@
 
 module Search
   class SuggestController < ApplicationController
+    skip_before_action :verify_authenticity_token
     before_action :require_login!, except: %i[suggest_event_names suggest_tags]
 
     # POST /search/suggest
@@ -13,7 +14,7 @@ module Search
       matched_profiles = query_profiles(get_profiles(params[:event_id]), tags)
       results = get_suggestions_for(matched_profiles, queriable_tags)
       results = sort_results(results)
-      render json: { status: 'success', data: { items: results } }
+      success(items: results)
     end
 
     # POST /search/results
@@ -24,7 +25,7 @@ module Search
       shown_profiles = check_params(params[:shown])
       not_shown = not_shown_profiles(get_profiles(params[:event_id]), shown_profiles)
       matched_profiles = query_profiles(not_shown, tags)
-      render json: { status: 'success', data: { profiles: matched_profiles.take(15) } }
+      success(profiles: matched_profiles.take(15))
     end
 
     # POST /search/suggest_program
@@ -37,7 +38,7 @@ module Search
         queriable_tags,
         queriable_filters
       )
-      render json: { status: 'success', data: { items: results } }
+      success(items: results)
     end
 
     # POST /search/results_program
@@ -59,26 +60,23 @@ module Search
       )
       hosts = Services::Events.get_event_program_hosts(params[:event_id])
 
-      render json: {
-        status: 'success',
-        data: {
-          program: results,
-          hosts: hosts,
-          program_timestamp: CachedEvent.program_timestamp(params[:event_id])
-        }
-      }
+      success(
+        program: results,
+        hosts: hosts,
+        program_timestamp: CachedEvent.program_timestamp(params[:event_id])
+      )
     end
 
     # POST /search/suggest_tags
     def suggest_tags
       results = Services::Suggest.tag_texts(params[:query], params[:source])
-      render json: { status: 'success', data: { items: results } }
+      success(items: results)
     end
 
     # POST /search/suggest_event_names
     def suggest_event_names
       results = Services::Suggest.event_names(params[:query])
-      render json: { status: 'success', items: results }
+      success(items: results)
     end
 
     private

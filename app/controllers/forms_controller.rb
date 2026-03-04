@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class FormsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy]
+  skip_before_action :verify_authenticity_token, only: %i[create update destroy index get_call_forms]
   before_action :require_login!, except: [:index]
 
   # POST /forms/ (list forms for a call)
@@ -9,14 +9,14 @@ class FormsController < ApplicationController
     check_call_exists!(params[:call_id])
     is_owner = call_owner?(params[:call_id]) == current_user_id || admin?
     forms = Actions::UserGetsForms.run(params[:call_id], params[:lang], current_user_id, is_owner)
-    render json: { status: 'success', data: { forms: forms } }
+    success(forms: forms)
   end
 
   # POST /forms/get_call_forms
   def get_call_forms
     check_call_exists!(params[:call_id])
     forms = Repos::Forms.get({ call_id: params[:call_id] })
-    render json: { status: 'success', data: { forms: forms } }
+    success(forms: forms)
   end
 
   # POST /forms/create

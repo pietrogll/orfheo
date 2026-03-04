@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class CallsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create destroy update add_whitelist delete_whitelist]
+  skip_before_action :verify_authenticity_token,
+                     only: %i[create destroy update add_whitelist delete_whitelist checks_participant_name
+                              get_call_proposals]
   before_action :require_login!, except: []
   before_action :require_admin, only: %i[show destroy]
 
@@ -39,7 +41,7 @@ class CallsController < ApplicationController
       params[:program_id],
       params[:participant_id]
     )
-    render json: { status: 'success', data: { available: status } }
+    success(available: status)
   end
 
   # POST /users/add_whitelist
@@ -48,7 +50,7 @@ class CallsController < ApplicationController
     check_future_event!(params[:event_id])
     whitelist = Actions::UserCreatesWhitelist.run(params[:call_id], params.to_unsafe_h)
     broadcast_websocket(params[:event_id], 'addWhitelist', whitelist.to_a)
-    render json: { status: 'success' }
+    success
   end
 
   # POST /users/delete_whitelist
@@ -57,7 +59,7 @@ class CallsController < ApplicationController
     check_future_event!(params[:event_id])
     whitelist = Actions::UserDeletesWhitelist.run(params[:call_id], params[:email])
     broadcast_websocket(params[:event_id], 'addWhitelist', whitelist)
-    render json: { status: 'success' }
+    success
   end
 
   # POST /users/get_call_proposals
@@ -68,7 +70,7 @@ class CallsController < ApplicationController
       params[:type],
       params[:filters]
     )
-    render json: { status: 'success', data: { proposals: proposals } }
+    success(proposals: proposals)
   end
 
   private

@@ -4,7 +4,8 @@
 # Migrated from controllers/profiles.rb
 
 class ProfilesController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy check_name]
+  skip_before_action :verify_authenticity_token,
+                     only: %i[create update destroy check_name list_profiles profile_productions_spaces]
   before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility
@@ -88,7 +89,7 @@ class ProfilesController < ApplicationController
     spaces = Actions::UserGetsProfileSpaces.run(profile_id)
     submitted_spaces = event_id ? Actions::UserGetsProfileSpaces.filter(profile_id, event_id) : []
 
-    render json: { status: 'success', productions: productions, spaces: spaces, submitted_spaces: submitted_spaces }
+    success(productions: productions, spaces: spaces, submitted_spaces: submitted_spaces)
   end
 
   private
