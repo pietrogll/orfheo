@@ -18,7 +18,7 @@ class ArtistProposalsController < ApplicationController
     artist = Actions::UserGetsArtistsList.run(proposal).first
 
     broadcast_websocket(params[:event_id], 'addArtist', artist)
-    success(proposal: proposal, model: proposal)
+    success(proposal: proposal, model: artist)
   end
 
   # POST /users/amend_artist_proposal
@@ -37,7 +37,7 @@ class ArtistProposalsController < ApplicationController
     artist = Actions::UserGetsArtistsList.run(proposal).first
 
     broadcast_websocket(params[:event_id], 'modifyArtist', artist)
-    success(proposal: proposal, model: proposal)
+    success(proposal: proposal, model: artist)
   end
 
   # POST /users/delete_artist_proposal
