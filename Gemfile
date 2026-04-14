@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '3.4.4'
+ruby '3.4.9'
 # ruby-gemset=orfheo
 
 # Rails 8.1.2 Framework
-gem 'puma', '~> 6.0'
+gem 'puma', '>= 7.0.3'
 gem 'rails', '~> 8.1.2'
 
 gem 'rack-cors' # CORS middleware
