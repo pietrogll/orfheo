@@ -21,26 +21,25 @@
     ]
   },
   "dependencies": {
-    "@rails/actioncable": "^8.1.200",
-    "cloudinary-react": "^1.1.0",
-    "core-js": "^3.43.0",
-    "dotenv-webpack": "^8.0.1",
-    "react": "^16.8.2",
-    "react-dom": "^16.8.2",
-    "react-foundation-modal": "^0.1.5",
-    "react-router-dom": "^4.3.1",
-    "regenerator-runtime": "^0.14.1"
-  },
-  "devDependencies": {
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
     "@babel/preset-react": "^7.24.0",
+    "@rails/actioncable": "^8.1.200",
     "babel-loader": "^9.1.3",
+    "cloudinary-react": "^1.1.0",
+    "core-js": "^3.43.0",
+    "dotenv-webpack": "^8.0.1",
     "expose-loader": "^4.1.0",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "react-foundation-modal": "^0.1.5",
     "react-infinite-scroller": "1.2.4",
+    "react-router-dom": "^4.3.1",
     "react-sinatra-ujs": "^1.0.1",
+    "regenerator-runtime": "^0.14.1",
     "terser-webpack-plugin": "^5.3.10",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
-  }
+  },
+  "devDependencies": {}
 }
