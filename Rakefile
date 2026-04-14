@@ -54,8 +54,12 @@ end
 namespace :frontend do
   desc 'Build React frontend'
   task :build do
-    puts 'Building React frontend...'
+    puts '--- Building React frontend ---'
+    puts "Node version: #{`node -v`}"
+    puts "NPM version: #{`npm -v`}"
     # Run the build command from the root package.json
-    system('npm run build') || exit(1)
+    # We use sh to ensure output is streamed to the build log
+    sh 'npm run build'
+    puts '--- Frontend build completed ---'
   end
 end
