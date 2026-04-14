@@ -787,14 +787,15 @@
         _shownSpaces = new_order;
         order = new_order;
         _shownSpaces.forEach(function(space_proposal_id, index){
+          the_event.spaces[space_proposal_id].reorder(index);
+          the_event.spaces[space_proposal_id].alignPerformances(index);
+          
           if(index == _shownSpaces.length - 1) return;
+          
           eventTime.forEach(function(evt){
             var date = evt.date;
             the_event.spaces[_shownSpaces[index]].columns[date].after(the_event.spaces[_shownSpaces[index + 1]].columns[date]);
           });
-          the_event.spaces[space_proposal_id].reorder(index);
-          the_event.spaces[space_proposal_id].alignPerformances(index);
-
         });
         _toolsDropdownMenu.setOrder(new_order);
         _programTable.orderSpaces(new_order);

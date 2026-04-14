@@ -25,7 +25,7 @@ class ActivitiesController < ApplicationController
     activities_arranged = Services::Programs.arrange_ids(activities)
     # If arrange_ids filtered out everything, fallback to raw activities for the response
     response_activities = activities_arranged.presence || activities
-    send_web_socket_message(event_id, 'addPerformances', response_activities, signature)
+    send_web_socket_message("event:#{event_id}", 'addPerformances', response_activities, signature)
     render json: { status: 'success', event: 'addPerformances', model: response_activities }
   end
 
@@ -40,7 +40,7 @@ class ActivitiesController < ApplicationController
     activities = Actions::UserModifiesActivities.run(symbolized_params, owner_id)
     activities_arranged = Services::Programs.arrange_ids(activities)
     response_activities = activities_arranged.presence || activities
-    send_web_socket_message(event_id, 'modifyPerformances', response_activities, signature)
+    send_web_socket_message("event:#{event_id}", 'modifyPerformances', response_activities, signature)
     render json: { status: 'success', event: 'modifyPerformances', model: response_activities }
   end
 
@@ -54,7 +54,7 @@ class ActivitiesController < ApplicationController
     activities = Actions::UserDeletesActivities.run(symbolized_params, owner_id)
     activities_arranged = Services::Programs.arrange_ids(activities)
     response_activities = activities_arranged.presence || activities
-    send_web_socket_message(event_id, 'deletePerformances', response_activities, signature)
+    send_web_socket_message("event:#{event_id}", 'deletePerformances', response_activities, signature)
     render json: { status: 'success', event: 'deletePerformances', model: response_activities }
   end
 end

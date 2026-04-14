@@ -55,8 +55,13 @@ class ProgramsController < ApplicationController
   def space_order
     scopify :event_id, :signature
     owner_id = check_event_ownership!(event_id)
+    
+    # Map frontend payload legacy keys
+    symbolized_params[:program_id] ||= symbolized_params[:id]
+    symbolized_params[:space_order] ||= symbolized_params[:order]
+
     hash = Actions::UserSpaceOrder.run(owner_id, symbolized_params)
-    send_web_socket_message(event_id, 'spaceOrder', hash, signature)
+    send_web_socket_message("event:#{event_id}", 'orderSpaces', hash, signature)
 
     render json: { status: 'success' }
   end
@@ -66,7 +71,7 @@ class ProgramsController < ApplicationController
     scopify :event_id, :signature
     owner_id = check_event_ownership!(event_id)
     hash = Actions::UserPublishProgram.run(owner_id, symbolized_params)
-    send_web_socket_message(event_id, 'publish', hash, signature)
+    send_web_socket_message("event:#{event_id}", 'publish', hash, signature)
 
     render json: { status: 'success' }
   end
@@ -76,7 +81,7 @@ class ProgramsController < ApplicationController
     scopify :event_id, :signature
     owner_id = check_event_ownership!(event_id)
     hash = Actions::UserArtistSubcategoriesPrice.run(owner_id, symbolized_params)
-    send_web_socket_message(event_id, 'artistSubcategoriesPrice', hash, signature)
+    send_web_socket_message("event:#{event_id}", 'artistSubcategoriesPrice', hash, signature)
 
     render json: { status: 'success' }
   end
@@ -87,7 +92,7 @@ class ProgramsController < ApplicationController
     owner_id = check_event_ownership!(event_id)
     check_permanents!(permanents)
     hash = Actions::UserSetPermanents.run(owner_id, symbolized_params)
-    send_web_socket_message(event_id, 'setPermanents', hash, signature)
+    send_web_socket_message("event:#{event_id}", 'setPermanents', hash, signature)
 
     render json: { status: 'success' }
   end
