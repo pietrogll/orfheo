@@ -45,3 +45,17 @@ task test: ['test:spec']
 task actions: ['db:drop_actions']
 
 task default: [:test]
+
+# Enhance assets:precompile to build React frontend first
+if Rake::Task.task_defined?('assets:precompile')
+  Rake::Task['assets:precompile'].enhance ['frontend:build']
+end
+
+namespace :frontend do
+  desc 'Build React frontend'
+  task :build do
+    puts 'Building React frontend...'
+    # Run the build command from the root package.json
+    system('npm run build') || exit(1)
+  end
+end
