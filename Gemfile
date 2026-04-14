@@ -46,7 +46,7 @@ end
 group :development do
   gem 'execjs'
   gem 'rerun'
-  gem 'therubyracer'
+  gem 'mini_racer'
 end
 
 group :test do
