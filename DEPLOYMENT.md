@@ -4,17 +4,11 @@ This document outlines the deployment process for the Orfheo Rails application.
 
 ## Prerequisites
 
--   Ruby 3.4.9
--   Node.js 22.11.0 (pinned in .node-version)
+-   Ruby 3.4.4
+-   Node.js & npm
 -   MongoDB instance
 -   Redis instance (for Sidekiq & Action Cable)
 -   SMTP Server credentials
-
-## Heroku Setup
-
-To ensure correct version pinning and automated builds, set your buildpacks in this order:
-1. `heroku/nodejs`
-2. `heroku/ruby`
 
 ## Environment Variables
 
@@ -31,7 +25,8 @@ Ensure the following variables are set in the production environment (e.g., Hero
 ## Deployment Checklist
 
 1.  **Push to Heroku**:
-    The frontend build (`npm run build-production`) and asset precompilation are now **automated** via the root `package.json` and the `heroku/ruby` buildpack.
+    The frontend build (`npm run build-production`) is now **automated** via the root `package.json`.
+    We have configured Webpack (`systemvars: true`) to pick up your Heroku Config Vars during the build process, so you no longer need to build locally.
     ```bash
     git push heroku master
     ```

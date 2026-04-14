@@ -34,6 +34,8 @@ module.exports = {
   plugins: [
     new Dotenv({
       path: './../../.env.production',
+      systemvars: true,
+      silent: true
     })
   ],
   optimization: {
