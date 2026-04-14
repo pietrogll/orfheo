@@ -2,7 +2,8 @@
 This is the public repo of orfheo, now migrated to Rails 8.1.2.
 
 ## Prerequisites
-- **Ruby**: 3.4.4 (managed via RVM)
+- **Ruby**: 3.4.9 (managed via RVM)
+- **Node.js**: 22.11.0 (managed via nvm)
 - **MongoDB**: `brew tap mongodb/brew && brew install mongodb-community`
 - **Redis**: `brew install redis` (Required for Action Cable and Sidekiq)
 
