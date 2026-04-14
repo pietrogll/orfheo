@@ -1,0 +1,11 @@
+{
+  "name": "orfheo",
+  "private": true,
+  "engines": {
+    "node": "22.11.0"
+  },
+  "scripts": {
+    "build": "cd assets/reactjs && npm install && npm run build-production",
+    "heroku-postbuild": "npm run build"
+  }
+}
