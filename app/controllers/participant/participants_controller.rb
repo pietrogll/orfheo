@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Participant
+class Participant
   class ParticipantsController < ApplicationController
     skip_before_action :verify_authenticity_token, only: %i[modify]
     before_action :require_login!
