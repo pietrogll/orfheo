@@ -26,7 +26,8 @@ RSpec.describe 'Activity Management', type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
         expect(json[:status]).to eq('success')
-        expect(json[:data][:activities]).to be_present
+        expect(json[:event]).to eq('addPerformances')
+        expect(json[:model]).to be_present
       end
     end
 
@@ -84,7 +85,8 @@ RSpec.describe 'Activity Management', type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
         expect(json[:status]).to eq('success')
-        expect(json[:data][:activities]).to be_present
+        expect(json[:event]).to eq('modifyPerformances')
+        expect(json[:model]).to be_present
       end
     end
 
@@ -123,7 +125,8 @@ RSpec.describe 'Activity Management', type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
         expect(json[:status]).to eq('success')
-        expect(json[:data][:activities]).to be_present
+        expect(json[:event]).to eq('deletePerformances')
+        expect(json[:model]).to be_present
       end
     end
 
