@@ -1,7 +1,9 @@
 .sass-cache/
 .bundle/
 .prove/
+node_modules/
 assets/reactjs/node_modules/
+assets/reactjs/dist/
 assets/reactjs/etc/
 assets/reactjs/npm-debug.log
 .env
