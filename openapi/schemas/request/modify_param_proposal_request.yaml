@@ -1,0 +1,27 @@
+---
+type: object
+required:
+- id
+- call_id
+- event_id
+- type
+- param
+- value
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    type: string
+  type:
+    type: string
+    enum:
+    - artist
+    - space
+  param:
+    type: string
+  value: {}

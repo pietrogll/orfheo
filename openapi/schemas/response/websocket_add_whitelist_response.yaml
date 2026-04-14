@@ -1,0 +1,13 @@
+---
+allOf:
+- "$ref": "#/components/schemas/WebsocketEventModelResponse"
+- type: object
+  properties:
+    event:
+      type: string
+      enum:
+      - addWhitelist
+    model:
+      type: array
+      items:
+        "$ref": "#/components/schemas/WhitelistEntry"

@@ -1,0 +1,13 @@
+---
+type: object
+required:
+- name
+properties:
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  program_id:
+    "$ref": "#/components/schemas/Uuid"
+  participant_id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string

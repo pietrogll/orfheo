@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- form
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  form:
+    "$ref": "#/components/schemas/Form"

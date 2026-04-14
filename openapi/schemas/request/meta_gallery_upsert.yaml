@@ -1,0 +1,10 @@
+---
+type: object
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  user_id:
+    "$ref": "#/components/schemas/Uuid"

@@ -1,8 +1,28 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Production Management', type: :request do
+RSpec.describe 'Production Management', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/users/create_production' do
+    post 'Create production' do
+      tags 'Productions'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/create_production_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/production_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { profile_id: SecureRandom.uuid, title: 'New Play', category: 'theatre' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:id]) }
   let(:production) { create_test_production(profile[:id], tags: nil) }

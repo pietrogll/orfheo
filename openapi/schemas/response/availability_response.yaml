@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- available
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  available:
+    type: boolean

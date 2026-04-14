@@ -1,0 +1,21 @@
+---
+type: object
+description: Profile payload. Required fields are enforced server-side.
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string
+  address:
+    type: object
+    additionalProperties: true
+  color:
+    type: string
+  email:
+    type: object
+    additionalProperties: true
+  facets:
+    type: array
+    items:
+      type: string

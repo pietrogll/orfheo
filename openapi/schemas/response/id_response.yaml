@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- id
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  id:
+    "$ref": "#/components/schemas/Uuid"

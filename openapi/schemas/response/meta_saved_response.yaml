@@ -1,0 +1,13 @@
+---
+type: object
+required:
+- status
+- saved
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  saved:
+    type: object
+    additionalProperties: true

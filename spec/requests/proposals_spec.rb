@@ -1,8 +1,66 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Proposals API', type: :request do
+RSpec.describe 'Proposals', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/users/get_call_proposals' do
+    post 'Get proposals for a call' do
+      tags 'Proposals'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/get_call_proposals_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/get_call_proposals_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { call_id: SecureRandom.uuid, type: 'artist' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/send_artist_proposal' do
+    post 'Send artist proposal' do
+      tags 'Proposals'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/artist_proposal_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { call_id: SecureRandom.uuid, event_id: SecureRandom.uuid, title: 'My Proposal', subcategory: 'music' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/send_space_proposal' do
+    post 'Send space proposal' do
+      tags 'Proposals'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/space_proposal_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { call_id: SecureRandom.uuid, event_id: SecureRandom.uuid, profile_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_user }
   let(:profile) do
     create_profile(user_id: user[:id], email: { value: user[:email], visible: 'false' },

@@ -1,8 +1,63 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Search API', type: :request do
+RSpec.describe 'Search', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/search/load_results' do
+    post 'Load search results' do
+      tags 'Search'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { type: :object, properties: { query: { type: :string }, type: { type: :string } } }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_list_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { query: 'music', type: 'events' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/search/suggest' do
+    post 'Get suggestions' do
+      tags 'Suggest'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/suggest_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_list_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { query: ['mus'], event_id: SecureRandom.uuid, lang: 'en' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/search/results' do
+    post 'Get suggestion results' do
+      tags 'Suggest'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/results_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_list_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { query: ['music'], shown: [], event_id: SecureRandom.uuid, lang: 'en' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_user }
   let(:event) { create_event(user_id: user[:id]) }
 

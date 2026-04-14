@@ -1,0 +1,28 @@
+---
+type: object
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string
+  texts:
+    type: object
+    additionalProperties: true
+  type:
+    type: string
+  place:
+    type: string
+  categories:
+    type: array
+    items:
+      type: string
+  eventTime:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  slug:
+    type: string

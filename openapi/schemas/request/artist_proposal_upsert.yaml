@@ -1,0 +1,73 @@
+---
+type: object
+required:
+- call_id
+- event_id
+- subcategory
+- form_id
+- title
+- phone
+- short_description
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  production_id:
+    "$ref": "#/components/schemas/Uuid"
+  form_id:
+    "$ref": "#/components/schemas/Uuid"
+  own:
+    oneOf:
+    - type: boolean
+    - type: string
+    nullable: true
+  name:
+    type: string
+  email:
+    type: string
+    format: email
+  subcategory:
+    type: string
+  other_categories: {}
+  other: {}
+  category:
+    type: string
+  format:
+    type: string
+  title:
+    type: string
+  short_description:
+    type: string
+  description:
+    type: string
+  duration:
+    type: string
+  photos:
+    type: array
+    items:
+      type: string
+    nullable: true
+  links:
+    type: array
+    items:
+      "$ref": "#/components/schemas/LinkItem"
+    nullable: true
+  children: {}
+  cache:
+    "$ref": "#/components/schemas/CacheField"
+  phone:
+    type: object
+    required:
+    - value
+    additionalProperties: true
+    properties:
+      value:
+        type: string
+      visible:
+        type: boolean

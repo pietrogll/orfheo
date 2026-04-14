@@ -1,8 +1,28 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Space Management', type: :request do
+RSpec.describe 'Space Management', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/users/create_space' do
+    post 'Create space' do
+      tags 'Spaces'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/create_space_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/space_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { profile_id: SecureRandom.uuid, name: 'Main Venue', type: 'concert_hall' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:id]) }
   let(:space) { create_test_space(profile[:id]) }

@@ -1,0 +1,13 @@
+---
+type: object
+required:
+- status
+- call
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  call:
+    type: object
+    additionalProperties: true

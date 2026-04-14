@@ -1,0 +1,37 @@
+---
+type: object
+required:
+- call_id
+- type
+- blocks
+- texts
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  type:
+    type: string
+    enum:
+    - artist
+    - space
+  texts:
+    description: Language-keyed texts. Must include `label` per language.
+    type: object
+    additionalProperties: true
+  blocks:
+    description: Language-keyed blocks. Mandatory keys depend on `type`.
+    type: object
+    additionalProperties: true
+  widgets:
+    type: object
+    additionalProperties: true
+    nullable: true
+  own:
+    description: Visibility mode.
+    type: string
+    nullable: true
+    enum:
+    - own
+    - private

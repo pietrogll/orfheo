@@ -1,0 +1,9 @@
+---
+type: object
+required:
+- call_id
+properties:
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  lang:
+    "$ref": "#/components/schemas/Lang"

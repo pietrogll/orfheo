@@ -1,0 +1,8 @@
+---
+type: object
+required:
+- interests
+properties:
+  interests:
+    type: object
+    additionalProperties: true

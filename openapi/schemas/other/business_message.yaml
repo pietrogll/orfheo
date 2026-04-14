@@ -1,0 +1,9 @@
+---
+allOf:
+- "$ref": "#/components/schemas/ContactMessage"
+- type: object
+  required:
+  - subject
+  properties:
+    subject:
+      type: string

@@ -1,0 +1,27 @@
+---
+type: object
+required:
+- status
+- productions
+- spaces
+- submitted_spaces
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  productions:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  spaces:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  submitted_spaces:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

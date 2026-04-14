@@ -1,0 +1,14 @@
+---
+type: object
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  start:
+    type: integer
+  deadline:
+    type: integer

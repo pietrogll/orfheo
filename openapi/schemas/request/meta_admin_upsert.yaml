@@ -1,0 +1,11 @@
+---
+type: object
+additionalProperties: false
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  email:
+    type: string
+    format: email
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"

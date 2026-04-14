@@ -1,0 +1,15 @@
+---
+type: object
+required:
+- status
+- profiles
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  profiles:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

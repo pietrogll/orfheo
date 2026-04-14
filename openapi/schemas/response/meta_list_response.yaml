@@ -1,0 +1,15 @@
+---
+type: object
+required:
+- status
+- list
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  list:
+    type: array
+    items:
+      type: object
+      additionalProperties: true

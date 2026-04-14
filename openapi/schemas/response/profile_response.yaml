@@ -1,0 +1,13 @@
+---
+type: object
+required:
+- status
+- profile
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  profile:
+    type: object
+    additionalProperties: true

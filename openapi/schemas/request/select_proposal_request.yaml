@@ -1,0 +1,14 @@
+---
+type: object
+required:
+- id
+- event_id
+- call_id
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"

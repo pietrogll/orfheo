@@ -1,0 +1,11 @@
+---
+allOf:
+- "$ref": "#/components/schemas/WebsocketEventModelResponse"
+- type: object
+  properties:
+    event:
+      type: string
+      enum:
+      - modifyParticipant
+    model:
+      "$ref": "#/components/schemas/ParticipantForManager"

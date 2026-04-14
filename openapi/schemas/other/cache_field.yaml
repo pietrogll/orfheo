@@ -1,0 +1,14 @@
+---
+description: Common cache object used by some elements.
+oneOf:
+- type: object
+  required:
+  - value
+  - visible
+  additionalProperties: true
+  properties:
+    value: {}
+    visible:
+      type: boolean
+    comment: {}
+- {}

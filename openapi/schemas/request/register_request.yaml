@@ -1,0 +1,17 @@
+---
+type: object
+required:
+- email
+- password
+- lang
+properties:
+  email:
+    type: string
+    format: email
+  password:
+    type: string
+    minLength: 8
+  lang:
+    "$ref": "#/components/schemas/Lang"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"

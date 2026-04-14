@@ -41,6 +41,10 @@ group :development, :test do
   gem 'rails_best_practices', require: false
   gem 'rspec-rails', '~> 7.0' # Rails-specific RSpec support
   gem 'rubocop-rails', require: false
+  gem 'rswag'
+  gem 'rswag-api'
+  gem 'rswag-ui'
+  gem 'rswag-specs'
 end
 
 group :development do

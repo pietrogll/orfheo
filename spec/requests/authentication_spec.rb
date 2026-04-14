@@ -1,8 +1,77 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Authentication', type: :request do
+RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/register' do
+    post 'Register a new user' do
+      tags 'Auth'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/register_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+
+        let(:body) { { user: { email: 'test@example.com', password: 'password123', name: 'Test User' } } }
+        run_test!
+      end
+    end
+  end
+
+  path '/login' do
+    post 'Log in' do
+      tags 'Auth'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/login_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/login_success' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+
+        let(:body) { { email: 'test@example.com', password: 'password123' } }
+        run_test!
+      end
+    end
+
+    get 'Get current session info' do
+      tags 'Auth'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/login_success' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/logout' do
+    post 'Log out' do
+      tags 'Auth'
+      security [cookieAuth: []]
+      produces 'application/json'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
   let(:user_email) { 'test@example.com' }
   let(:user_password) { 'password123' }
   let(:user_lang) { 'en' }

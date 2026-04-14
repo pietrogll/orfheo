@@ -1,0 +1,9 @@
+---
+type: object
+required:
+- profile_id
+properties:
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"

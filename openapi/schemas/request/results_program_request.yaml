@@ -1,0 +1,27 @@
+---
+type: object
+required:
+- query
+- event_id
+- filters
+- date
+- time
+- lang
+properties:
+  query:
+    type: array
+    items:
+      type: string
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  filters:
+    type: object
+    additionalProperties: true
+  date:
+    type: string
+  time:
+    type: string
+  lang:
+    "$ref": "#/components/schemas/Lang"
+  program_timestamp:
+    type: integer

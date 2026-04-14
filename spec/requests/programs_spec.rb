@@ -1,8 +1,122 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Program Management', type: :request do
+RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/program' do
+    get 'Show program' do
+      tags 'Programs'
+      produces 'application/json'
+      parameter name: :id, in: :query, type: :string, description: 'Program ID'
+      parameter name: :event_id, in: :query, type: :string, description: 'Event ID'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/program_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:id) { SecureRandom.uuid }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/create_program' do
+    post 'Create a new program' do
+      tags 'Programs'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/program_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/program_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { event_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/modify_program' do
+    post 'Modify an existing program' do
+      tags 'Programs'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/program_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/program_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid, event_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/delete_program' do
+    post 'Delete a program' do
+      tags 'Programs'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/id_only_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/space_order' do
+    post 'Order spaces in program' do
+      tags 'Programs'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { type: :object, properties: { event_id: { type: :string }, order: { type: :array, items: { type: :string } } } }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { event_id: SecureRandom.uuid, order: [SecureRandom.uuid] } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/publish' do
+    post 'Publish program' do
+      tags 'Programs'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { type: :object, properties: { event_id: { type: :string } } }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { event_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:_id]) }
   let(:event) { create_test_event(user[:_id], profile[:_id]) }

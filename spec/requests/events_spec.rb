@@ -1,8 +1,142 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Event Management', type: :request do
+RSpec.describe 'Event Management', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/events' do
+    get 'List all events' do
+      tags 'Events'
+      produces 'application/json'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/list_events_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/event' do
+    get 'Show event' do
+      tags 'Events'
+      produces 'application/json'
+      parameter name: :id, in: :query, type: :string, description: 'Event ID'
+      parameter name: :slug, in: :query, type: :string, description: 'Event slug'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/event_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:id) { SecureRandom.uuid }
+        run_test!
+      end
+
+      response '404', 'Event not found' do
+        schema '$ref' => '#/components/schemas/fail_envelope'
+        let(:id) { 'non-existent' }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/create_event' do
+    post 'Create a new event' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/event_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/event_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { profile_id: SecureRandom.uuid, name: 'New festival' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/modify_event' do
+    post 'Modify an existing event' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/event_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/event_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid, name: 'Updated festival' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/delete_event' do
+    post 'Delete an event' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/id_only_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/event_manager' do
+    post 'Get event manager data' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/event_manager_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/event_manager_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { event_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/check_slug' do
+    post 'Check slug availability' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/check_slug_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/availability_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { slug: 'my-event' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:_id]) }
   let(:event) { create_test_event(user[:_id], profile[:_id]) }

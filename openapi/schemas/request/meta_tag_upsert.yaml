@@ -1,0 +1,16 @@
+---
+type: object
+additionalProperties: false
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  text:
+    type: string
+  source:
+    type: string
+  holders:
+    type: array
+    items:
+      type: string
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"

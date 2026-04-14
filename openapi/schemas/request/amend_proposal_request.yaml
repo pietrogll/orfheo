@@ -1,0 +1,13 @@
+---
+type: object
+required:
+- id
+- call_id
+- amend
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  amend: {}

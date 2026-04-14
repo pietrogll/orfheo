@@ -1,0 +1,7 @@
+---
+type: object
+required:
+- lang
+properties:
+  lang:
+    "$ref": "#/components/schemas/Lang"

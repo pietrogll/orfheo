@@ -1,8 +1,129 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Users', type: :request do
+RSpec.describe 'Users', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/users' do
+    get 'List users (Admin/Search)' do
+      tags 'Users'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_list_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/users/header' do
+    post 'Get user header data' do
+      tags 'Users'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/user_header_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/users/modify_password' do
+    post 'Change user password' do
+      tags 'Users'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/modify_password_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { password: 'newpassword123' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/save_interests' do
+    post 'Save user intereses' do
+      tags 'Users'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/save_interests_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { interests: { tags: ['music'] } } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/get_user_email' do
+    get 'Get user email' do
+      tags 'Users'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/get_user_email_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/users/delete_user' do
+    post 'Delete user account' do
+      tags 'Users'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/modify_lang' do
+    post 'Modify user language' do
+      tags 'Users'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/modify_lang_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { lang: 'es' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user_id) { SecureRandom.uuid }
   let(:user_email) { 'testuser@example.com' }
   let(:user_password) { 'password123' }

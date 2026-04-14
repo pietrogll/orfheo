@@ -1,0 +1,17 @@
+---
+type: object
+required:
+- status
+- reason
+properties:
+  status:
+    type: string
+    enum:
+    - fail
+  reason:
+    type: string
+  backtrace:
+    type: array
+    items:
+      type: string
+additionalProperties: true

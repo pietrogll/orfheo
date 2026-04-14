@@ -1,0 +1,17 @@
+---
+type: object
+required:
+- status
+- the_event
+- forms
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  the_event:
+    type: object
+    additionalProperties: true
+  forms:
+    type: object
+    additionalProperties: true

@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- space
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  space:
+    "$ref": "#/components/schemas/SpaceWithMeta"

@@ -75,6 +75,8 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    addressable (2.9.0)
+      public_suffix (>= 2.0.2, < 8.0)
     ast (2.4.3)
     awesome_print (1.9.2)
     babel-source (5.8.35)
@@ -143,6 +145,9 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.12.2)
+    json-schema (6.2.0)
+      addressable (~> 2.8)
+      bigdecimal (>= 3.1, < 5)
     language_server-protocol (3.17.0.5)
     libv8-node (24.12.0.1)
     libv8-node (24.12.0.1-aarch64-linux)
@@ -224,6 +229,7 @@ GEM
     psych (5.2.6)
       date
       stringio
+    public_suffix (7.0.5)
     puma (8.0.0)
       nio4r (~> 2.0)
     racc (1.8.1)
@@ -320,6 +326,21 @@ GEM
       rspec-mocks (~> 3.13)
       rspec-support (~> 3.13)
     rspec-support (3.13.4)
+    rswag (2.17.0)
+      rswag-api (= 2.17.0)
+      rswag-specs (= 2.17.0)
+      rswag-ui (= 2.17.0)
+    rswag-api (2.17.0)
+      activesupport (>= 5.2, < 8.2)
+      railties (>= 5.2, < 8.2)
+    rswag-specs (2.17.0)
+      activesupport (>= 5.2, < 8.2)
+      json-schema (>= 2.2, < 7.0)
+      railties (>= 5.2, < 8.2)
+      rspec-core (>= 2.14)
+    rswag-ui (2.17.0)
+      actionpack (>= 5.2, < 8.2)
+      railties (>= 5.2, < 8.2)
     rubocop (1.84.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -443,6 +464,10 @@ DEPENDENCIES
   rspec
   rspec-eventmachine
   rspec-rails (~> 7.0)
+  rswag
+  rswag-api
+  rswag-specs
+  rswag-ui
   rubocop-rails
   sassc-rails
   sidekiq

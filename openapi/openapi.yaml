@@ -1,221 +1,16 @@
-openapi: 3.0.3
-
+---
+openapi: 3.0.1
 info:
   title: Orfheo API
-  version: 0.1.0
-  description: |
-    JSON API specification derived from the Sinatra/Rack routes.
-
-    Notes on behavior:
-    - Many validation/permission failures raise `Pard::Invalid` and are normalized by middleware to HTTP 200 with a JSON body:
-      `{ "status": "fail", "reason": "..." }`.
-    - `Pard::Unexisting` returns HTTP 404.
-    - Session auth is cookie-based (`rack.session`).
-    - Several endpoints are implemented as POST even when they semantically mutate/delete.
-
-servers:
-  - url: http://localhost:3000
-    description: Local
-  - url: https://www.orfheo.org
-    description: Production
-
-tags:
-  - name: Auth
-  - name: Users
-  - name: Profiles
-  - name: Productions
-  - name: Spaces
-  - name: FreeBlocks
-  - name: Events
-  - name: Calls
-  - name: Forms
-  - name: Programs
-  - name: Activities
-  - name: Participants
-  - name: Proposals
-  - name: Search
-  - name: Suggest
-  - name: Meta
-  - name: Contact
-
+  version: 1.0.0
 paths:
-  /feedback:
-    post:
-      tags: [Contact]
-      summary: Send feedback message
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ContactMessage'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ContactMessage'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /techSupport:
-    post:
-      tags: [Contact]
-      summary: Send tech support message
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ContactMessage'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ContactMessage'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /business:
-    post:
-      tags: [Contact]
-      summary: Send business inquiry
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/BusinessMessage'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/BusinessMessage'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /register:
-    post:
-      tags: [Auth]
-      summary: Register a new user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/RegisterRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/RegisterRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /login:
-    post:
-      tags: [Auth]
-      summary: Log in (creates cookie session)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/LoginRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/LoginRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          headers:
-            Set-Cookie:
-              description: Session cookie
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/LoginSuccess'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /logout:
-    post:
-      tags: [Auth]
-      summary: Log out (clears cookie session)
-      security:
-        - cookieAuth: []
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /forgotten_password:
-    post:
-      tags: [Auth]
-      summary: Request password reset email
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ForgotPasswordRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ForgotPasswordRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/header:
-    post:
-      tags: [Users]
-      summary: Get header data for logged-in user
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/UserHeaderResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/modify_password:
-    post:
-      tags: [Users]
-      summary: Change logged-in user password
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyPasswordRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyPasswordRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /modify_lang:
-    post:
-      tags: [Users]
-      summary: Set user language preference
-      description: |-
-        If not logged in, returns success without changing anything.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyLangRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyLangRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/save_interests:
-    post:
-      tags: [Users]
-      summary: Save notification interests
-      description: |-
-        If not logged in, returns success without changing anything.
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SaveInterestsRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SaveInterestsRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/get_user_email:
+  "/admin/assets":
     get:
-      tags: [Users]
-      summary: Get logged-in user's email
+      summary: List assets
+      tags:
+      - Meta
       security:
-        - cookieAuth: []
+      - cookieAuth: []
       responses:
         '200':
           description: Success or fail
@@ -223,334 +18,15 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/GetUserEmailResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/delete_user:
-    post:
-      tags: [Users]
-      summary: Delete logged-in user and related data
-      security:
-        - cookieAuth: []
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/check_name:
-    post:
-      tags: [Profiles]
-      summary: Check if a profile name is available
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CheckNameRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CheckNameRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/AvailabilityResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/create_profile:
-    post:
-      tags: [Profiles]
-      summary: Create profile
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ProfileUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ProfileUpsert'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ProfileResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/modify_profile:
-    post:
-      tags: [Profiles]
-      summary: Modify profile
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ProfileUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ProfileUpsert'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ProfileResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/modify_profile_description:
-    post:
-      tags: [Profiles]
-      summary: Modify profile description
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyProfileDescriptionRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyProfileDescriptionRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/IdResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/modify_profile_name:
-    post:
-      tags: [Profiles]
-      summary: Modify profile name
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyProfileNameRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyProfileNameRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/IdResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/delete_profile:
-    post:
-      tags: [Profiles]
-      summary: Delete profile
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/list_profiles:
-    post:
-      tags: [Profiles]
-      summary: List profiles for logged-in user
-      security:
-        - cookieAuth: []
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ListProfilesResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/profile_productions_spaces:
-    post:
-      tags: [Profiles]
-      summary: Get a profile's productions and spaces
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ProfileProductionsSpacesRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ProfileProductionsSpacesRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ProfileProductionsSpacesResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/create_production:
-    post:
-      tags: [Productions]
-      summary: Create production
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CreateProductionRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CreateProductionRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithProductionOrFail'}
-
-  /users/modify_production:
-    post:
-      tags: [Productions]
-      summary: Modify production
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyProductionRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyProductionRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithProductionOrFail'}
-
-  /users/delete_production:
-    post:
-      tags: [Productions]
-      summary: Delete production
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/create_space:
-    post:
-      tags: [Spaces]
-      summary: Create space
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CreateSpaceRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CreateSpaceRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSpaceOrFail'}
-
-  /users/modify_space:
-    post:
-      tags: [Spaces]
-      summary: Modify space
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifySpaceRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifySpaceRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSpaceOrFail'}
-
-  /users/delete_space:
-    post:
-      tags: [Spaces]
-      summary: Delete space
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/create_free_block:
-    post:
-      tags: [FreeBlocks]
-      summary: Create free block
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CreateFreeBlockRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CreateFreeBlockRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithFreeBlockOrFail'}
-
-  /users/modify_free_block:
-    post:
-      tags: [FreeBlocks]
-      summary: Modify free block
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyFreeBlockRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyFreeBlockRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithFreeBlockOrFail'}
-
-  /users/delete_free_block:
-    post:
-      tags: [FreeBlocks]
-      summary: Delete free block
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /events:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/admin/participants":
     get:
-      tags: [Events]
-      summary: List events
+      summary: List participants
+      tags:
+      - Meta
+      security:
+      - cookieAuth: []
       responses:
         '200':
           description: Success or fail
@@ -558,1400 +34,1015 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/ListEventsResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-        '404': {$ref: '#/components/responses/NotFound'}
-
-  /users/event_manager:
-    post:
-      tags: [Events]
-      summary: Get event manager data
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/EventManagerRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/EventManagerRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/EventManagerResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-        '404': {$ref: '#/components/responses/NotFound'}
-
-  /users/create_event:
-    post:
-      tags: [Events]
-      summary: Create event
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/EventUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/EventUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithEventOrFail'}
-
-  /users/modify_event:
-    post:
-      tags: [Events]
-      summary: Modify event
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/EventUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/EventUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithEventOrFail'}
-
-  /users/delete_event:
-    post:
-      tags: [Events]
-      summary: Delete event
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/update_partners:
-    post:
-      tags: [Events]
-      summary: Update event partners
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/check_slug:
-    post:
-      tags: [Events]
-      summary: Check slug availability
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CheckSlugRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CheckSlugRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/AvailableResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/create_slug:
-    post:
-      tags: [Events]
-      summary: Assign a slug to an event
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CreateSlugRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CreateSlugRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /call:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/admin/tags":
     get:
-      tags: [Calls]
-      summary: Get call by id (admin only)
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: query
-          name: id
-          required: true
-          schema: {$ref: '#/components/schemas/Uuid'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/CallResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/create_call:
-    post:
-      tags: [Calls]
-      summary: Create call
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CallUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CallUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithCallOrFail'}
-
-  /users/modify_call:
-    post:
-      tags: [Calls]
-      summary: Modify call
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CallUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CallUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithCallOrFail'}
-
-  /users/delete_call:
-    post:
-      tags: [Calls]
-      summary: Delete call (admin only)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/checks_participant_name:
-    post:
-      tags: [Calls]
-      summary: Check participant name availability
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CheckParticipantNameRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CheckParticipantNameRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/AvailableResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/add_whitelist:
-    post:
-      tags: [Calls]
-      summary: Add whitelist entry
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/AddWhitelistRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/AddWhitelistRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketWhitelistAddedOrFail'}
-
-  /users/delete_whitelist:
-    post:
-      tags: [Calls]
-      summary: Remove whitelist entry
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/DeleteWhitelistRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/DeleteWhitelistRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketWhitelistDeletedOrFail'}
-
-  /users/get_call_proposals:
-    post:
-      tags: [Calls]
-      summary: Get proposals for a call
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/GetCallProposalsRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/GetCallProposalsRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/GetCallProposalsResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /forms/:
-    post:
-      tags: [Forms]
-      summary: Get forms for a call (filtered)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/GetFormsRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/GetFormsRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/GetFormsResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /forms/get_call_forms:
-    post:
-      tags: [Forms]
-      summary: Get raw call forms
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CallIdRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CallIdRequest'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/GetCallFormsResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /forms/create:
-    post:
-      tags: [Forms]
-      summary: Create form
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/CreateFormRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/CreateFormRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithFormOrFail'}
-
-  /forms/modify:
-    post:
-      tags: [Forms]
-      summary: Modify form
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyFormRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyFormRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithFormOrFail'}
-
-  /forms/delete:
-    post:
-      tags: [Forms]
-      summary: Delete form
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /program:
-    get:
-      tags: [Programs]
-      summary: Get program by id
-      security:
-        - cookieAuth: []
-      parameters:
-        - in: query
-          name: id
-          required: true
-          schema: {$ref: '#/components/schemas/Uuid'}
-      responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ProgramResponse'
-                  - $ref: '#/components/schemas/FailEnvelope'
-
-  /users/create_program:
-    post:
-      tags: [Programs]
-      summary: Create program
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ProgramUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ProgramUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithProgramOrFail'}
-
-  /users/modify_program:
-    post:
-      tags: [Programs]
-      summary: Modify program
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ProgramUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ProgramUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithProgramOrFail'}
-
-  /users/delete_program:
-    post:
-      tags: [Programs]
-      summary: Delete program (admin only)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/IdOnlyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/space_order:
-    post:
-      tags: [Programs]
-      summary: Update program space order
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/publish:
-    post:
-      tags: [Programs]
-      summary: Publish program
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/artist_subcategories_price:
-    post:
-      tags: [Programs]
-      summary: Set prices for artist subcategories
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/set_permanents:
-    post:
-      tags: [Programs]
-      summary: Set permanent activities time ranges
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/create_performances:
-    post:
-      tags: [Activities]
-      summary: Create activities (performances)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/modify_performances:
-    post:
-      tags: [Activities]
-      summary: Modify activities (performances)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /users/delete_performances:
-    post:
-      tags: [Activities]
-      summary: Delete activities (performances)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /participant/modify:
-    post:
-      tags: [Participants]
-      summary: Modify participant (manager)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ParticipantModifyRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ParticipantModifyRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketParticipantModifiedOrFail'}
-
-  /users/send_artist_proposal:
-    post:
-      tags: [Proposals]
-      summary: Create artist proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ArtistProposalUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ArtistProposalUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/amend_artist_proposal:
-    post:
-      tags: [Proposals]
-      summary: Amend artist proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/AmendProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/AmendProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/modify_artist_proposal:
-    post:
-      tags: [Proposals]
-      summary: Modify artist proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ArtistProposalUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ArtistProposalUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/delete_artist_proposal:
-    post:
-      tags: [Proposals]
-      summary: Delete artist proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/DeleteProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/DeleteProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/select_artist_proposal:
-    post:
-      tags: [Proposals]
-      summary: Select/deselect artist proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SelectProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SelectProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/send_space_proposal:
-    post:
-      tags: [Proposals]
-      summary: Create space proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SpaceProposalUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SpaceProposalUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/amend_space_proposal:
-    post:
-      tags: [Proposals]
-      summary: Amend space proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/AmendProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/AmendProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /users/modify_space_proposal:
-    post:
-      tags: [Proposals]
-      summary: Modify space proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SpaceProposalUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SpaceProposalUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/select_space_proposal:
-    post:
-      tags: [Proposals]
-      summary: Select/deselect space proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SelectProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SelectProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/delete_space_proposal:
-    post:
-      tags: [Proposals]
-      summary: Delete space proposal
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/DeleteProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/DeleteProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /users/modify_param_proposal:
-    post:
-      tags: [Proposals]
-      summary: Modify proposal parameter (artist or space)
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ModifyParamProposalRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ModifyParamProposalRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/WebsocketEventModelOrFail'}
-
-  /search/load_results:
-    post:
-      tags: [Search]
-      summary: Load search results
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {type: object, additionalProperties: true}
-          application/x-www-form-urlencoded:
-            schema: {type: object, additionalProperties: true}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /search/public_info:
-    get:
-      tags: [Search]
-      summary: Get public info for an element
-      parameters:
-        - in: query
-          name: db_key
-          required: true
-          schema: {type: string}
-        - in: query
-          name: id
-          required: true
-          schema: {$ref: '#/components/schemas/Uuid'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-        '404': {$ref: '#/components/responses/NotFound'}
-
-  /suggest:
-    post:
-      tags: [Suggest]
-      summary: Suggest profiles by query
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SuggestRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SuggestRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /results:
-    post:
-      tags: [Suggest]
-      summary: Fetch more profile results by query
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ResultsRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ResultsRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /suggest_program:
-    post:
-      tags: [Suggest]
-      summary: Suggest program entries
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SuggestProgramRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SuggestProgramRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /results_program:
-    post:
-      tags: [Suggest]
-      summary: Fetch program results
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/ResultsProgramRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/ResultsProgramRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-        '304':
-          description: Not modified (program_timestamp matches cached)
-
-  /suggest_tags:
-    post:
-      tags: [Suggest]
-      summary: Suggest tags
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SuggestTagsRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SuggestTagsRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  /suggest_event_names:
-    post:
-      tags: [Suggest]
-      summary: Suggest event names
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/SuggestEventNamesRequest'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/SuggestEventNamesRequest'}
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEnvelopeOrFail'}
-
-  # Meta repo routes (dynamic controllers). Documented explicitly for current meta repos.
-  /tags/:
-    get:
-      tags: [Meta]
       summary: List tags
+      tags:
+      - Meta
+      security:
+      - cookieAuth: []
       responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
     post:
-      tags: [Meta]
       summary: Create tag
+      tags:
+      - Meta
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_saved_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaTagUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaTagUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /tags/modify:
+            schema:
+              "$ref": "#/components/schemas/meta_tag_upsert"
+  "/register":
     post:
-      tags: [Meta]
-      summary: Modify tag
-      security:
-        - cookieAuth: []
+      summary: Register a new user
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaTagUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaTagUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /tags/by_text/{value}:
-    get:
-      tags: [Meta]
-      summary: Find tags by text
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /tags/by_source/{value}:
-    get:
-      tags: [Meta]
-      summary: Find tags by source
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /tags/by_holders/{value}:
-    get:
-      tags: [Meta]
-      summary: Find tags by holders
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /tags/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete tag
-      parameters:
-        - $ref: '#/components/parameters/MetaId'
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /ambients/:
-    get:
-      tags: [Meta]
-      summary: List ambients
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
+            schema:
+              "$ref": "#/components/schemas/register_request"
+  "/login":
     post:
-      tags: [Meta]
-      summary: Create ambient
-      security:
-        - cookieAuth: []
+      summary: Log in
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/login_success"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaAmbientUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAmbientUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /ambients/modify:
-    post:
-      tags: [Meta]
-      summary: Modify ambient
-      security:
-        - cookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: {$ref: '#/components/schemas/MetaAmbientUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAmbientUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /ambients/by_space_id/{value}:
+            schema:
+              "$ref": "#/components/schemas/login_request"
     get:
-      tags: [Meta]
-      summary: Find ambients by space_id
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /ambients/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete ambient
-      parameters:
-        - $ref: '#/components/parameters/MetaId'
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /galleries/:
-    get:
-      tags: [Meta]
-      summary: List galleries
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-    post:
-      tags: [Meta]
-      summary: Create gallery
+      summary: Get current session info
+      tags:
+      - Auth
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/login_success"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/logout":
+    post:
+      summary: Log out
+      tags:
+      - Auth
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/call":
+    get:
+      summary: Show call
+      tags:
+      - Calls
+      parameters:
+      - name: id
+        in: query
+        description: Call ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/call_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/create_call":
+    post:
+      summary: Create call
+      tags:
+      - Calls
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/call_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaGalleryUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaGalleryUpsert'}
+            schema:
+              "$ref": "#/components/schemas/call_upsert"
+  "/events":
+    get:
+      summary: List all events
+      tags:
+      - Events
       responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /galleries/modify:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/list_events_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/event":
+    get:
+      summary: Show event
+      tags:
+      - Events
+      parameters:
+      - name: id
+        in: query
+        description: Event ID
+        schema:
+          type: string
+      - name: slug
+        in: query
+        description: Event slug
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/event_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fail_envelope"
+  "/users/create_event":
     post:
-      tags: [Meta]
-      summary: Modify gallery
+      summary: Create a new event
+      tags:
+      - Events
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/event_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaGalleryUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaGalleryUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /galleries/by_profile_id/{value}:
-    get:
-      tags: [Meta]
-      summary: Find galleries by profile_id
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /galleries/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete gallery
-      parameters:
-        - $ref: '#/components/parameters/MetaId'
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /admins/:
-    get:
-      tags: [Meta]
-      summary: List admins
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
+            schema:
+              "$ref": "#/components/schemas/event_upsert"
+  "/users/modify_event":
     post:
-      tags: [Meta]
-      summary: Create admin
+      summary: Modify an existing event
+      tags:
+      - Events
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/event_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaAdminUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAdminUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /admins/modify:
+            schema:
+              "$ref": "#/components/schemas/event_upsert"
+  "/users/delete_event":
     post:
-      tags: [Meta]
-      summary: Modify admin
+      summary: Delete an event
+      tags:
+      - Events
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaAdminUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAdminUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /admins/by_email/{value}:
-    get:
-      tags: [Meta]
-      summary: Find admins by email
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /admins/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete admin
-      parameters:
-        - $ref: '#/components/parameters/MetaId'
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /assets/:
-    get:
-      tags: [Meta]
-      summary: List assets (meta)
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
+            schema:
+              "$ref": "#/components/schemas/id_only_request"
+  "/users/event_manager":
     post:
-      tags: [Meta]
-      summary: Create asset (meta)
+      summary: Get event manager data
+      tags:
+      - Events
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/event_manager_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaAssetUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAssetUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /assets/modify:
+            schema:
+              "$ref": "#/components/schemas/event_manager_request"
+  "/users/check_slug":
     post:
-      tags: [Meta]
-      summary: Modify asset (meta)
-      security:
-        - cookieAuth: []
+      summary: Check slug availability
+      tags:
+      - Events
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/availability_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaAssetUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaAssetUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /assets/by_url/{value}:
-    get:
-      tags: [Meta]
-      summary: Find assets by url
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /assets/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete asset (meta)
-      parameters:
-        - $ref: '#/components/parameters/MetaId'
-      responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
-  /participants/:
-    get:
-      tags: [Meta]
-      summary: List participants (meta)
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
+            schema:
+              "$ref": "#/components/schemas/check_slug_request"
+  "/forms":
     post:
-      tags: [Meta]
-      summary: Create participant (meta)
-      security:
-        - cookieAuth: []
+      summary: List forms
+      tags:
+      - Forms
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/get_forms_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaParticipantUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaParticipantUpsert'}
-      responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /participants/modify:
+            schema:
+              type: object
+              properties:
+                call_id:
+                  type: string
+  "/forms/create":
     post:
-      tags: [Meta]
-      summary: Modify participant (meta)
+      summary: Create form
+      tags:
+      - Forms
       security:
-        - cookieAuth: []
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/form_response"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
-        required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/MetaParticipantUpsert'}
-          application/x-www-form-urlencoded:
-            schema: {$ref: '#/components/schemas/MetaParticipantUpsert'}
+            schema:
+              "$ref": "#/components/schemas/create_form_request"
+  "/forms/modify":
+    post:
+      summary: Modify form
+      tags:
+      - Forms
+      security:
+      - cookieAuth: []
+      parameters: []
       responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithSavedOrFail'}
-
-  /participants/by_email/{value}:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/form_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/modify_form_request"
+  "/users/create_free_block":
+    post:
+      summary: Create free block
+      tags:
+      - FreeBlocks
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/free_block_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/create_free_block_request"
+  "/users/create_production":
+    post:
+      summary: Create production
+      tags:
+      - Productions
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/production_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/create_production_request"
+  "/profiles":
     get:
-      tags: [Meta]
-      summary: Find participants by email (meta)
-      parameters:
-        - $ref: '#/components/parameters/MetaValue'
+      summary: List all profiles
+      tags:
+      - Profiles
       responses:
-        '200': {$ref: '#/components/responses/EnvelopeWithListOrFail'}
-
-  /participants/{id}:
-    delete:
-      tags: [Meta]
-      summary: Delete participant (meta)
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/list_profiles_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/profile":
+    get:
+      summary: Show profile
+      tags:
+      - Profiles
       parameters:
-        - $ref: '#/components/parameters/MetaId'
+      - name: id
+        in: query
+        description: Profile ID
+        schema:
+          type: string
+      - name: slug
+        in: query
+        description: Profile slug
+        schema:
+          type: string
       responses:
-        '200': {$ref: '#/components/responses/SuccessEmptyOrFail'}
-
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/profile_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/create_profile":
+    post:
+      summary: Create profile
+      tags:
+      - Profiles
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/profile_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/profile_upsert"
+  "/users/modify_profile":
+    post:
+      summary: Modify profile
+      tags:
+      - Profiles
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/profile_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/profile_upsert"
+  "/users/delete_profile":
+    post:
+      summary: Delete profile
+      tags:
+      - Profiles
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/id_only_request"
+  "/program":
+    get:
+      summary: Show program
+      tags:
+      - Programs
+      parameters:
+      - name: id
+        in: query
+        description: Program ID
+        schema:
+          type: string
+      - name: event_id
+        in: query
+        description: Event ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/program_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/create_program":
+    post:
+      summary: Create a new program
+      tags:
+      - Programs
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/program_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/program_upsert"
+  "/users/modify_program":
+    post:
+      summary: Modify an existing program
+      tags:
+      - Programs
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/program_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/program_upsert"
+  "/users/delete_program":
+    post:
+      summary: Delete a program
+      tags:
+      - Programs
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/id_only_request"
+  "/users/space_order":
+    post:
+      summary: Order spaces in program
+      tags:
+      - Programs
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event_id:
+                  type: string
+                order:
+                  type: array
+                  items:
+                    type: string
+  "/users/publish":
+    post:
+      summary: Publish program
+      tags:
+      - Programs
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event_id:
+                  type: string
+  "/users/get_call_proposals":
+    post:
+      summary: Get proposals for a call
+      tags:
+      - Proposals
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/get_call_proposals_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/get_call_proposals_request"
+  "/users/send_artist_proposal":
+    post:
+      summary: Send artist proposal
+      tags:
+      - Proposals
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/artist_proposal_upsert"
+  "/users/send_space_proposal":
+    post:
+      summary: Send space proposal
+      tags:
+      - Proposals
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/space_proposal_upsert"
+  "/search/load_results":
+    post:
+      summary: Load search results
+      tags:
+      - Search
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                type:
+                  type: string
+  "/search/suggest":
+    post:
+      summary: Get suggestions
+      tags:
+      - Suggest
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/suggest_request"
+  "/search/results":
+    post:
+      summary: Get suggestion results
+      tags:
+      - Suggest
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/results_request"
+  "/users/create_space":
+    post:
+      summary: Create space
+      tags:
+      - Spaces
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/space_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/create_space_request"
+  "/users":
+    get:
+      summary: List users (Admin/Search)
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/meta_list_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/header":
+    post:
+      summary: Get user header data
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/user_header_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/modify_password":
+    post:
+      summary: Change user password
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/modify_password_request"
+  "/users/save_interests":
+    post:
+      summary: Save user intereses
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/save_interests_request"
+  "/users/get_user_email":
+    get:
+      summary: Get user email
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/get_user_email_response"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/users/delete_user":
+    post:
+      summary: Delete user account
+      tags:
+      - Users
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+  "/modify_lang":
+    post:
+      summary: Modify user language
+      tags:
+      - Users
+      parameters: []
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/success_envelope"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/modify_lang_request"
+servers:
+- url: http://localhost:3000
+  description: Local
 components:
   securitySchemes:
     cookieAuth:
       type: apiKey
       in: cookie
       name: rack.session
-
-  parameters:
-    MetaId:
-      in: path
-      name: id
-      required: true
-      schema: {$ref: '#/components/schemas/Uuid'}
-    MetaValue:
-      in: path
-      name: value
-      required: true
-      schema: {type: string}
-
-  responses:
-    SuccessEmptyOrFail:
-      description: Success (empty) or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/SuccessEnvelope'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    SuccessEnvelopeOrFail:
-      description: Success envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/SuccessEnvelope'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithEventOrFail:
-      description: Event envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/EventResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithCallOrFail:
-      description: Call envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/CallResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithProgramOrFail:
-      description: Program envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/ProgramResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithFormOrFail:
-      description: Form envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/FormResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithProductionOrFail:
-      description: Production envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/ProductionResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithSpaceOrFail:
-      description: Space envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/SpaceResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithFreeBlockOrFail:
-      description: Free block envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/FreeBlockResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithSavedOrFail:
-      description: Meta save envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/MetaSavedResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    EnvelopeWithListOrFail:
-      description: Meta list envelope or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/MetaListResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    WebsocketEventModelOrFail:
-      description: Websocket-trigger message or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/WebsocketEventModelResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    WebsocketWhitelistAddedOrFail:
-      description: Websocket-trigger message (addWhitelist) or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/WebsocketAddWhitelistResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    WebsocketWhitelistDeletedOrFail:
-      description: Websocket-trigger message (addWhitelist with updated list) or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/WebsocketDeleteWhitelistResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    WebsocketParticipantModifiedOrFail:
-      description: Websocket-trigger message (modifyParticipant) or fail
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/WebsocketModifyParticipantResponse'
-              - $ref: '#/components/schemas/FailEnvelope'
-
-    NotFound:
-      description: Not Found
-      content:
-        text/plain:
-          schema:
-            type: string
-
   schemas:
-    Uuid:
-      type: string
-      format: uuid
-
-    Lang:
-      type: string
-      enum: [en, es, ca]
-
-    SuccessEnvelope:
+    ambient_public:
+      allOf:
+      - "$ref": "#/components/schemas/AmbientUpsert"
+      - type: object
+        description: Stored ambient has more fields; responses strip space_id/user_id/profile_id.
+    business_message:
+      allOf:
+      - "$ref": "#/components/schemas/ContactMessage"
+      - type: object
+        required:
+        - subject
+        properties:
+          subject:
+            type: string
+    cache_field:
+      description: Common cache object used by some elements.
+      oneOf:
+      - type: object
+        required:
+        - value
+        - visible
+        additionalProperties: true
+        properties:
+          value: {}
+          visible:
+            type: boolean
+          comment: {}
+      - {}
+    contact_message:
       type: object
-      required: [status]
+      required:
+      - email
+      - name
+      - message
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        message:
+          type: string
+    fail_envelope:
+      type: object
+      required:
+      - status
+      - reason
       properties:
         status:
           type: string
-          enum: [success]
-      additionalProperties: true
-
-    FailEnvelope:
-      type: object
-      required: [status, reason]
-      properties:
-        status:
-          type: string
-          enum: [fail]
+          enum:
+          - fail
         reason:
           type: string
         backtrace:
@@ -1959,635 +1050,234 @@ components:
           items:
             type: string
       additionalProperties: true
-
-    ContactMessage:
+    form:
       type: object
-      required: [email, name, message]
+      required:
+      - id
+      - call_id
+      - type
+      - blocks
+      - texts
+      additionalProperties: true
       properties:
-        email: {type: string, format: email}
-        name: {type: string}
-        message: {type: string}
-
-    BusinessMessage:
-      allOf:
-        - $ref: '#/components/schemas/ContactMessage'
-        - type: object
-          required: [subject]
-          properties:
-            subject: {type: string}
-
-    RegisterRequest:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+        type:
+          type: string
+          enum:
+          - artist
+          - space
+        texts:
+          type: object
+          additionalProperties: true
+        own:
+          oneOf:
+          - type: boolean
+          - type: string
+          nullable: true
+        widgets:
+          type: object
+          additionalProperties: true
+          nullable: true
+        blocks:
+          type: object
+          additionalProperties: true
+    free_block_with_meta:
       type: object
-      required: [email, password, lang]
+      required:
+      - id
+      - name
+      additionalProperties: true
       properties:
-        email: {type: string, format: email}
-        password: {type: string, minLength: 8}
-        lang: {$ref: '#/components/schemas/Lang'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-
-    LoginRequest:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        links:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LinkItem"
+          nullable: true
+        photos:
+          type: array
+          items:
+            type: string
+          nullable: true
+        buttons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          nullable: true
+        gallery:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          nullable: true
+    lang:
+      type: string
+      enum:
+      - en
+      - es
+      - ca
+    link_item:
       type: object
-      required: [email, password]
+      additionalProperties: true
       properties:
-        email: {type: string, format: email}
-        password: {type: string}
-
-    LoginSuccess:
+        link:
+          type: string
+        web_title:
+          type: string
+    login_success:
       type: object
-      required: [status, lang]
+      required:
+      - status
+      - lang
       properties:
         status:
           type: string
-          enum: [success]
+          enum:
+          - success
         lang:
-          $ref: '#/components/schemas/Lang'
-
-    ForgotPasswordRequest:
+          "$ref": "#/components/schemas/Lang"
+    participant_for_manager:
       type: object
-      required: [email]
-      properties:
-        email: {type: string, format: email}
-
-    ModifyPasswordRequest:
-      type: object
-      required: [password]
-      properties:
-        password: {type: string, minLength: 8}
-
-    ModifyLangRequest:
-      type: object
-      required: [lang]
-      properties:
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    SaveInterestsRequest:
-      type: object
-      required: [interests]
-      properties:
-        interests:
-          type: object
-          additionalProperties: true
-
-    UserHeaderResponse:
-      type: object
-      required: [status, profiles, events, admin, interests]
-      properties:
-        status: {type: string, enum: [success]}
-        profiles:
-          type: array
-          items: {type: object, additionalProperties: true}
-        events:
-          type: array
-          items: {type: object, additionalProperties: true}
-        admin: {type: boolean}
-        interests: {type: object, additionalProperties: true}
-
-    GetUserEmailResponse:
-      type: object
-      required: [status, user_email]
-      properties:
-        status: {type: string, enum: [success]}
-        user_email: {type: string}
-
-    CheckNameRequest:
-      type: object
-      required: [name]
-      properties:
-        name: {type: string}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    AvailabilityResponse:
-      type: object
-      required: [status, available]
-      properties:
-        status: {type: string, enum: [success]}
-        available: {type: boolean}
-
-    AvailableResponse:
-      $ref: '#/components/schemas/AvailabilityResponse'
-
-    IdOnlyRequest:
-      type: object
-      required: [id]
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-
-    IdResponse:
-      type: object
-      required: [status, id]
-      properties:
-        status: {type: string, enum: [success]}
-        id: {$ref: '#/components/schemas/Uuid'}
-
-    ProfileUpsert:
-      type: object
-      description: |-
-        Profile payload. Required fields are enforced server-side.
+      required:
+      - profile_id
+      - email
+      - name
       additionalProperties: true
       properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        address: {type: object, additionalProperties: true}
-        color: {type: string}
-        email: {type: object, additionalProperties: true}
+        profile_id:
+          type: string
+          description: Participant id suffixed with `-own`.
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        address: {}
+        phone:
+          type: object
+          additionalProperties: true
         facets:
           type: array
-          items: {type: string}
-
-    ModifyProfileDescriptionRequest:
-      type: object
-      required: [id]
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-      additionalProperties: true
-
-    ModifyProfileNameRequest:
-      type: object
-      required: [id, name]
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-
-    ProfileResponse:
-      type: object
-      required: [status, profile]
-      properties:
-        status: {type: string, enum: [success]}
-        profile: {type: object, additionalProperties: true}
-
-    ListProfilesResponse:
-      type: object
-      required: [status, profiles]
-      properties:
-        status: {type: string, enum: [success]}
-        profiles:
-          type: array
-          items: {type: object, additionalProperties: true}
-
-    ProfileProductionsSpacesRequest:
-      type: object
-      required: [profile_id]
-      properties:
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-
-    ProfileProductionsSpacesResponse:
-      type: object
-      required: [status, productions, spaces, submitted_spaces]
-      properties:
-        status: {type: string, enum: [success]}
-        productions:
-          type: array
-          items: {type: object, additionalProperties: true}
-        spaces:
-          type: array
-          items: {type: object, additionalProperties: true}
-        submitted_spaces:
-          type: array
-          items: {type: object, additionalProperties: true}
-
-    EventUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        texts: {type: object, additionalProperties: true}
-        type: {type: string}
-        place: {type: string}
-        categories:
-          type: array
-          items: {type: string}
-        eventTime:
-          type: array
-          items: {type: object, additionalProperties: true}
-        slug: {type: string}
-
-    ListEventsResponse:
-      type: object
-      required: [status, events]
-      properties:
-        status: {type: string, enum: [success]}
-        events:
-          type: array
-          items: {type: object, additionalProperties: true}
-
-    EventResponse:
-      type: object
-      required: [status, event]
-      properties:
-        status: {type: string, enum: [success]}
-        event: {type: object, additionalProperties: true}
-
-    EventManagerRequest:
-      type: object
-      required: [event_id]
-      properties:
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    EventManagerResponse:
-      type: object
-      required: [status, the_event, forms]
-      properties:
-        status: {type: string, enum: [success]}
-        the_event: {type: object, additionalProperties: true}
-        forms: {type: object, additionalProperties: true}
-
-    CheckSlugRequest:
-      type: object
-      required: [slug]
-      properties:
-        slug: {type: string}
-
-    CreateSlugRequest:
-      type: object
-      required: [event_id, slug]
-      properties:
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        slug: {type: string}
-
-    CallUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        start: {type: integer}
-        deadline: {type: integer}
-
-    CallResponse:
-      type: object
-      required: [status, call]
-      properties:
-        status: {type: string, enum: [success]}
-        call: {type: object, additionalProperties: true}
-
-    CheckParticipantNameRequest:
-      type: object
-      required: [name]
-      properties:
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        program_id: {$ref: '#/components/schemas/Uuid'}
-        participant_id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-
-    GetCallProposalsRequest:
-      type: object
-      required: [call_id, type]
-      properties:
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        type:
+          items:
+            type: string
+          nullable: true
+        color:
           type: string
-          enum: [artist, space]
-        filters:
-          type: object
-          additionalProperties: true
-
-    GetCallProposalsResponse:
-      type: object
-      required: [status, proposals]
-      properties:
-        status: {type: string, enum: [success]}
-        proposals:
-          type: array
-          items: {type: object, additionalProperties: true}
-
-    GetFormsRequest:
-      type: object
-      required: [call_id]
-      properties:
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    GetFormsResponse:
-      type: object
-      required: [status, forms]
-      properties:
-        status: {type: string, enum: [success]}
-        forms: {type: object, additionalProperties: true}
-
-    CallIdRequest:
-      type: object
-      required: [call_id]
-      properties:
-        call_id: {$ref: '#/components/schemas/Uuid'}
-
-    GetCallFormsResponse:
-      type: object
-      required: [status, forms]
-      properties:
-        status: {type: string, enum: [success]}
-        forms:
-          type: array
-          items: {$ref: '#/components/schemas/Form'}
-
-    FormResponse:
-      type: object
-      required: [status, form]
-      properties:
-        status: {type: string, enum: [success]}
-        form: {$ref: '#/components/schemas/Form'}
-
-    ProgramUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        subcategories: {type: object, additionalProperties: true}
-        texts: {type: object, additionalProperties: true}
-
-    ProgramResponse:
-      type: object
-      required: [status]
-      properties:
-        status: {type: string, enum: [success]}
-        program: {type: object, additionalProperties: true}
-      additionalProperties: true
-
-    ProductionResponse:
-      type: object
-      required: [status, production]
-      properties:
-        status: {type: string, enum: [success]}
-        production: {$ref: '#/components/schemas/ProductionWithMeta'}
-
-    SpaceResponse:
-      type: object
-      required: [status, space]
-      properties:
-        status: {type: string, enum: [success]}
-        space: {$ref: '#/components/schemas/SpaceWithMeta'}
-
-    FreeBlockResponse:
-      type: object
-      required: [status, free_block]
-      properties:
-        status: {type: string, enum: [success]}
-        free_block: {$ref: '#/components/schemas/FreeBlockWithMeta'}
-
-    SuggestRequest:
-      type: object
-      required: [query, event_id, lang]
-      properties:
-        query:
-          type: array
-          items: {type: string}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    ResultsRequest:
-      type: object
-      required: [query, shown, event_id, lang]
-      properties:
-        query:
-          type: array
-          items: {type: string}
-        shown:
-          type: array
-          items: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    SuggestProgramRequest:
-      type: object
-      required: [query, event_id, filters, lang]
-      properties:
-        query:
-          type: array
-          items: {type: string}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        filters: {type: object, additionalProperties: true}
-        lang: {$ref: '#/components/schemas/Lang'}
-
-    ResultsProgramRequest:
-      type: object
-      required: [query, event_id, filters, date, time, lang]
-      properties:
-        query:
-          type: array
-          items: {type: string}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        filters: {type: object, additionalProperties: true}
-        date: {type: string}
-        time: {type: string}
-        lang: {$ref: '#/components/schemas/Lang'}
-        program_timestamp: {type: integer}
-
-    SuggestTagsRequest:
-      type: object
-      required: [query, source]
-      properties:
-        query: {type: string}
-        source: {type: string}
-
-    SuggestEventNamesRequest:
-      type: object
-      required: [query]
-      properties:
-        query: {type: string}
-
-    MetaListResponse:
-      type: object
-      required: [status, list]
-      properties:
-        status: {type: string, enum: [success]}
-        list:
-          type: array
-          items: {type: object, additionalProperties: true}
-
-    MetaSavedResponse:
-      type: object
-      required: [status, saved]
-      properties:
-        status: {type: string, enum: [success]}
-        saved: {type: object, additionalProperties: true}
-
-    MetaTagUpsert:
-      type: object
-      additionalProperties: false
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        text: {type: string}
-        source: {type: string}
-        holders:
-          type: array
-          items: {type: string}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    MetaAmbientUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        space_id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    MetaGalleryUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-
-    MetaAdminUpsert:
-      type: object
-      additionalProperties: false
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        email: {type: string, format: email}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    MetaAssetUpsert:
-      type: object
-      additionalProperties: false
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        url: {type: string}
-        holders:
-          type: array
-          items: {type: string}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    MetaParticipantUpsert:
-      type: object
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        email: {type: string}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-
-    # --- Additions to make the spec self-contained (no dangling $ref) ---
-
-    LinkItem:
-      type: object
-      additionalProperties: true
-      properties:
-        link: {type: string}
-        web_title: {type: string}
-
-    CacheField:
-      description: Common cache object used by some elements.
-      oneOf:
-        - type: object
-          required: [value, visible]
-          additionalProperties: true
-          properties:
-            value: {}
-            visible: {type: boolean}
-            comment: {}
-        - {}
-
-    CreateProductionRequest:
-      type: object
-      required: [profile_id, format, category, title, description, short_description]
-      additionalProperties: true
-      properties:
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        id: {$ref: '#/components/schemas/Uuid'}
-        format: {type: string}
-        category: {type: string}
-        title: {type: string}
-        tags:
-          description: Incoming tags as strings (server will map/create Tag ids and return tag texts).
-          type: array
-          items: {type: string}
           nullable: true
-        description: {type: string}
-        short_description: {type: string}
-        duration: {type: string, nullable: true}
-        photos:
-          type: array
-          items: {type: string}
-          nullable: true
-        main_picture:
-          oneOf:
-            - type: array
-              items: {type: string}
-            - type: string
-          nullable: true
-        links:
-          type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
-          nullable: true
-        children: {}
-        cache: {$ref: '#/components/schemas/CacheField'}
-
-    ModifyProductionRequest:
-      allOf:
-        - $ref: '#/components/schemas/CreateProductionRequest'
-        - type: object
-          required: [id]
-          properties:
-            id: {$ref: '#/components/schemas/Uuid'}
-
-    ProductionWithMeta:
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+    production_with_meta:
       type: object
-      required: [id, profile_id, format, category, title, description, short_description]
+      required:
+      - id
+      - profile_id
+      - format
+      - category
+      - title
+      - description
+      - short_description
       additionalProperties: true
       properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        format: {type: string}
-        category: {type: string}
-        title: {type: string}
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        format:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
         tags:
           description: Response tag texts.
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
-        description: {type: string}
-        short_description: {type: string}
-        duration: {type: string, nullable: true}
+        description:
+          type: string
+        short_description:
+          type: string
+        duration:
+          type: string
+          nullable: true
         photos:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
         main_picture:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
         links:
           type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
+          items:
+            "$ref": "#/components/schemas/LinkItem"
           nullable: true
         children: {}
-        cache: {$ref: '#/components/schemas/CacheField'}
+        cache:
+          "$ref": "#/components/schemas/CacheField"
         gallery:
           description: Gallery objects created/updated as side effects.
           type: array
-          items: {type: object, additionalProperties: true}
+          items:
+            type: object
+            additionalProperties: true
           nullable: true
-
-    CreateSpaceRequest:
+    space_with_meta:
       type: object
-      required: [profile_id, name, address, description, type, ambients]
+      required:
+      - id
+      - profile_id
+      - name
+      - address
+      - description
+      - type
+      - ambients
       additionalProperties: true
       properties:
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        space_name:
-          description: Alternative to `name` accepted by server.
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
           type: string
-        type: {type: string}
+        type:
+          type: string
         address: {}
         description: {}
         size: {}
         plane_picture:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
         main_picture:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
         human_resources: {}
         materials: {}
@@ -2595,30 +1285,73 @@ components:
         rules: {}
         single_ambient: {}
         ambients:
-          description: Accepts array or hash-of-ambient; server normalizes hash values to array.
-          oneOf:
-            - type: array
-              items: {$ref: '#/components/schemas/AmbientUpsert'}
-            - type: object
-              additionalProperties:
-                $ref: '#/components/schemas/AmbientUpsert'
-
-    ModifySpaceRequest:
-      allOf:
-        - $ref: '#/components/schemas/CreateSpaceRequest'
-        - type: object
-          required: [id]
-          properties:
-            id: {$ref: '#/components/schemas/Uuid'}
-
-    AmbientUpsert:
+          type: array
+          items:
+            "$ref": "#/components/schemas/AmbientPublic"
+        gallery:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          nullable: true
+    success_envelope:
       type: object
-      required: [name, description, allowed_formats, allowed_categories]
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+      additionalProperties: true
+    uuid:
+      type: string
+      format: uuid
+    whitelist_entry:
+      type: object
+      required:
+      - name_email
+      - email
+      additionalProperties: false
+      properties:
+        name_email:
+          type: string
+        email:
+          type: string
+          format: email
+    add_whitelist_request:
+      type: object
+      required:
+      - event_id
+      - call_id
+      - name_email
+      - email
       additionalProperties: true
       properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        description: {type: string}
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        name_email:
+          type: string
+        email:
+          type: string
+          format: email
+    ambient_upsert:
+      type: object
+      required:
+      - name
+      - description
+      - allowed_formats
+      - allowed_categories
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        description:
+          type: string
         size: {}
         tech_specs: {}
         tech_poss: {}
@@ -2627,153 +1360,176 @@ components:
         capacity: {}
         allowed_categories:
           type: array
-          items: {type: string}
+          items:
+            type: string
         allowed_formats:
           type: array
-          items: {type: string}
+          items:
+            type: string
         links:
           type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
+          items:
+            "$ref": "#/components/schemas/LinkItem"
           nullable: true
         photos:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
-
-    AmbientPublic:
-      allOf:
-        - $ref: '#/components/schemas/AmbientUpsert'
-        - type: object
-          description: Stored ambient has more fields; responses strip space_id/user_id/profile_id.
-
-    SpaceWithMeta:
+    amend_proposal_request:
       type: object
-      required: [id, profile_id, name, address, description, type, ambients]
+      required:
+      - id
+      - call_id
+      - amend
       additionalProperties: true
       properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        type: {type: string}
-        address: {}
-        description: {}
-        size: {}
-        plane_picture:
-          type: array
-          items: {type: string}
-          nullable: true
-        main_picture:
-          type: array
-          items: {type: string}
-          nullable: true
-        human_resources: {}
-        materials: {}
-        accessibility: {}
-        rules: {}
-        single_ambient: {}
-        ambients:
-          type: array
-          items: {$ref: '#/components/schemas/AmbientPublic'}
-        gallery:
-          type: array
-          items: {type: object, additionalProperties: true}
-          nullable: true
-
-    CreateFreeBlockRequest:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        amend: {}
+    artist_proposal_upsert:
       type: object
-      required: [name]
+      required:
+      - call_id
+      - event_id
+      - subcategory
+      - form_id
+      - title
+      - phone
+      - short_description
       additionalProperties: true
       properties:
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        description: {type: string, nullable: true}
-        links:
-          type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        production_id:
+          "$ref": "#/components/schemas/Uuid"
+        form_id:
+          "$ref": "#/components/schemas/Uuid"
+        own:
+          oneOf:
+          - type: boolean
+          - type: string
           nullable: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        subcategory:
+          type: string
+        other_categories: {}
+        other: {}
+        category:
+          type: string
+        format:
+          type: string
+        title:
+          type: string
+        short_description:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
         photos:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
-        buttons:
+        links:
           type: array
-          items: {type: object, additionalProperties: true}
+          items:
+            "$ref": "#/components/schemas/LinkItem"
           nullable: true
-
-    ModifyFreeBlockRequest:
-      allOf:
-        - $ref: '#/components/schemas/CreateFreeBlockRequest'
-        - type: object
-          required: [id]
+        children: {}
+        cache:
+          "$ref": "#/components/schemas/CacheField"
+        phone:
+          type: object
+          required:
+          - value
+          additionalProperties: true
           properties:
-            id: {$ref: '#/components/schemas/Uuid'}
-
-    FreeBlockWithMeta:
+            value:
+              type: string
+            visible:
+              type: boolean
+    call_id_request:
       type: object
-      required: [id, name]
+      required:
+      - call_id
+      properties:
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+    call_upsert:
+      type: object
       additionalProperties: true
       properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        description: {type: string, nullable: true}
-        links:
-          type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
-          nullable: true
-        photos:
-          type: array
-          items: {type: string}
-          nullable: true
-        buttons:
-          type: array
-          items: {type: object, additionalProperties: true}
-          nullable: true
-        gallery:
-          type: array
-          items: {type: object, additionalProperties: true}
-          nullable: true
-
-    WhitelistEntry:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        start:
+          type: integer
+        deadline:
+          type: integer
+    check_name_request:
       type: object
-      required: [name_email, email]
-      additionalProperties: false
+      required:
+      - name
       properties:
-        name_email: {type: string}
-        email: {type: string, format: email}
-
-    AddWhitelistRequest:
+        name:
+          type: string
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    check_participant_name_request:
       type: object
-      required: [event_id, call_id, name_email, email]
+      required:
+      - name
+      properties:
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        program_id:
+          "$ref": "#/components/schemas/Uuid"
+        participant_id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+    check_slug_request:
+      type: object
+      required:
+      - slug
+      properties:
+        slug:
+          type: string
+    create_form_request:
+      type: object
+      required:
+      - call_id
+      - type
+      - blocks
+      - texts
       additionalProperties: true
       properties:
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        name_email: {type: string}
-        email: {type: string, format: email}
-
-    DeleteWhitelistRequest:
-      type: object
-      required: [event_id, call_id, email]
-      additionalProperties: true
-      properties:
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        email: {type: string, format: email}
-
-    CreateFormRequest:
-      type: object
-      required: [call_id, type, blocks, texts]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
         type:
           type: string
-          enum: [artist, space]
+          enum:
+          - artist
+          - space
         texts:
           description: Language-keyed texts. Must include `label` per language.
           type: object
@@ -2790,252 +1546,1095 @@ components:
           description: Visibility mode.
           type: string
           nullable: true
-          enum: [own, private]
-
-    ModifyFormRequest:
-      allOf:
-        - $ref: '#/components/schemas/CreateFormRequest'
-        - type: object
-          required: [id]
-          properties:
-            id: {$ref: '#/components/schemas/Uuid'}
-
-    Form:
+          enum:
+          - own
+          - private
+    create_free_block_request:
       type: object
-      required: [id, call_id, type, blocks, texts]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-        type:
-          type: string
-          enum: [artist, space]
-        texts:
-          type: object
-          additionalProperties: true
-        own:
-          oneOf:
-            - type: boolean
-            - type: string
-          nullable: true
-        widgets:
-          type: object
-          additionalProperties: true
-          nullable: true
-        blocks:
-          type: object
-          additionalProperties: true
-
-    ParticipantModifyRequest:
-      type: object
-      required: [id, event_id, name, phone, email]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        program_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        name: {type: string}
-        email: {type: string, format: email}
-        address: {}
-        phone:
-          type: object
-          required: [value]
-          additionalProperties: true
-          properties:
-            value: {type: string}
-            visible: {type: boolean}
-        facets:
-          type: array
-          items: {type: string}
-          nullable: true
-        color: {type: string, nullable: true}
-
-    ParticipantForManager:
-      type: object
-      required: [profile_id, email, name]
+      required:
+      - name
       additionalProperties: true
       properties:
         profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
           type: string
-          description: Participant id suffixed with `-own`.
-        email: {type: string, format: email}
-        name: {type: string}
+        description:
+          type: string
+          nullable: true
+        links:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LinkItem"
+          nullable: true
+        photos:
+          type: array
+          items:
+            type: string
+          nullable: true
+        buttons:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          nullable: true
+    create_production_request:
+      type: object
+      required:
+      - profile_id
+      - format
+      - category
+      - title
+      - description
+      - short_description
+      additionalProperties: true
+      properties:
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        format:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        tags:
+          description: Incoming tags as strings (server will map/create Tag ids and
+            return tag texts).
+          type: array
+          items:
+            type: string
+          nullable: true
+        description:
+          type: string
+        short_description:
+          type: string
+        duration:
+          type: string
+          nullable: true
+        photos:
+          type: array
+          items:
+            type: string
+          nullable: true
+        main_picture:
+          oneOf:
+          - type: array
+            items:
+              type: string
+          - type: string
+          nullable: true
+        links:
+          type: array
+          items:
+            "$ref": "#/components/schemas/LinkItem"
+          nullable: true
+        children: {}
+        cache:
+          "$ref": "#/components/schemas/CacheField"
+    create_slug_request:
+      type: object
+      required:
+      - event_id
+      - slug
+      properties:
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        slug:
+          type: string
+    create_space_request:
+      type: object
+      required:
+      - profile_id
+      - name
+      - address
+      - description
+      - type
+      - ambients
+      additionalProperties: true
+      properties:
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        space_name:
+          description: Alternative to `name` accepted by server.
+          type: string
+        type:
+          type: string
+        address: {}
+        description: {}
+        size: {}
+        plane_picture:
+          type: array
+          items:
+            type: string
+          nullable: true
+        main_picture:
+          type: array
+          items:
+            type: string
+          nullable: true
+        human_resources: {}
+        materials: {}
+        accessibility: {}
+        rules: {}
+        single_ambient: {}
+        ambients:
+          description: Accepts array or hash-of-ambient; server normalizes hash values
+            to array.
+          oneOf:
+          - type: array
+            items:
+              "$ref": "#/components/schemas/AmbientUpsert"
+          - type: object
+            additionalProperties:
+              "$ref": "#/components/schemas/AmbientUpsert"
+    delete_proposal_request:
+      type: object
+      required:
+      - id
+      - event_id
+      - call_id
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+    delete_whitelist_request:
+      type: object
+      required:
+      - event_id
+      - call_id
+      - email
+      additionalProperties: true
+      properties:
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        email:
+          type: string
+          format: email
+    event_manager_request:
+      type: object
+      required:
+      - event_id
+      properties:
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    event_upsert:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        texts:
+          type: object
+          additionalProperties: true
+        type:
+          type: string
+        place:
+          type: string
+        categories:
+          type: array
+          items:
+            type: string
+        eventTime:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        slug:
+          type: string
+    forgot_password_request:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+    get_call_proposals_request:
+      type: object
+      required:
+      - call_id
+      - type
+      properties:
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        type:
+          type: string
+          enum:
+          - artist
+          - space
+        filters:
+          type: object
+          additionalProperties: true
+    get_forms_request:
+      type: object
+      required:
+      - call_id
+      properties:
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    id_only_request:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+    login_request:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    meta_admin_upsert:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        email:
+          type: string
+          format: email
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    meta_ambient_upsert:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        space_id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    meta_asset_upsert:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        url:
+          type: string
+        holders:
+          type: array
+          items:
+            type: string
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    meta_gallery_upsert:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        user_id:
+          "$ref": "#/components/schemas/Uuid"
+    meta_participant_upsert:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        email:
+          type: string
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    meta_tag_upsert:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        text:
+          type: string
+        source:
+          type: string
+        holders:
+          type: array
+          items:
+            type: string
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+    modify_form_request:
+      allOf:
+      - "$ref": "#/components/schemas/CreateFormRequest"
+      - type: object
+        required:
+        - id
+        properties:
+          id:
+            "$ref": "#/components/schemas/Uuid"
+    modify_free_block_request:
+      allOf:
+      - "$ref": "#/components/schemas/CreateFreeBlockRequest"
+      - type: object
+        required:
+        - id
+        properties:
+          id:
+            "$ref": "#/components/schemas/Uuid"
+    modify_lang_request:
+      type: object
+      required:
+      - lang
+      properties:
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    modify_param_proposal_request:
+      type: object
+      required:
+      - id
+      - call_id
+      - event_id
+      - type
+      - param
+      - value
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          type: string
+        type:
+          type: string
+          enum:
+          - artist
+          - space
+        param:
+          type: string
+        value: {}
+    modify_password_request:
+      type: object
+      required:
+      - password
+      properties:
+        password:
+          type: string
+          minLength: 8
+    modify_production_request:
+      allOf:
+      - "$ref": "#/components/schemas/CreateProductionRequest"
+      - type: object
+        required:
+        - id
+        properties:
+          id:
+            "$ref": "#/components/schemas/Uuid"
+    modify_profile_description_request:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+      additionalProperties: true
+    modify_profile_name_request:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+    modify_space_request:
+      allOf:
+      - "$ref": "#/components/schemas/CreateSpaceRequest"
+      - type: object
+        required:
+        - id
+        properties:
+          id:
+            "$ref": "#/components/schemas/Uuid"
+    participant_modify_request:
+      type: object
+      required:
+      - id
+      - event_id
+      - name
+      - phone
+      - email
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        program_id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        email:
+          type: string
+          format: email
         address: {}
         phone:
+          type: object
+          required:
+          - value
+          additionalProperties: true
+          properties:
+            value:
+              type: string
+            visible:
+              type: boolean
+        facets:
+          type: array
+          items:
+            type: string
+          nullable: true
+        color:
+          type: string
+          nullable: true
+    profile_productions_spaces_request:
+      type: object
+      required:
+      - profile_id
+      properties:
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+    profile_upsert:
+      type: object
+      description: Profile payload. Required fields are enforced server-side.
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        name:
+          type: string
+        address:
+          type: object
+          additionalProperties: true
+        color:
+          type: string
+        email:
           type: object
           additionalProperties: true
         facets:
           type: array
-          items: {type: string}
+          items:
+            type: string
+    program_upsert:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        subcategories:
+          type: object
+          additionalProperties: true
+        texts:
+          type: object
+          additionalProperties: true
+    register_request:
+      type: object
+      required:
+      - email
+      - password
+      - lang
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        lang:
+          "$ref": "#/components/schemas/Lang"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+    results_program_request:
+      type: object
+      required:
+      - query
+      - event_id
+      - filters
+      - date
+      - time
+      - lang
+      properties:
+        query:
+          type: array
+          items:
+            type: string
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        filters:
+          type: object
+          additionalProperties: true
+        date:
+          type: string
+        time:
+          type: string
+        lang:
+          "$ref": "#/components/schemas/Lang"
+        program_timestamp:
+          type: integer
+    results_request:
+      type: object
+      required:
+      - query
+      - shown
+      - event_id
+      - lang
+      properties:
+        query:
+          type: array
+          items:
+            type: string
+        shown:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    save_interests_request:
+      type: object
+      required:
+      - interests
+      properties:
+        interests:
+          type: object
+          additionalProperties: true
+    select_proposal_request:
+      type: object
+      required:
+      - id
+      - event_id
+      - call_id
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+    space_proposal_upsert:
+      type: object
+      required:
+      - call_id
+      - event_id
+      - subcategory
+      - form_id
+      - address
+      - phone
+      - space_name
+      - ambients
+      additionalProperties: true
+      properties:
+        id:
+          "$ref": "#/components/schemas/Uuid"
+        profile_id:
+          "$ref": "#/components/schemas/Uuid"
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        call_id:
+          "$ref": "#/components/schemas/Uuid"
+        space_id:
+          "$ref": "#/components/schemas/Uuid"
+        form_id:
+          "$ref": "#/components/schemas/Uuid"
+        own:
+          oneOf:
+          - type: boolean
+          - type: string
           nullable: true
-        color: {type: string, nullable: true}
-        user_id: {$ref: '#/components/schemas/Uuid'}
-
-    AmendProposalRequest:
-      type: object
-      required: [id, call_id, amend]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        amend: {}
-
-    DeleteProposalRequest:
-      type: object
-      required: [id, event_id, call_id]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-
-    SelectProposalRequest:
-      type: object
-      required: [id, event_id, call_id]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-
-    ModifyParamProposalRequest:
-      type: object
-      required: [id, call_id, event_id, type, param, value]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {type: string}
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        subcategory:
+          type: string
+        other_categories: {}
+        other: {}
+        space_name:
+          type: string
+        address:
+          type: string
         type:
           type: string
-          enum: [artist, space]
-        param: {type: string}
-        value: {}
-
-    ArtistProposalUpsert:
-      type: object
-      required: [call_id, event_id, subcategory, form_id, title, phone, short_description]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        production_id: {$ref: '#/components/schemas/Uuid'}
-        form_id: {$ref: '#/components/schemas/Uuid'}
-        own:
-          oneOf:
-            - type: boolean
-            - type: string
-          nullable: true
-        name: {type: string}
-        email: {type: string, format: email}
-        subcategory: {type: string}
-        other_categories: {}
-        other: {}
-        category: {type: string}
-        format: {type: string}
-        title: {type: string}
-        short_description: {type: string}
-        description: {type: string}
-        duration: {type: string}
-        photos:
-          type: array
-          items: {type: string}
-          nullable: true
-        links:
-          type: array
-          items: {$ref: '#/components/schemas/LinkItem'}
-          nullable: true
-        children: {}
-        cache: {$ref: '#/components/schemas/CacheField'}
-        phone:
-          type: object
-          required: [value]
-          additionalProperties: true
-          properties:
-            value: {type: string}
-            visible: {type: boolean}
-
-    SpaceProposalUpsert:
-      type: object
-      required: [call_id, event_id, subcategory, form_id, address, phone, space_name, ambients]
-      additionalProperties: true
-      properties:
-        id: {$ref: '#/components/schemas/Uuid'}
-        profile_id: {$ref: '#/components/schemas/Uuid'}
-        event_id: {$ref: '#/components/schemas/Uuid'}
-        call_id: {$ref: '#/components/schemas/Uuid'}
-        space_id: {$ref: '#/components/schemas/Uuid'}
-        form_id: {$ref: '#/components/schemas/Uuid'}
-        own:
-          oneOf:
-            - type: boolean
-            - type: string
-          nullable: true
-        name: {type: string}
-        email: {type: string, format: email}
-        subcategory: {type: string}
-        other_categories: {}
-        other: {}
-        space_name: {type: string}
-        address: {type: string}
-        type: {type: string}
-        description: {type: string}
+        description:
+          type: string
         plane_picture:
           type: array
-          items: {type: string}
+          items:
+            type: string
           nullable: true
         single_ambient: {}
         ambients:
           type: array
-          items: {$ref: '#/components/schemas/AmbientUpsert'}
+          items:
+            "$ref": "#/components/schemas/AmbientUpsert"
         amend: {}
         phone:
           type: object
-          required: [value]
+          required:
+          - value
           additionalProperties: true
           properties:
-            value: {type: string}
-            visible: {type: boolean}
-
-    WebsocketEventModelResponse:
+            value:
+              type: string
+            visible:
+              type: boolean
+    suggest_event_names_request:
       type: object
-      required: [status, event, model]
+      required:
+      - query
+      properties:
+        query:
+          type: string
+    suggest_program_request:
+      type: object
+      required:
+      - query
+      - event_id
+      - filters
+      - lang
+      properties:
+        query:
+          type: array
+          items:
+            type: string
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        filters:
+          type: object
+          additionalProperties: true
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    suggest_request:
+      type: object
+      required:
+      - query
+      - event_id
+      - lang
+      properties:
+        query:
+          type: array
+          items:
+            type: string
+        event_id:
+          "$ref": "#/components/schemas/Uuid"
+        lang:
+          "$ref": "#/components/schemas/Lang"
+    suggest_tags_request:
+      type: object
+      required:
+      - query
+      - source
+      properties:
+        query:
+          type: string
+        source:
+          type: string
+    availability_response:
+      type: object
+      required:
+      - status
+      - available
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        available:
+          type: boolean
+    available_response:
+      "$ref": "#/components/schemas/AvailabilityResponse"
+    call_response:
+      type: object
+      required:
+      - status
+      - call
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        call:
+          type: object
+          additionalProperties: true
+    event_manager_response:
+      type: object
+      required:
+      - status
+      - the_event
+      - forms
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        the_event:
+          type: object
+          additionalProperties: true
+        forms:
+          type: object
+          additionalProperties: true
+    event_response:
+      type: object
+      required:
+      - status
+      - event
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        event:
+          type: object
+          additionalProperties: true
+    form_response:
+      type: object
+      required:
+      - status
+      - form
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        form:
+          "$ref": "#/components/schemas/Form"
+    free_block_response:
+      type: object
+      required:
+      - status
+      - free_block
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        free_block:
+          "$ref": "#/components/schemas/FreeBlockWithMeta"
+    get_call_forms_response:
+      type: object
+      required:
+      - status
+      - forms
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        forms:
+          type: array
+          items:
+            "$ref": "#/components/schemas/Form"
+    get_call_proposals_response:
+      type: object
+      required:
+      - status
+      - proposals
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        proposals:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    get_forms_response:
+      type: object
+      required:
+      - status
+      - forms
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        forms:
+          type: object
+          additionalProperties: true
+    get_user_email_response:
+      type: object
+      required:
+      - status
+      - user_email
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        user_email:
+          type: string
+    id_response:
+      type: object
+      required:
+      - status
+      - id
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        id:
+          "$ref": "#/components/schemas/Uuid"
+    list_events_response:
+      type: object
+      required:
+      - status
+      - events
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    list_profiles_response:
+      type: object
+      required:
+      - status
+      - profiles
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        profiles:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    meta_list_response:
+      type: object
+      required:
+      - status
+      - list
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        list:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    meta_saved_response:
+      type: object
+      required:
+      - status
+      - saved
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        saved:
+          type: object
+          additionalProperties: true
+    production_response:
+      type: object
+      required:
+      - status
+      - production
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        production:
+          "$ref": "#/components/schemas/ProductionWithMeta"
+    profile_productions_spaces_response:
+      type: object
+      required:
+      - status
+      - productions
+      - spaces
+      - submitted_spaces
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        productions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        spaces:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        submitted_spaces:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    profile_response:
+      type: object
+      required:
+      - status
+      - profile
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        profile:
+          type: object
+          additionalProperties: true
+    program_response:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        program:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    space_response:
+      type: object
+      required:
+      - status
+      - space
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        space:
+          "$ref": "#/components/schemas/SpaceWithMeta"
+    user_header_response:
+      type: object
+      required:
+      - status
+      - profiles
+      - events
+      - admin
+      - interests
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        profiles:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        events:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        admin:
+          type: boolean
+        interests:
+          type: object
+          additionalProperties: true
+    websocket_add_whitelist_response:
+      allOf:
+      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - type: object
+        properties:
+          event:
+            type: string
+            enum:
+            - addWhitelist
+          model:
+            type: array
+            items:
+              "$ref": "#/components/schemas/WhitelistEntry"
+    websocket_delete_whitelist_response:
+      allOf:
+      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - type: object
+        properties:
+          event:
+            type: string
+            enum:
+            - addWhitelist
+          model:
+            type: array
+            items:
+              "$ref": "#/components/schemas/WhitelistEntry"
+    websocket_event_model_response:
+      type: object
+      required:
+      - status
+      - event
+      - model
       additionalProperties: true
       properties:
-        status: {type: string, enum: [success]}
-        event: {type: string}
+        status:
+          type: string
+          enum:
+          - success
+        event:
+          type: string
         model: {}
-
-    WebsocketAddWhitelistResponse:
+    websocket_modify_participant_response:
       allOf:
-        - $ref: '#/components/schemas/WebsocketEventModelResponse'
-        - type: object
-          properties:
-            event: {type: string, enum: [addWhitelist]}
-            model:
-              type: array
-              items: {$ref: '#/components/schemas/WhitelistEntry'}
-
-    WebsocketDeleteWhitelistResponse:
-      allOf:
-        - $ref: '#/components/schemas/WebsocketEventModelResponse'
-        - type: object
-          properties:
-            event: {type: string, enum: [addWhitelist]}
-            model:
-              type: array
-              items: {$ref: '#/components/schemas/WhitelistEntry'}
-
-    WebsocketModifyParticipantResponse:
-      allOf:
-        - $ref: '#/components/schemas/WebsocketEventModelResponse'
-        - type: object
-          properties:
-            event: {type: string, enum: [modifyParticipant]}
-            model: {$ref: '#/components/schemas/ParticipantForManager'}
+      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - type: object
+        properties:
+          event:
+            type: string
+            enum:
+            - modifyParticipant
+          model:
+            "$ref": "#/components/schemas/ParticipantForManager"

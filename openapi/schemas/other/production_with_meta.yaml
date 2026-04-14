@@ -1,0 +1,62 @@
+---
+type: object
+required:
+- id
+- profile_id
+- format
+- category
+- title
+- description
+- short_description
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  user_id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  format:
+    type: string
+  category:
+    type: string
+  title:
+    type: string
+  tags:
+    description: Response tag texts.
+    type: array
+    items:
+      type: string
+    nullable: true
+  description:
+    type: string
+  short_description:
+    type: string
+  duration:
+    type: string
+    nullable: true
+  photos:
+    type: array
+    items:
+      type: string
+    nullable: true
+  main_picture:
+    type: array
+    items:
+      type: string
+    nullable: true
+  links:
+    type: array
+    items:
+      "$ref": "#/components/schemas/LinkItem"
+    nullable: true
+  children: {}
+  cache:
+    "$ref": "#/components/schemas/CacheField"
+  gallery:
+    description: Gallery objects created/updated as side effects.
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+    nullable: true

@@ -1,8 +1,99 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Profile Management', type: :request do
+RSpec.describe 'Profile Management', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/profiles' do
+    get 'List all profiles' do
+      tags 'Profiles'
+      produces 'application/json'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/list_profiles_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+  end
+
+  path '/profile' do
+    get 'Show profile' do
+      tags 'Profiles'
+      produces 'application/json'
+      parameter name: :id, in: :query, type: :string, description: 'Profile ID'
+      parameter name: :slug, in: :query, type: :string, description: 'Profile slug'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/profile_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:id) { SecureRandom.uuid }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/create_profile' do
+    post 'Create profile' do
+      tags 'Profiles'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/profile_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/profile_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { name: 'My Artistic Profile' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/modify_profile' do
+    post 'Modify profile' do
+      tags 'Profiles'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/profile_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/profile_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid, name: 'Updated Profile' } }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/delete_profile' do
+    post 'Delete profile' do
+      tags 'Profiles'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/id_only_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/success_envelope' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:id]) }
   let(:other_user) { create_test_user(email: 'other@example.com') }

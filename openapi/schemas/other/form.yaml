@@ -1,0 +1,36 @@
+---
+type: object
+required:
+- id
+- call_id
+- type
+- blocks
+- texts
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  user_id:
+    "$ref": "#/components/schemas/Uuid"
+  type:
+    type: string
+    enum:
+    - artist
+    - space
+  texts:
+    type: object
+    additionalProperties: true
+  own:
+    oneOf:
+    - type: boolean
+    - type: string
+    nullable: true
+  widgets:
+    type: object
+    additionalProperties: true
+    nullable: true
+  blocks:
+    type: object
+    additionalProperties: true

@@ -1,0 +1,68 @@
+---
+type: object
+required:
+- call_id
+- event_id
+- subcategory
+- form_id
+- address
+- phone
+- space_name
+- ambients
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  space_id:
+    "$ref": "#/components/schemas/Uuid"
+  form_id:
+    "$ref": "#/components/schemas/Uuid"
+  own:
+    oneOf:
+    - type: boolean
+    - type: string
+    nullable: true
+  name:
+    type: string
+  email:
+    type: string
+    format: email
+  subcategory:
+    type: string
+  other_categories: {}
+  other: {}
+  space_name:
+    type: string
+  address:
+    type: string
+  type:
+    type: string
+  description:
+    type: string
+  plane_picture:
+    type: array
+    items:
+      type: string
+    nullable: true
+  single_ambient: {}
+  ambients:
+    type: array
+    items:
+      "$ref": "#/components/schemas/AmbientUpsert"
+  amend: {}
+  phone:
+    type: object
+    required:
+    - value
+    additionalProperties: true
+    properties:
+      value:
+        type: string
+      visible:
+        type: boolean

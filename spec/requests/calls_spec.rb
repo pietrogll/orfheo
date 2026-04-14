@@ -1,8 +1,45 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Calls API', type: :request do
+RSpec.describe 'Open Calls', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/call' do
+    get 'Show call' do
+      tags 'Calls'
+      produces 'application/json'
+      parameter name: :id, in: :query, type: :string, description: 'Call ID'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/call_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:id) { SecureRandom.uuid }
+        run_test!
+      end
+    end
+  end
+
+  path '/users/create_call' do
+    post 'Create call' do
+      tags 'Calls'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/call_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/call_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { event_id: SecureRandom.uuid, start: Time.now.to_i, deadline: (Time.now + 86400).to_i } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_user }
   let(:admin) { create_admin }
   let(:profile) { create_profile(user_id: user[:id]) }

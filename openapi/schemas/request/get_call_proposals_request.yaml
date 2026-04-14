@@ -1,0 +1,16 @@
+---
+type: object
+required:
+- call_id
+- type
+properties:
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  type:
+    type: string
+    enum:
+    - artist
+    - space
+  filters:
+    type: object
+    additionalProperties: true

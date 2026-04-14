@@ -1,0 +1,14 @@
+---
+type: object
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  subcategories:
+    type: object
+    additionalProperties: true
+  texts:
+    type: object
+    additionalProperties: true

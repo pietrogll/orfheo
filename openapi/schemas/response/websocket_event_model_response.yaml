@@ -1,0 +1,15 @@
+---
+type: object
+required:
+- status
+- event
+- model
+additionalProperties: true
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  event:
+    type: string
+  model: {}

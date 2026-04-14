@@ -44,3 +44,10 @@ Run Sidekiq:
 ```bash
 bundle exec sidekiq -r ./config/environment.rb
 ```
+
+## API Documentation
+Regenerate `openapi/openapi.yaml` from request specs:
+```bash
+bundle exec rake rswag:specs:swaggerize
+```
+The documentation is also viewable at `/api-docs` when the server is running.

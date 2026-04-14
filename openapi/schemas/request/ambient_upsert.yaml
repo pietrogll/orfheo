@@ -1,0 +1,39 @@
+---
+type: object
+required:
+- name
+- description
+- allowed_formats
+- allowed_categories
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string
+  description:
+    type: string
+  size: {}
+  tech_specs: {}
+  tech_poss: {}
+  floor: {}
+  height: {}
+  capacity: {}
+  allowed_categories:
+    type: array
+    items:
+      type: string
+  allowed_formats:
+    type: array
+    items:
+      type: string
+  links:
+    type: array
+    items:
+      "$ref": "#/components/schemas/LinkItem"
+    nullable: true
+  photos:
+    type: array
+    items:
+      type: string
+    nullable: true

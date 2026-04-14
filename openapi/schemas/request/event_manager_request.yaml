@@ -1,0 +1,9 @@
+---
+type: object
+required:
+- event_id
+properties:
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  lang:
+    "$ref": "#/components/schemas/Lang"

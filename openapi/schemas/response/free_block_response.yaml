@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- free_block
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  free_block:
+    "$ref": "#/components/schemas/FreeBlockWithMeta"

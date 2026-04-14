@@ -1,0 +1,44 @@
+---
+type: object
+required:
+- id
+- event_id
+- name
+- phone
+- email
+additionalProperties: true
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  program_id:
+    "$ref": "#/components/schemas/Uuid"
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string
+  email:
+    type: string
+    format: email
+  address: {}
+  phone:
+    type: object
+    required:
+    - value
+    additionalProperties: true
+    properties:
+      value:
+        type: string
+      visible:
+        type: boolean
+  facets:
+    type: array
+    items:
+      type: string
+    nullable: true
+  color:
+    type: string
+    nullable: true

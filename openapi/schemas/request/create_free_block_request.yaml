@@ -1,0 +1,31 @@
+---
+type: object
+required:
+- name
+additionalProperties: true
+properties:
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string
+  description:
+    type: string
+    nullable: true
+  links:
+    type: array
+    items:
+      "$ref": "#/components/schemas/LinkItem"
+    nullable: true
+  photos:
+    type: array
+    items:
+      type: string
+    nullable: true
+  buttons:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+    nullable: true

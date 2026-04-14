@@ -1,0 +1,18 @@
+---
+type: object
+required:
+- event_id
+- call_id
+- name_email
+- email
+additionalProperties: true
+properties:
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  call_id:
+    "$ref": "#/components/schemas/Uuid"
+  name_email:
+    type: string
+  email:
+    type: string
+    format: email

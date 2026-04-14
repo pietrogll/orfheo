@@ -1,8 +1,28 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'FreeBlocks API', type: :request do
+RSpec.describe 'FreeBlocks API', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/users/create_free_block' do
+    post 'Create free block' do
+      tags 'FreeBlocks'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/create_free_block_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/free_block_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { name: 'My Availability' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_user }
   let(:profile) { create_profile(user_id: user[:id]) }
   let(:free_block) { create_free_block(profile_id: profile[:id], user_id: user[:id]) }

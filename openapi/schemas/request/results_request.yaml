@@ -1,0 +1,20 @@
+---
+type: object
+required:
+- query
+- shown
+- event_id
+- lang
+properties:
+  query:
+    type: array
+    items:
+      type: string
+  shown:
+    type: array
+    items:
+      "$ref": "#/components/schemas/Uuid"
+  event_id:
+    "$ref": "#/components/schemas/Uuid"
+  lang:
+    "$ref": "#/components/schemas/Lang"

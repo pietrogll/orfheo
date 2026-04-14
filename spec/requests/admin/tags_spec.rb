@@ -1,8 +1,42 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Admin::Tags', type: :request do
+RSpec.describe 'Admin::Tags', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/admin/tags' do
+    get 'List tags' do
+      tags 'Meta'
+      produces 'application/json'
+      security [cookieAuth: []]
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_list_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        run_test!
+      end
+    end
+
+    post 'Create tag' do
+      tags 'Meta'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/meta_tag_upsert' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/meta_saved_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { text: 'new-tag', source: 'user' } }
+        run_test!
+      end
+    end
+  end
+
   let(:user_data) { { _id: SecureRandom.uuid, id: SecureRandom.uuid, email: 'admin@test.com', password_digest: BCrypt::Password.create('password'), lang: 'en' } }
   let(:non_admin_data) { { _id: SecureRandom.uuid, id: SecureRandom.uuid, email: 'user@test.com', password_digest: BCrypt::Password.create('password'), lang: 'en' } }
   let(:tag_id) { SecureRandom.uuid }

@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- lang
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  lang:
+    "$ref": "#/components/schemas/Lang"

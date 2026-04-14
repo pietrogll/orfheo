@@ -1,0 +1,10 @@
+---
+type: object
+required:
+- id
+- name
+properties:
+  id:
+    "$ref": "#/components/schemas/Uuid"
+  name:
+    type: string

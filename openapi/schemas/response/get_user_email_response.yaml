@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- user_email
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  user_email:
+    type: string

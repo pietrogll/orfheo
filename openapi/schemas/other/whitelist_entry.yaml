@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- name_email
+- email
+additionalProperties: false
+properties:
+  name_email:
+    type: string
+  email:
+    type: string
+    format: email

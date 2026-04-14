@@ -1,0 +1,9 @@
+---
+type: object
+required:
+- name
+properties:
+  name:
+    type: string
+  profile_id:
+    "$ref": "#/components/schemas/Uuid"

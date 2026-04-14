@@ -1,0 +1,12 @@
+---
+type: object
+required:
+- status
+- production
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  production:
+    "$ref": "#/components/schemas/ProductionWithMeta"

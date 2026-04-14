@@ -1,8 +1,65 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Forms API', type: :request do
+RSpec.describe 'Forms', type: :request, swagger_doc: 'openapi.yaml' do
+  path '/forms' do
+    post 'List forms' do
+      tags 'Forms'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { type: :object, properties: { call_id: { type: :string } } }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/get_forms_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { call_id: SecureRandom.uuid } }
+        run_test!
+      end
+    end
+  end
+
+  path '/forms/create' do
+    post 'Create form' do
+      tags 'Forms'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/create_form_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/form_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { call_id: SecureRandom.uuid, type: 'artist', blocks: {}, texts: { en: { label: 'My Form' } } } }
+        run_test!
+      end
+    end
+  end
+
+  path '/forms/modify' do
+    post 'Modify form' do
+      tags 'Forms'
+      consumes 'application/json'
+      produces 'application/json'
+      security [cookieAuth: []]
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/modify_form_request' }
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/form_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        let(:body) { { id: SecureRandom.uuid, call_id: SecureRandom.uuid, type: 'artist', blocks: {}, texts: { en: { label: 'Updated Form' } } } }
+        run_test!
+      end
+    end
+  end
+
   let(:user) { create_user }
   let(:profile) { create_profile(user_id: user[:id]) }
   let(:call) { create_call(profile_id: profile[:id], user_id: user[:id]) }

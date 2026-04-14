@@ -1,0 +1,28 @@
+---
+type: object
+required:
+- status
+- profiles
+- events
+- admin
+- interests
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  profiles:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  events:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  admin:
+    type: boolean
+  interests:
+    type: object
+    additionalProperties: true
