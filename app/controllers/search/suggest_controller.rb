@@ -3,7 +3,7 @@
 module Search
   class SuggestController < ApplicationController
     skip_before_action :verify_authenticity_token
-    before_action :require_login!, except: %i[suggest_event_names suggest_tags]
+    before_action :require_login!, except: %i[suggest_event_names suggest_tags suggest_program results_program]
 
     # POST /search/suggest
     def suggest
