@@ -68,7 +68,7 @@ module Services
       def add_profiles_info(activity)
         artist_profile = Repos::Profiles.get_by_id activity[:participant_id]
         if artist_profile.blank?
-          artist_profile = Repos::Participants.get_by_id activity[:participant_id]
+          artist_profile = MetaRepos::Participants.get_by_id activity[:participant_id]
           activity[:participant_id] = "#{activity[:participant_id]}-own"
         end
         activity[:host_id] = "#{activity[:host_id]}-own" unless Repos::Profiles.exists?(activity[:host_id])

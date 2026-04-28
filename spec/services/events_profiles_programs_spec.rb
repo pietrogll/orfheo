@@ -370,4 +370,47 @@ describe 'Services Events / Profiles / Programs' do
       expect(program).to include(hash_including(activity_saved))
     end
   end
+
+  describe 'Programs.arrange_program when participant has no profile (own participant)' do
+    let(:own_participant_id) { 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' }
+
+    let(:activity_saved) do
+      {
+        id: activity_id,
+        participant_id: own_participant_id,
+        host_id: host_id,
+        participant_proposal_id: proposal_id,
+        host_proposal_id: host_proposal_id,
+        space_id: space_id,
+        event_id: event_id,
+        program_id: program_id,
+        dateTime: [
+          { date: '2019-04-25', time: %w[10 14] },
+          { date: '2019-04-26', time: %w[17 23] }
+        ],
+        permanent: 'false'
+      }
+    end
+
+    before(:each) do
+      MetaRepos::Participants.save({
+        id: own_participant_id,
+        name: 'own participant',
+        email: nil,
+        phone: nil,
+        address: nil,
+        facets: 'facet',
+        color: 'color',
+        user_id: user_id
+      })
+    end
+
+    it 'resolves participant name from MetaRepos::Participants and marks participant_id as own' do
+      program = Services::Programs.arrange_program program_id
+      expect(program).to include(hash_including(
+        participant_id: "#{own_participant_id}-own",
+        participant_name: 'own participant'
+      ))
+    end
+  end
 end
