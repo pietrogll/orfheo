@@ -18,11 +18,10 @@ properties:
         type: string
     - type: string
   tags:
-    oneOf:
-    - type: array
-      items:
-        type: string
-    - type: 'null'
+    type: array
+    nullable: true
+    items:
+      type: string
   short_description:
     type: string
   description:

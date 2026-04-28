@@ -1,6 +1,6 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/WebsocketEventModelResponse"
+- "$ref": "#/components/schemas/websocket_event_model_response"
 - type: object
   properties:
     event:
@@ -8,4 +8,4 @@ allOf:
       enum:
       - modifyParticipant
     model:
-      "$ref": "#/components/schemas/ParticipantForManager"
+      "$ref": "#/components/schemas/participant_for_manager"

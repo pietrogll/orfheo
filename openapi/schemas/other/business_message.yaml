@@ -1,6 +1,6 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/ContactMessage"
+- "$ref": "#/components/schemas/contact_message"
 - type: object
   required:
   - subject

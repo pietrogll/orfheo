@@ -13,8 +13,8 @@ properties:
   shown:
     type: array
     items:
-      "$ref": "#/components/schemas/Uuid"
+      "$ref": "#/components/schemas/uuid"
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   lang:
     "$ref": "#/components/schemas/lang"

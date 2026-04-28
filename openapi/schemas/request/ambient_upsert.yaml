@@ -8,7 +8,7 @@ required:
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   name:
     type: string
   description:
@@ -30,7 +30,7 @@ properties:
   links:
     type: array
     items:
-      "$ref": "#/components/schemas/LinkItem"
+      "$ref": "#/components/schemas/link_item"
     nullable: true
   photos:
     type: array

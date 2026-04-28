@@ -11,11 +11,11 @@ required:
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   user_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   name:
     type: string
   type:
@@ -41,7 +41,7 @@ properties:
   ambients:
     type: array
     items:
-      "$ref": "#/components/schemas/AmbientPublic"
+      "$ref": "#/components/schemas/ambient_public"
   gallery:
     type: array
     items:

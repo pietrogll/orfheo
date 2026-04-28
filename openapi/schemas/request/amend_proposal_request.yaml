@@ -7,7 +7,7 @@ required:
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   call_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   amend: {}

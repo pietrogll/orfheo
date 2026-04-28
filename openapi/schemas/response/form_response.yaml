@@ -9,4 +9,4 @@ properties:
     enum:
     - success
   form:
-    "$ref": "#/components/schemas/Form"
+    "$ref": "#/components/schemas/form"

@@ -10,9 +10,9 @@ required:
 additionalProperties: true
 properties:
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   format:
     type: string
   category:
@@ -48,8 +48,8 @@ properties:
   links:
     type: array
     items:
-      "$ref": "#/components/schemas/LinkItem"
+      "$ref": "#/components/schemas/link_item"
     nullable: true
   children: {}
   cache:
-    "$ref": "#/components/schemas/CacheField"
+    "$ref": "#/components/schemas/cache_field"

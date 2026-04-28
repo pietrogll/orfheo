@@ -1,9 +1,9 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/CreateFormRequest"
+- "$ref": "#/components/schemas/create_form_request"
 - type: object
   required:
   - id
   properties:
     id:
-      "$ref": "#/components/schemas/Uuid"
+      "$ref": "#/components/schemas/uuid"

@@ -1,6 +1,6 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/WebsocketEventModelResponse"
+- "$ref": "#/components/schemas/websocket_event_model_response"
 - type: object
   properties:
     event:
@@ -10,4 +10,4 @@ allOf:
     model:
       type: array
       items:
-        "$ref": "#/components/schemas/WhitelistEntry"
+        "$ref": "#/components/schemas/whitelist_entry"

@@ -4,4 +4,4 @@ required:
 - id
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

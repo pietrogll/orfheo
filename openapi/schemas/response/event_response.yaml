@@ -9,10 +9,14 @@ properties:
     enum:
     - success
   event:
-    type: object
-    additionalProperties: true
+    "$ref": "#/components/schemas/event_document"
   event_status:
     type: string
+    enum:
+    - owner
+    - admin
+    - visitor
+    - outsider
   lang:
     "$ref": "#/components/schemas/lang"
 additionalProperties: true

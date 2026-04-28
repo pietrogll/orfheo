@@ -9,4 +9,4 @@ properties:
     enum:
     - success
   free_block:
-    "$ref": "#/components/schemas/FreeBlockWithMeta"
+    "$ref": "#/components/schemas/free_block_with_meta"

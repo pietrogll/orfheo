@@ -11,5 +11,4 @@ properties:
   events:
     type: array
     items:
-      type: object
-      additionalProperties: true
+      "$ref": "#/components/schemas/event_document"

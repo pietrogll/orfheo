@@ -1,9 +1,9 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/CreateSpaceRequest"
+- "$ref": "#/components/schemas/create_space_request"
 - type: object
   required:
   - id
   properties:
     id:
-      "$ref": "#/components/schemas/Uuid"
+      "$ref": "#/components/schemas/uuid"

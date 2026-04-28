@@ -3,9 +3,9 @@ type: object
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   subcategories:
     type: object
     additionalProperties: true

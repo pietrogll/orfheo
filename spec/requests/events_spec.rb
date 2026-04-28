@@ -20,9 +20,10 @@ RSpec.describe 'Event Management', type: :request, swagger_doc: 'openapi.yaml' d
   end
 
   path '/event' do
-    get 'Show event' do
+    get 'Show event by id' do
       tags 'Events'
       produces 'application/json'
+      description 'Returns the public event document for an event UUID, including schedule, categories, and publishing metadata when present.'
       parameter name: :id, in: :query, type: :string, description: 'Event ID'
       parameter name: :slug, in: :query, type: :string, description: 'Event slug'
 
@@ -31,16 +32,43 @@ RSpec.describe 'Event Management', type: :request, swagger_doc: 'openapi.yaml' d
           { '$ref' => '#/components/schemas/event_response' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:id) { event[:_id] }
         let(:slug) { nil }
-        run_test!
-      end
 
-      response '200', 'Event not found' do
-        schema '$ref' => '#/components/schemas/fail_envelope'
-        let(:id) { SecureRandom.uuid }
-        let(:slug) { nil }
-        run_test!
+        context 'when the event exists' do
+          let(:id) { event[:_id] }
+          run_test!
+        end
+
+        context 'when the event does not exist' do
+          let(:id) { SecureRandom.uuid }
+          run_test!
+        end
+      end
+    end
+  end
+
+  path '/event/{slug}' do
+    get 'Show event by slug' do
+      tags 'Events'
+      produces 'application/json'
+      description 'Returns the public event document for an event slug using the path-style endpoint.'
+      parameter name: :slug, in: :path, type: :string, required: true, description: 'Event slug'
+
+      response '200', 'Success or fail' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/event_response' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+
+        context 'when the event exists' do
+          let(:slug) { event_with_slug[:slug] }
+          run_test!
+        end
+
+        context 'when the event does not exist' do
+          let(:slug) { 'missing-event-slug' }
+          run_test!
+        end
       end
     end
   end
@@ -142,6 +170,7 @@ RSpec.describe 'Event Management', type: :request, swagger_doc: 'openapi.yaml' d
   let(:user) { create_test_user }
   let(:profile) { create_test_profile(user[:_id]) }
   let(:event) { create_test_event(user[:_id], profile[:_id]) }
+  let(:event_with_slug) { create_test_event(user[:_id], profile[:_id], slug: 'test-event-json') }
 
   describe 'GET /event/:slug' do
     it 'shows event by slug' do

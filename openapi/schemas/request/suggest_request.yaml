@@ -10,6 +10,6 @@ properties:
     items:
       type: string
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   lang:
     "$ref": "#/components/schemas/lang"

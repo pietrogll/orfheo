@@ -6,4 +6,4 @@ properties:
   name:
     type: string
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

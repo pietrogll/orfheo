@@ -1,0 +1,321 @@
+---
+type: object
+description: Event document returned by event endpoints. Events can include nested program and configuration data, so optional and legacy fields may vary by record.
+additionalProperties: true
+properties:
+  id:
+    type: string
+    format: uuid
+  user_id:
+    type: string
+    format: uuid
+  profile_id:
+    type: string
+    format: uuid
+  name:
+    type: string
+  slug:
+    type: string
+  type:
+    type: string
+  professional:
+    type: boolean
+  published:
+    type: boolean
+  place:
+    type: string
+  color:
+    type: string
+    example: "#4eface"
+    nullable: true
+  img:
+    oneOf:
+    - type: string
+    - type: array
+      items:
+        type: string
+  address:
+    type: object
+    additionalProperties: true
+    properties:
+      route:
+        type: string
+      street_number:
+        type: string
+      door:
+        type: string
+      locality:
+        type: string
+      country:
+        type: string
+      postal_code:
+        type: string
+      location:
+        type: object
+        additionalProperties: true
+        properties:
+          lat:
+            type: string
+          lng:
+            type: string
+  texts:
+    type: object
+    additionalProperties:
+      type: object
+      additionalProperties: true
+      properties:
+        baseline:
+          type: string
+        description:
+          type: string
+        buttons:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+  eventTime:
+    type: array
+    nullable: true
+    items:
+      type: object
+      additionalProperties: true
+      properties:
+        date:
+          type: string
+          format: date
+        time:
+          type: array
+          items:
+            type: string
+  categories:
+    type: object
+    additionalProperties: true
+  partners:
+    type: object
+    additionalProperties: true
+    properties:
+      sponsors:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          properties:
+            name:
+              type: string
+            img:
+              type: array
+              items:
+                type: string
+            link:
+              type: string
+  program_id:
+    type: string
+    format: uuid
+    nullable: true
+  call_id:
+    type: string
+    format: uuid
+    nullable: true
+  program:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        participant_id:
+          type: string
+        host_id:
+          type: string
+        title:
+          type: string
+        participant_name:
+          type: string
+        participant_category:
+          type: string
+        participant_subcategory:
+          type: string
+        host_name:
+          type: string
+        short_description:
+          type: string
+        permanent:
+          type: string
+        children:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          type: array
+          items:
+            type: string
+        address:
+          type: object
+          additionalProperties: true
+        price:
+          type: object
+          additionalProperties: true
+  subcategories:
+    type: object
+    additionalProperties: true
+  subcategories_icons:
+    type: object
+    additionalProperties: true
+  display_program:
+    type: string
+  whitelisted:
+    type: boolean
+  start:
+    type: string
+  deadline:
+    type: string
+  conditions:
+    type: string
+  organizer:
+    type: string
+  organizer_email:
+    type: object
+    nullable: true
+    additionalProperties: true
+    properties:
+      value:
+        type: string
+      visible:
+        type: string
+example:
+  id: "880c990f-0ce9-48ed-8359-f1cb07467d6a"
+  user_id: "45825599-b8cf-499c-825c-a7134a3f1ff0"
+  profile_id: "fce01c94-4a2b-49ff-b6b6-dfd53e45bb83"
+  name: "conFusion IX"
+  slug: "confusion2022"
+  type: "festival"
+  professional: true
+  published: true
+  place: "Benimaclet, Valencia"
+  color: "#4eface"
+  img:
+  - "photos/Screenshot_from_2022-05-13_19-31-09_c6r6ia"
+  address:
+    route: "Placa de Benimaclet"
+    street_number: ""
+    door: ""
+    locality: "Valencia"
+    country: "Spain"
+    postal_code: "46020"
+    location:
+      lat: "39.4862381"
+      lng: "-0.3591347"
+  texts:
+    es:
+      baseline: ""
+      description: "<p>Tienes un tutorial de como hacer la inscripcion.</p>"
+      buttons:
+        "0":
+          link: "https://beniconfusionfest.es/es/inicio"
+          text: "Web"
+          tooltip: "beniconfusionfest.es"
+  eventTime:
+  - date: "2022-10-15"
+    time:
+    - "1665820800000"
+    - "1665862200000"
+  - date: "2022-10-16"
+    time:
+    - "1665907200000"
+    - "1665948600000"
+  categories:
+    artist:
+    - "music"
+    - "arts"
+    - "visual"
+    - "audiovisual"
+    - "literature"
+  partners:
+    sponsors:
+    - name: "Ajuntament de Valencia"
+      img:
+      - "photos/ayuntamiento_zvxbct"
+      link: ""
+  program_id: "30ae74e0-47f2-45a6-86e8-6e3f4fbd6334"
+  call_id: "a6c2f31e-8cf2-4bab-9d42-8e7fa1c4d2ac"
+  program:
+  - id: "95b6c9f1-a2b0-4ad9-96b1-69436c5250ee"
+    participant_id: "ea2febdd-dd81-45aa-ad23-c30177ae8534"
+    host_id: "fce01c94-4a2b-49ff-b6b6-dfd53e45bb83"
+    title: "Petit comite"
+    participant_name: "Petit comite"
+    participant_category: "music"
+    participant_subcategory: "4"
+    host_name: "Cruce Circense"
+    short_description: "Concierto de musica en directo."
+    permanent: "false"
+    children: "all_public"
+    date: "2022-10-16"
+    time:
+    - "1665910800000"
+    - "1665915300000"
+    address:
+      route: "Masquefa"
+      street_number: "8"
+      locality: "Valencia"
+      postal_code: "46020"
+    price:
+      price: "false"
+      ticket_url: ""
+      transition_type: "buy"
+  - id: "76b4c37b-1617-4239-a332-b910941c68b6"
+    participant_id: "69051592-01dd-4e65-bbac-1f28ce491d58"
+    host_id: "fce01c94-4a2b-49ff-b6b6-dfd53e45bb83"
+    title: "Art Inclusiu"
+    participant_name: "SEA"
+    participant_category: "street_art"
+    participant_subcategory: "1"
+    host_name: "Solar Maria"
+    short_description: "Arte inclusivo y anticapacitista."
+    permanent: "true"
+    children: "all_public"
+    date: "2022-10-15"
+    time:
+    - "1665846000000"
+    - "1665858600000"
+    address:
+      route: "Pucol"
+      street_number: "12"
+      locality: "Valencia"
+      postal_code: "46020"
+    price:
+      price: "false"
+      ticket_url: ""
+      transition_type: "buy"
+  subcategories:
+    artist:
+      "0": "Artes Escenicas"
+      "4": "Musica"
+      "7": "Talleres / Charlas"
+    space:
+      "0": "Espacio interior"
+      "1": "Espacio exterior"
+  subcategories_icons:
+    artist:
+      "0":
+      - "arts"
+      "4":
+      - "music"
+      "7":
+      - "music"
+      - "arts"
+    space:
+      "0": ""
+      "1": ""
+  display_program: "by_time"
+  whitelisted: false
+  start: "1652565600000"
+  deadline: "1656971999000"
+  conditions: "http://beniconfusionfest.es/wp-content/uploads/2022/05/Bases-conFusion-2022.pdf"
+  organizer: "Possibilitats"
+  organizer_email:
+    value: "asociacion@possibilitats.org"
+    visible: "true"

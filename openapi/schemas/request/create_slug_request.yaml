@@ -5,6 +5,6 @@ required:
 - slug
 properties:
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   slug:
     type: string

@@ -1,5 +1,5 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/AmbientUpsert"
+- "$ref": "#/components/schemas/ambient_upsert"
 - type: object
   description: Stored ambient has more fields; responses strip space_id/user_id/profile_id.

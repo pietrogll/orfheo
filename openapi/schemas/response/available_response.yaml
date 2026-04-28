@@ -1,2 +1,2 @@
 ---
-"$ref": "#/components/schemas/AvailabilityResponse"
+"$ref": "#/components/schemas/availability_response"

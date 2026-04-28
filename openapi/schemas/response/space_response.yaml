@@ -9,4 +9,4 @@ properties:
     enum:
     - success
   space:
-    "$ref": "#/components/schemas/SpaceWithMeta"
+    "$ref": "#/components/schemas/space_with_meta"

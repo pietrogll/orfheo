@@ -26,18 +26,35 @@ RSpec.describe 'Profile Management', type: :request, swagger_doc: 'openapi.yaml'
       description 'Returns the public profile document for a profile UUID. The current JSON endpoint resolves profiles via the `id` query parameter.'
       parameter name: :id, in: :query, type: :string, required: true, description: 'Profile UUID'
 
-      response '200', 'Profile found' do
+      response '200', 'Success or fail' do
         schema oneOf: [
           { '$ref' => '#/components/schemas/profile_response' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:id) { profile[:id] }
-        run_test!
-      end
 
-      response '200', 'Profile not found' do
-        schema '$ref' => '#/components/schemas/fail_envelope'
-        let(:id) { SecureRandom.uuid }
+        context 'when the profile exists' do
+          let(:id) { profile[:id] }
+          run_test!
+        end
+
+        context 'when the profile does not exist' do
+          let(:id) { SecureRandom.uuid }
+          run_test!
+        end
+      end
+    end
+  end
+
+  path '/profile/{slug}' do
+    get 'Show profile by slug' do
+      tags 'Profiles'
+      produces 'text/html'
+      description 'Current slug path implementation redirects to the query-style show endpoint using the provided path segment as the profile identifier.'
+      parameter name: :slug, in: :path, type: :string, required: true, description: 'Profile slug'
+
+      response '302', 'Redirects to query show endpoint' do
+        header 'Location', schema: { type: :string }, description: 'Redirect target'
+        let(:slug) { profile[:id] }
         run_test!
       end
     end

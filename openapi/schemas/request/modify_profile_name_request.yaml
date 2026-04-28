@@ -5,6 +5,6 @@ required:
 - name
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   name:
     type: string

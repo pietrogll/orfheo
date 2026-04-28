@@ -261,9 +261,11 @@ paths:
                 - "$ref": "#/components/schemas/fail_envelope"
   "/event":
     get:
-      summary: Show event
+      summary: Show event by id
       tags:
       - Events
+      description: Returns the public event document for an event UUID, including
+        schedule, categories, and publishing metadata when present.
       parameters:
       - name: id
         in: query
@@ -277,14 +279,36 @@ paths:
           type: string
       responses:
         '200':
-          description: Event not found
+          description: Success or fail
           content:
             application/json:
               schema:
                 oneOf:
                 - "$ref": "#/components/schemas/event_response"
                 - "$ref": "#/components/schemas/fail_envelope"
-                "$ref": "#/components/schemas/fail_envelope"
+  "/event/{slug}":
+    get:
+      summary: Show event by slug
+      tags:
+      - Events
+      description: Returns the public event document for an event slug using the path-style
+        endpoint.
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Event slug
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success or fail
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/event_response"
+                - "$ref": "#/components/schemas/fail_envelope"
   "/users/create_event":
     post:
       summary: Create a new event
@@ -534,14 +558,35 @@ paths:
           type: string
       responses:
         '200':
-          description: Profile not found
+          description: Success or fail
           content:
             application/json:
               schema:
                 oneOf:
                 - "$ref": "#/components/schemas/profile_response"
                 - "$ref": "#/components/schemas/fail_envelope"
-                "$ref": "#/components/schemas/fail_envelope"
+  "/profile/{slug}":
+    get:
+      summary: Show profile by slug
+      tags:
+      - Profiles
+      description: Current slug path implementation redirects to the query-style show
+        endpoint using the provided path segment as the profile identifier.
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        description: Profile slug
+        schema:
+          type: string
+      responses:
+        '302':
+          description: Redirects to query show endpoint
+          headers:
+            Location:
+              schema:
+                type: string
+              description: Redirect target
   "/users/create_profile":
     post:
       summary: Create profile
@@ -1292,12 +1337,12 @@ components:
   schemas:
     ambient_public:
       allOf:
-      - "$ref": "#/components/schemas/AmbientUpsert"
+      - "$ref": "#/components/schemas/ambient_upsert"
       - type: object
         description: Stored ambient has more fields; responses strip space_id/user_id/profile_id.
     business_message:
       allOf:
-      - "$ref": "#/components/schemas/ContactMessage"
+      - "$ref": "#/components/schemas/contact_message"
       - type: object
         required:
         - subject
@@ -1332,6 +1377,329 @@ components:
           type: string
         message:
           type: string
+    event_document:
+      type: object
+      description: Event document returned by event endpoints. Events can include
+        nested program and configuration data, so optional and legacy fields may vary
+        by record.
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        profile_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        type:
+          type: string
+        professional:
+          type: boolean
+        published:
+          type: boolean
+        place:
+          type: string
+        color:
+          type: string
+          example: "#4eface"
+          nullable: true
+        img:
+          oneOf:
+          - type: string
+          - type: array
+            items:
+              type: string
+        address:
+          type: object
+          additionalProperties: true
+          properties:
+            route:
+              type: string
+            street_number:
+              type: string
+            door:
+              type: string
+            locality:
+              type: string
+            country:
+              type: string
+            postal_code:
+              type: string
+            location:
+              type: object
+              additionalProperties: true
+              properties:
+                lat:
+                  type: string
+                lng:
+                  type: string
+        texts:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              baseline:
+                type: string
+              description:
+                type: string
+              buttons:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties: true
+        eventTime:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              date:
+                type: string
+                format: date
+              time:
+                type: array
+                items:
+                  type: string
+        categories:
+          type: object
+          additionalProperties: true
+        partners:
+          type: object
+          additionalProperties: true
+          properties:
+            sponsors:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                properties:
+                  name:
+                    type: string
+                  img:
+                    type: array
+                    items:
+                      type: string
+                  link:
+                    type: string
+        program_id:
+          type: string
+          format: uuid
+          nullable: true
+        call_id:
+          type: string
+          format: uuid
+          nullable: true
+        program:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              id:
+                type: string
+                format: uuid
+              participant_id:
+                type: string
+              host_id:
+                type: string
+              title:
+                type: string
+              participant_name:
+                type: string
+              participant_category:
+                type: string
+              participant_subcategory:
+                type: string
+              host_name:
+                type: string
+              short_description:
+                type: string
+              permanent:
+                type: string
+              children:
+                type: string
+              date:
+                type: string
+                format: date
+              time:
+                type: array
+                items:
+                  type: string
+              address:
+                type: object
+                additionalProperties: true
+              price:
+                type: object
+                additionalProperties: true
+        subcategories:
+          type: object
+          additionalProperties: true
+        subcategories_icons:
+          type: object
+          additionalProperties: true
+        display_program:
+          type: string
+        whitelisted:
+          type: boolean
+        start:
+          type: string
+        deadline:
+          type: string
+        conditions:
+          type: string
+        organizer:
+          type: string
+        organizer_email:
+          type: object
+          nullable: true
+          additionalProperties: true
+          properties:
+            value:
+              type: string
+            visible:
+              type: string
+      example:
+        id: 880c990f-0ce9-48ed-8359-f1cb07467d6a
+        user_id: 45825599-b8cf-499c-825c-a7134a3f1ff0
+        profile_id: fce01c94-4a2b-49ff-b6b6-dfd53e45bb83
+        name: conFusion IX
+        slug: confusion2022
+        type: festival
+        professional: true
+        published: true
+        place: Benimaclet, Valencia
+        color: "#4eface"
+        img:
+        - photos/Screenshot_from_2022-05-13_19-31-09_c6r6ia
+        address:
+          route: Placa de Benimaclet
+          street_number: ''
+          door: ''
+          locality: Valencia
+          country: Spain
+          postal_code: '46020'
+          location:
+            lat: '39.4862381'
+            lng: "-0.3591347"
+        texts:
+          es:
+            baseline: ''
+            description: "<p>Tienes un tutorial de como hacer la inscripcion.</p>"
+            buttons:
+              '0':
+                link: https://beniconfusionfest.es/es/inicio
+                text: Web
+                tooltip: beniconfusionfest.es
+        eventTime:
+        - date: '2022-10-15'
+          time:
+          - '1665820800000'
+          - '1665862200000'
+        - date: '2022-10-16'
+          time:
+          - '1665907200000'
+          - '1665948600000'
+        categories:
+          artist:
+          - music
+          - arts
+          - visual
+          - audiovisual
+          - literature
+        partners:
+          sponsors:
+          - name: Ajuntament de Valencia
+            img:
+            - photos/ayuntamiento_zvxbct
+            link: ''
+        program_id: 30ae74e0-47f2-45a6-86e8-6e3f4fbd6334
+        call_id: a6c2f31e-8cf2-4bab-9d42-8e7fa1c4d2ac
+        program:
+        - id: 95b6c9f1-a2b0-4ad9-96b1-69436c5250ee
+          participant_id: ea2febdd-dd81-45aa-ad23-c30177ae8534
+          host_id: fce01c94-4a2b-49ff-b6b6-dfd53e45bb83
+          title: Petit comite
+          participant_name: Petit comite
+          participant_category: music
+          participant_subcategory: '4'
+          host_name: Cruce Circense
+          short_description: Concierto de musica en directo.
+          permanent: 'false'
+          children: all_public
+          date: '2022-10-16'
+          time:
+          - '1665910800000'
+          - '1665915300000'
+          address:
+            route: Masquefa
+            street_number: '8'
+            locality: Valencia
+            postal_code: '46020'
+          price:
+            price: 'false'
+            ticket_url: ''
+            transition_type: buy
+        - id: 76b4c37b-1617-4239-a332-b910941c68b6
+          participant_id: 69051592-01dd-4e65-bbac-1f28ce491d58
+          host_id: fce01c94-4a2b-49ff-b6b6-dfd53e45bb83
+          title: Art Inclusiu
+          participant_name: SEA
+          participant_category: street_art
+          participant_subcategory: '1'
+          host_name: Solar Maria
+          short_description: Arte inclusivo y anticapacitista.
+          permanent: 'true'
+          children: all_public
+          date: '2022-10-15'
+          time:
+          - '1665846000000'
+          - '1665858600000'
+          address:
+            route: Pucol
+            street_number: '12'
+            locality: Valencia
+            postal_code: '46020'
+          price:
+            price: 'false'
+            ticket_url: ''
+            transition_type: buy
+        subcategories:
+          artist:
+            '0': Artes Escenicas
+            '4': Musica
+            '7': Talleres / Charlas
+          space:
+            '0': Espacio interior
+            '1': Espacio exterior
+        subcategories_icons:
+          artist:
+            '0':
+            - arts
+            '4':
+            - music
+            '7':
+            - music
+            - arts
+          space:
+            '0': ''
+            '1': ''
+        display_program: by_time
+        whitelisted: false
+        start: '1652565600000'
+        deadline: '1656971999000'
+        conditions: http://beniconfusionfest.es/wp-content/uploads/2022/05/Bases-conFusion-2022.pdf
+        organizer: Possibilitats
+        organizer_email:
+          value: asociacion@possibilitats.org
+          visible: 'true'
     fail_envelope:
       type: object
       required:
@@ -1360,11 +1728,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         type:
           type: string
           enum:
@@ -1393,11 +1761,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         description:
@@ -1406,7 +1774,7 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         photos:
           type: array
@@ -1480,7 +1848,7 @@ components:
           type: string
           nullable: true
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     production_with_meta:
       type: object
       required:
@@ -1494,11 +1862,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         format:
           type: string
         category:
@@ -1531,11 +1899,11 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         children: {}
         cache:
-          "$ref": "#/components/schemas/CacheField"
+          "$ref": "#/components/schemas/cache_field"
         gallery:
           description: Gallery objects created/updated as side effects.
           type: array
@@ -1565,11 +1933,10 @@ components:
               type: string
           - type: string
         tags:
-          oneOf:
-          - type: array
-            items:
-              type: string
-          - type: 'null'
+          type: array
+          nullable: true
+          items:
+            type: string
         short_description:
           type: string
         description:
@@ -1808,11 +2175,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         type:
@@ -1838,7 +2205,7 @@ components:
         ambients:
           type: array
           items:
-            "$ref": "#/components/schemas/AmbientPublic"
+            "$ref": "#/components/schemas/ambient_public"
         gallery:
           type: array
           items:
@@ -1880,9 +2247,9 @@ components:
       additionalProperties: true
       properties:
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name_email:
           type: string
         email:
@@ -1898,7 +2265,7 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         description:
@@ -1920,7 +2287,7 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         photos:
           type: array
@@ -1936,9 +2303,9 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         amend: {}
     artist_proposal_upsert:
       type: object
@@ -1953,17 +2320,17 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         production_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         form_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         own:
           oneOf:
           - type: boolean
@@ -1998,11 +2365,11 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         children: {}
         cache:
-          "$ref": "#/components/schemas/CacheField"
+          "$ref": "#/components/schemas/cache_field"
         phone:
           type: object
           required:
@@ -2019,17 +2386,17 @@ components:
       - call_id
       properties:
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     call_upsert:
       type: object
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         start:
           type: integer
         deadline:
@@ -2042,18 +2409,18 @@ components:
         name:
           type: string
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     check_participant_name_request:
       type: object
       required:
       - name
       properties:
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         program_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         participant_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
     check_slug_request:
@@ -2073,9 +2440,9 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         type:
           type: string
           enum:
@@ -2107,9 +2474,9 @@ components:
       additionalProperties: true
       properties:
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         description:
@@ -2118,7 +2485,7 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         photos:
           type: array
@@ -2143,9 +2510,9 @@ components:
       additionalProperties: true
       properties:
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         format:
           type: string
         category:
@@ -2181,11 +2548,11 @@ components:
         links:
           type: array
           items:
-            "$ref": "#/components/schemas/LinkItem"
+            "$ref": "#/components/schemas/link_item"
           nullable: true
         children: {}
         cache:
-          "$ref": "#/components/schemas/CacheField"
+          "$ref": "#/components/schemas/cache_field"
     create_slug_request:
       type: object
       required:
@@ -2193,7 +2560,7 @@ components:
       - slug
       properties:
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         slug:
           type: string
     create_space_request:
@@ -2208,9 +2575,9 @@ components:
       additionalProperties: true
       properties:
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         space_name:
@@ -2242,10 +2609,10 @@ components:
           oneOf:
           - type: array
             items:
-              "$ref": "#/components/schemas/AmbientUpsert"
+              "$ref": "#/components/schemas/ambient_upsert"
           - type: object
             additionalProperties:
-              "$ref": "#/components/schemas/AmbientUpsert"
+              "$ref": "#/components/schemas/ambient_upsert"
     delete_proposal_request:
       type: object
       required:
@@ -2255,11 +2622,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     delete_whitelist_request:
       type: object
       required:
@@ -2269,9 +2636,9 @@ components:
       additionalProperties: true
       properties:
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         email:
           type: string
           format: email
@@ -2281,7 +2648,7 @@ components:
       - event_id
       properties:
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         lang:
           "$ref": "#/components/schemas/lang"
     event_upsert:
@@ -2289,9 +2656,9 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         texts:
@@ -2327,7 +2694,7 @@ components:
       - type
       properties:
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         type:
           type: string
           enum:
@@ -2342,7 +2709,7 @@ components:
       - call_id
       properties:
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         lang:
           "$ref": "#/components/schemas/lang"
     id_only_request:
@@ -2351,7 +2718,7 @@ components:
       - id
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     login_request:
       type: object
       required:
@@ -2368,30 +2735,30 @@ components:
       additionalProperties: false
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         email:
           type: string
           format: email
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     meta_ambient_upsert:
       type: object
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         space_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     meta_asset_upsert:
       type: object
       additionalProperties: false
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         url:
           type: string
         holders:
@@ -2399,35 +2766,35 @@ components:
           items:
             type: string
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     meta_gallery_upsert:
       type: object
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         user_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     meta_participant_upsert:
       type: object
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         email:
           type: string
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     meta_tag_upsert:
       type: object
       additionalProperties: false
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         text:
           type: string
         source:
@@ -2437,25 +2804,25 @@ components:
           items:
             type: string
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     modify_form_request:
       allOf:
-      - "$ref": "#/components/schemas/CreateFormRequest"
+      - "$ref": "#/components/schemas/create_form_request"
       - type: object
         required:
         - id
         properties:
           id:
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "#/components/schemas/uuid"
     modify_free_block_request:
       allOf:
-      - "$ref": "#/components/schemas/CreateFreeBlockRequest"
+      - "$ref": "#/components/schemas/create_free_block_request"
       - type: object
         required:
         - id
         properties:
           id:
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "#/components/schemas/uuid"
     modify_lang_request:
       type: object
       required:
@@ -2475,11 +2842,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
           type: string
         type:
@@ -2500,20 +2867,20 @@ components:
           minLength: 8
     modify_production_request:
       allOf:
-      - "$ref": "#/components/schemas/CreateProductionRequest"
+      - "$ref": "#/components/schemas/create_production_request"
       - type: object
         required:
         - id
         properties:
           id:
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "#/components/schemas/uuid"
     modify_profile_description_request:
       type: object
       required:
       - id
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
       additionalProperties: true
     modify_profile_name_request:
       type: object
@@ -2522,18 +2889,18 @@ components:
       - name
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
     modify_space_request:
       allOf:
-      - "$ref": "#/components/schemas/CreateSpaceRequest"
+      - "$ref": "#/components/schemas/create_space_request"
       - type: object
         required:
         - id
         properties:
           id:
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "#/components/schemas/uuid"
     participant_modify_request:
       type: object
       required:
@@ -2545,15 +2912,15 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         program_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         email:
@@ -2584,16 +2951,16 @@ components:
       - profile_id
       properties:
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     profile_upsert:
       type: object
       description: Profile payload. Required fields are enforced server-side.
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         name:
           type: string
         address:
@@ -2613,9 +2980,9 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         subcategories:
           type: object
           additionalProperties: true
@@ -2638,7 +3005,7 @@ components:
         lang:
           "$ref": "#/components/schemas/lang"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     results_program_request:
       type: object
       required:
@@ -2654,7 +3021,7 @@ components:
           items:
             type: string
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         filters:
           type: object
           additionalProperties: true
@@ -2681,9 +3048,9 @@ components:
         shown:
           type: array
           items:
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         lang:
           "$ref": "#/components/schemas/lang"
     save_interests_request:
@@ -2736,11 +3103,11 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     space_proposal_upsert:
       type: object
       required:
@@ -2755,17 +3122,17 @@ components:
       additionalProperties: true
       properties:
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         profile_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         call_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         space_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         form_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         own:
           oneOf:
           - type: boolean
@@ -2797,7 +3164,7 @@ components:
         ambients:
           type: array
           items:
-            "$ref": "#/components/schemas/AmbientUpsert"
+            "$ref": "#/components/schemas/ambient_upsert"
         amend: {}
         phone:
           type: object
@@ -2829,7 +3196,7 @@ components:
           items:
             type: string
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         filters:
           type: object
           additionalProperties: true
@@ -2847,7 +3214,7 @@ components:
           items:
             type: string
         event_id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
         lang:
           "$ref": "#/components/schemas/lang"
     suggest_tags_request:
@@ -2873,7 +3240,7 @@ components:
         available:
           type: boolean
     available_response:
-      "$ref": "#/components/schemas/AvailabilityResponse"
+      "$ref": "#/components/schemas/availability_response"
     call_response:
       type: object
       required:
@@ -2915,10 +3282,14 @@ components:
           enum:
           - success
         event:
-          type: object
-          additionalProperties: true
+          "$ref": "#/components/schemas/event_document"
         event_status:
           type: string
+          enum:
+          - owner
+          - admin
+          - visitor
+          - outsider
         lang:
           "$ref": "#/components/schemas/lang"
       additionalProperties: true
@@ -2933,7 +3304,7 @@ components:
           enum:
           - success
         form:
-          "$ref": "#/components/schemas/Form"
+          "$ref": "#/components/schemas/form"
     free_block_response:
       type: object
       required:
@@ -2945,7 +3316,7 @@ components:
           enum:
           - success
         free_block:
-          "$ref": "#/components/schemas/FreeBlockWithMeta"
+          "$ref": "#/components/schemas/free_block_with_meta"
     get_call_forms_response:
       type: object
       required:
@@ -2959,7 +3330,7 @@ components:
         forms:
           type: array
           items:
-            "$ref": "#/components/schemas/Form"
+            "$ref": "#/components/schemas/form"
     get_call_proposals_response:
       type: object
       required:
@@ -3011,7 +3382,7 @@ components:
           enum:
           - success
         id:
-          "$ref": "#/components/schemas/Uuid"
+          "$ref": "#/components/schemas/uuid"
     list_events_response:
       type: object
       required:
@@ -3025,8 +3396,7 @@ components:
         events:
           type: array
           items:
-            type: object
-            additionalProperties: true
+            "$ref": "#/components/schemas/event_document"
     list_profiles_response:
       type: object
       required:
@@ -3080,7 +3450,7 @@ components:
           enum:
           - success
         production:
-          "$ref": "#/components/schemas/ProductionWithMeta"
+          "$ref": "#/components/schemas/production_with_meta"
     profile_productions_spaces_response:
       type: object
       required:
@@ -3481,7 +3851,7 @@ components:
           enum:
           - success
         space:
-          "$ref": "#/components/schemas/SpaceWithMeta"
+          "$ref": "#/components/schemas/space_with_meta"
     user_header_response:
       type: object
       required:
@@ -3512,7 +3882,7 @@ components:
           additionalProperties: true
     websocket_add_whitelist_response:
       allOf:
-      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - "$ref": "#/components/schemas/websocket_event_model_response"
       - type: object
         properties:
           event:
@@ -3522,10 +3892,10 @@ components:
           model:
             type: array
             items:
-              "$ref": "#/components/schemas/WhitelistEntry"
+              "$ref": "#/components/schemas/whitelist_entry"
     websocket_delete_whitelist_response:
       allOf:
-      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - "$ref": "#/components/schemas/websocket_event_model_response"
       - type: object
         properties:
           event:
@@ -3535,7 +3905,7 @@ components:
           model:
             type: array
             items:
-              "$ref": "#/components/schemas/WhitelistEntry"
+              "$ref": "#/components/schemas/whitelist_entry"
     websocket_event_model_response:
       type: object
       required:
@@ -3553,7 +3923,7 @@ components:
         model: {}
     websocket_modify_participant_response:
       allOf:
-      - "$ref": "#/components/schemas/WebsocketEventModelResponse"
+      - "$ref": "#/components/schemas/websocket_event_model_response"
       - type: object
         properties:
           event:
@@ -3561,4 +3931,4 @@ components:
             enum:
             - modifyParticipant
           model:
-            "$ref": "#/components/schemas/ParticipantForManager"
+            "$ref": "#/components/schemas/participant_for_manager"

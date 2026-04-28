@@ -7,9 +7,9 @@ required:
 additionalProperties: true
 properties:
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   call_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   email:
     type: string
     format: email

@@ -10,9 +10,9 @@ required:
 additionalProperties: true
 properties:
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   name:
     type: string
   space_name:
@@ -44,7 +44,7 @@ properties:
     oneOf:
     - type: array
       items:
-        "$ref": "#/components/schemas/AmbientUpsert"
+        "$ref": "#/components/schemas/ambient_upsert"
     - type: object
       additionalProperties:
-        "$ref": "#/components/schemas/AmbientUpsert"
+        "$ref": "#/components/schemas/ambient_upsert"

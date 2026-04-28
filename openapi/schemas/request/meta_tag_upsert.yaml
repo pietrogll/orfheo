@@ -3,7 +3,7 @@ type: object
 additionalProperties: false
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   text:
     type: string
   source:
@@ -13,4 +13,4 @@ properties:
     items:
       type: string
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

@@ -27,4 +27,4 @@ properties:
     type: string
     nullable: true
   user_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

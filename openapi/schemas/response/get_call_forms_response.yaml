@@ -11,4 +11,4 @@ properties:
   forms:
     type: array
     items:
-      "$ref": "#/components/schemas/Form"
+      "$ref": "#/components/schemas/form"

@@ -4,7 +4,7 @@ description: Profile payload. Required fields are enforced server-side.
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   name:
     type: string
   address:

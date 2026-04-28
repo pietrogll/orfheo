@@ -4,4 +4,4 @@ required:
 - call_id
 properties:
   call_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

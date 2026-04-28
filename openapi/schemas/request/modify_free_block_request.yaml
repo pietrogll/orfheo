@@ -1,9 +1,9 @@
 ---
 allOf:
-- "$ref": "#/components/schemas/CreateFreeBlockRequest"
+- "$ref": "#/components/schemas/create_free_block_request"
 - type: object
   required:
   - id
   properties:
     id:
-      "$ref": "#/components/schemas/Uuid"
+      "$ref": "#/components/schemas/uuid"

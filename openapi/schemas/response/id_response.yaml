@@ -9,4 +9,4 @@ properties:
     enum:
     - success
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"

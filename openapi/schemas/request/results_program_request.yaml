@@ -13,7 +13,7 @@ properties:
     items:
       type: string
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   filters:
     type: object
     additionalProperties: true

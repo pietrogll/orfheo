@@ -12,17 +12,17 @@ required:
 additionalProperties: true
 properties:
   id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   profile_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   event_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   call_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   space_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   form_id:
-    "$ref": "#/components/schemas/Uuid"
+    "$ref": "#/components/schemas/uuid"
   own:
     oneOf:
     - type: boolean
@@ -54,7 +54,7 @@ properties:
   ambients:
     type: array
     items:
-      "$ref": "#/components/schemas/AmbientUpsert"
+      "$ref": "#/components/schemas/ambient_upsert"
   amend: {}
   phone:
     type: object
