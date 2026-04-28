@@ -9,8 +9,12 @@ properties:
     enum:
     - success
   profile:
-    type: object
-    additionalProperties: true
+    "$ref": "#/components/schemas/profile_document"
   profile_status:
     type: string
+    enum:
+    - owner
+    - admin
+    - visitor
+    - outsider
 additionalProperties: true

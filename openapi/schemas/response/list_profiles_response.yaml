@@ -11,5 +11,4 @@ properties:
   profiles:
     type: array
     items:
-      type: object
-      additionalProperties: true
+      "$ref": "#/components/schemas/profile_document"

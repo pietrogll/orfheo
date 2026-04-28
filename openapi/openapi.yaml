@@ -520,29 +520,28 @@ paths:
                 - "$ref": "#/components/schemas/fail_envelope"
   "/profile":
     get:
-      summary: Show profile
+      summary: Show profile by id
       tags:
       - Profiles
+      description: Returns the public profile document for a profile UUID. The current
+        JSON endpoint resolves profiles via the `id` query parameter.
       parameters:
       - name: id
         in: query
-        description: Profile ID
-        schema:
-          type: string
-      - name: slug
-        in: query
-        description: Profile slug
+        required: true
+        description: Profile UUID
         schema:
           type: string
       responses:
         '200':
-          description: Success or fail
+          description: Profile not found
           content:
             application/json:
               schema:
                 oneOf:
                 - "$ref": "#/components/schemas/profile_response"
                 - "$ref": "#/components/schemas/fail_envelope"
+                "$ref": "#/components/schemas/fail_envelope"
   "/users/create_profile":
     post:
       summary: Create profile
@@ -1544,6 +1543,258 @@ components:
             type: object
             additionalProperties: true
           nullable: true
+    profile_document:
+      type: object
+      description: Public profile document returned by profile endpoints. Profiles
+        are highly configurable, so many sections are optional and extra keys may
+        appear.
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        facets:
+          oneOf:
+          - type: array
+            items:
+              type: string
+          - type: string
+        tags:
+          oneOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+        short_description:
+          type: string
+        description:
+          type: string
+        color:
+          type: string
+          example: "#4eface"
+        email:
+          type: object
+          additionalProperties: true
+          properties:
+            value:
+              type: string
+            visible:
+              type: string
+        phone:
+          type: object
+          additionalProperties: true
+          properties:
+            value:
+              type: string
+            visible:
+              type: string
+        address:
+          type: object
+          additionalProperties: true
+          properties:
+            locality:
+              type: string
+            postal_code:
+              type: string
+            neighborhood:
+              type: string
+            route:
+              type: string
+            street_number:
+              type: string
+            country:
+              type: string
+            location:
+              type: object
+              additionalProperties: true
+              properties:
+                lat:
+                  type: string
+                lng:
+                  type: string
+        profile_picture:
+          type: array
+          items:
+            type: string
+        personal_web:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: true
+            properties:
+              url:
+                type: string
+              provider:
+                type: string
+        buttons:
+          oneOf:
+          - type: object
+            additionalProperties: true
+            properties:
+              link:
+                type: string
+              text:
+                type: string
+              tooltip:
+                type: string
+          - type: array
+            items:
+              type: object
+              additionalProperties: true
+        menu:
+          type: array
+          items:
+            type: string
+        relations:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+            properties:
+              id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              color:
+                type: string
+        portfolio:
+          type: object
+          additionalProperties: true
+          properties:
+            proposals:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        free_block:
+          type: object
+          additionalProperties: true
+        gallery:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        history:
+          type: object
+          additionalProperties: true
+          properties:
+            events:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        activities:
+          type: object
+          additionalProperties: true
+          properties:
+            events:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+        upcoming:
+          type: object
+          additionalProperties: true
+          properties:
+            events:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+      example:
+        id: fce01c94-4a2b-49ff-b6b6-dfd53e45bb83
+        user_id: 45825599-b8cf-499c-825c-a7134a3f1ff0
+        name: Possibilitats
+        facets:
+        - association
+        tags:
+        - arte
+        - creatividad
+        short_description: Asociación sociocultural enfocada en comunidad y creatividad.
+        description: "<p><strong>Más que un evento: una comunidad.</strong></p>"
+        color: "#4eface"
+        email:
+          value: asociacion@possibilitats.org
+          visible: 'true'
+        phone:
+          value: 622 62 61 63
+          visible: 'true'
+        address:
+          locality: València
+          postal_code: '46020'
+          neighborhood: Benimaclet
+          location:
+            lat: '39.4884784'
+            lng: "-0.3583606"
+        profile_picture:
+        - profile_picture/IMG_20161015_180807393-min_myiuhq
+        personal_web:
+          '0':
+            url: https://www.instagram.com/benimacletconfusion/
+            provider: instagram
+        buttons:
+          link: https://possibilitats.org/asociacion/
+          text: possibilitats.org
+          tooltip: ''
+        menu:
+        - upcoming
+        - free_block
+        - description
+        - history
+        relations:
+        - id: 48144fa8-37e1-45d3-84e1-ba0e5de6f8d9
+          name: Possibility
+          color: "#ed7b67"
+        portfolio:
+          proposals:
+          - id: 0dd832ea-e67d-4508-9971-842ef0c7d6f4
+            title: Juegos confusos
+            format: other
+            category: other
+            short_description: Juegos multiidiomas para todo tipo de publico.
+        free_block:
+          id: 5000db68-4a01-4712-95ae-b826bda1b3e0
+          name: La filosofia
+          description: "<p>Texto libre del perfil.</p>"
+        gallery:
+        - id: fce01c94-4a2b-49ff-b6b6-dfd53e45bb83
+          source: profiles
+          name: Possibilitats
+          photos:
+          - profile_picture/IMG_20161015_180807393-min_myiuhq
+        history:
+          events:
+          - id: 46fa14de-319c-4907-a31f-0c1cd44849ec
+            name: conFusion 2024
+            type: festival
+            place: Benimaclet
+            eventTime:
+            - date: '2024-10-19'
+              time:
+              - '1729324800000'
+              - '1729366200000'
+        activities:
+          events:
+          - event_id: 880c990f-0ce9-48ed-8359-f1cb07467d6a
+            event_name: conFusion IX
+            date: '2022-10-16'
+            shows:
+            - id: 95b6c9f1-a2b0-4ad9-96b1-69436c5250ee
+              title: Petit comite
+              participant_name: Petit comite
+              participant_category: music
+        upcoming:
+          events:
+          - id: af89a3a6-55c1-4e6b-be48-98a3ff14c426
+            name: conFusion al Ras
+            place: Orriols, Valencia
+            published: false
     space_with_meta:
       type: object
       required:
@@ -2789,8 +3040,7 @@ components:
         profiles:
           type: array
           items:
-            type: object
-            additionalProperties: true
+            "$ref": "#/components/schemas/profile_document"
     meta_list_response:
       type: object
       required:
@@ -2869,10 +3119,14 @@ components:
           enum:
           - success
         profile:
-          type: object
-          additionalProperties: true
+          "$ref": "#/components/schemas/profile_document"
         profile_status:
           type: string
+          enum:
+          - owner
+          - admin
+          - visitor
+          - outsider
       additionalProperties: true
     program_response:
       type: object
