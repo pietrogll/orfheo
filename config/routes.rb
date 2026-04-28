@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  mount Rswag::Ui::Engine => '/api-docs'
-  mount Rswag::Api::Engine => '/api-docs'
+  if defined?(Rswag::Ui::Engine) && defined?(Rswag::Api::Engine)
+    mount Rswag::Ui::Engine => '/api-docs'
+    mount Rswag::Api::Engine => '/api-docs'
+  end
   # Health check endpoint for monitoring
   get '/health', to: proc { [200, { 'Content-Type' => 'text/plain' }, ['OK']] }
 
