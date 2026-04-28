@@ -1,0 +1,74 @@
+---
+type: object
+required:
+- status
+- data
+properties:
+  status:
+    type: string
+    example: "success"
+  productions:
+    type: array
+    items:
+      type: object
+  pull_params:
+    type: object
+  data:
+    type: object
+    properties:
+      productions:
+        type: array
+        items:
+          type: object
+          properties:
+            profile_id:
+              type: string
+            id:
+              type: string
+            main_picture:
+              type: array
+              items:
+                type: string
+            format:
+              type: string
+            category:
+              type: string
+            title:
+              type: string
+            duration:
+              type: string
+            children:
+              type: string
+            cache:
+              type: object
+              nullable: true
+              properties:
+                value:
+                  type: string
+                visible:
+                  type: string
+                comment:
+                  type: string
+            profile_color:
+              type: string
+            profile_name:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+      pull_params:
+        type: object
+        properties:
+          starting_db_position:
+            type: integer
+          db_position:
+            type: integer
+          n_pulled:
+            type: integer
+          n_total:
+            type: integer
+          first_half_results:
+            type: string
+          n_results:
+            type: integer

@@ -1,0 +1,100 @@
+---
+type: object
+required:
+- status
+- data
+properties:
+  status:
+    type: string
+    example: "success"
+  events:
+    type: array
+    items:
+      type: object
+  pull_params:
+    type: object
+  data:
+    type: object
+    properties:
+      events:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            img:
+              oneOf:
+                - type: string
+                - type: array
+                  items:
+                    type: string
+            place:
+              type: string
+            address:
+              type: object
+              properties:
+                route:
+                  type: string
+                street_number:
+                  type: string
+                door:
+                  type: string
+                locality:
+                  type: string
+                country:
+                  type: string
+                postal_code:
+                  type: string
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+            eventTime:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                  time:
+                    type: array
+                    items:
+                      type: string
+            categories:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+            id:
+              type: string
+            professional:
+              type: boolean
+            call_id:
+              type: string
+              nullable: true
+            past_event:
+              type: boolean
+            color:
+              type: string
+      pull_params:
+        type: object
+        properties:
+          starting_db_position:
+            type: integer
+          db_position:
+            type: integer
+          n_pulled:
+            type: integer
+          n_total:
+            type: integer
+          first_half_results:
+            type: string
+          n_results:
+            type: integer

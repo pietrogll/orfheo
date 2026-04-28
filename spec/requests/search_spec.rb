@@ -9,16 +9,37 @@ RSpec.describe 'Search', type: :request, swagger_doc: 'openapi.yaml' do
       tags 'Search'
       consumes 'application/json'
       produces 'application/json'
-      parameter name: :body, in: :body, schema: { type: :object, properties: { query: { type: :string }, type: { type: :string } } }
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/search_load_results_request' }
 
-      response '200', 'Success or fail' do
+      response '200', 'Success' do
         schema oneOf: [
-          { '$ref' => '#/components/schemas/meta_list_response' },
-          { '$ref' => '#/components/schemas/fail_envelope' }
+          { '$ref' => '#/components/schemas/search_profiles_response' },
+          { '$ref' => '#/components/schemas/search_productions_response' },
+          { '$ref' => '#/components/schemas/search_spaces_response' },
+          { '$ref' => '#/components/schemas/search_events_response' }
         ]
-        let(:body) { { query: 'music', type: 'events' } }
-        run_test!
+
+        context 'when loading profiles' do
+          let(:body) { { db_key: 'profiles', pull_params: { first_half_results: 'true' } } }
+          run_test!
+        end
+
+        context 'when loading productions' do
+          let(:body) { { db_key: 'productions', pull_params: { first_half_results: 'true' } } }
+          run_test!
+        end
+
+        context 'when loading spaces' do
+          let(:body) { { db_key: 'spaces', pull_params: { first_half_results: 'true' } } }
+          run_test!
+        end
+
+        context 'when loading events' do
+          let(:body) { { db_key: 'events', pull_params: { first_half_results: 'true' } } }
+          run_test!
+        end
       end
+
     end
   end
 

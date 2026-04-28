@@ -1,0 +1,81 @@
+---
+type: object
+required:
+- status
+- data
+properties:
+  status:
+    type: string
+    example: "success"
+  spaces:
+    type: array
+    items:
+      type: object
+  pull_params:
+    type: object
+  data:
+    type: object
+    properties:
+      spaces:
+        type: array
+        items:
+          type: object
+          properties:
+            profile_id:
+              type: string
+            id:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+            address:
+              type: object
+              properties:
+                route:
+                  type: string
+                street_number:
+                  type: string
+                door:
+                  type: string
+                locality:
+                  type: string
+                country:
+                  type: string
+                postal_code:
+                  type: string
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+            description:
+              type: string
+            size:
+              type: string
+              nullable: true
+            main_picture:
+              type: array
+              items:
+                type: string
+            profile_color:
+              type: string
+            profile_name:
+              type: string
+      pull_params:
+        type: object
+        properties:
+          starting_db_position:
+            type: integer
+          db_position:
+            type: integer
+          n_pulled:
+            type: integer
+          n_total:
+            type: integer
+          first_half_results:
+            type: string
+          n_results:
+            type: integer

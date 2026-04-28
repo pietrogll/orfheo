@@ -1,0 +1,74 @@
+---
+type: object
+required:
+- status
+- data
+properties:
+  status:
+    type: string
+    example: "success"
+  profiles:
+    type: array
+    items:
+      type: object
+  pull_params:
+    type: object
+  data:
+    type: object
+    properties:
+      profiles:
+        type: array
+        items:
+          type: object
+          properties:
+            _id:
+              type: string
+            id:
+              type: string
+            facets:
+              type: array
+              items:
+                type: string
+            name:
+              type: string
+            profile_picture:
+              type: array
+              items:
+                type: string
+            address:
+              type: object
+              properties:
+                locality:
+                  type: string
+                postal_code:
+                  type: string
+                neighborhood:
+                  type: string
+                location:
+                  type: object
+                  properties:
+                    lat:
+                      type: string
+                    lng:
+                      type: string
+            color:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+      pull_params:
+        type: object
+        properties:
+          starting_db_position:
+            type: integer
+          db_position:
+            type: integer
+          n_pulled:
+            type: integer
+          n_total:
+            type: integer
+          first_half_results:
+            type: string
+          n_results:
+            type: integer

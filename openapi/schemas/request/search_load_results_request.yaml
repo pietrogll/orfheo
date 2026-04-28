@@ -1,0 +1,29 @@
+---
+type: object
+required:
+- pull_params
+- db_key
+properties:
+  pull_params:
+    type: object
+    properties:
+      first_half_results:
+        type: string
+        example: "true"
+      n_results:
+        type: integer
+      starting_db_position:
+        type: integer
+      db_position:
+        type: integer
+      n_pulled:
+        type: integer
+      n_total:
+        type: integer
+  db_key:
+    type: string
+    enum: [profiles, productions, spaces, events]
+    example: "profiles"
+  query:
+    type: object
+    nullable: true

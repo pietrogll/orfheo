@@ -101,13 +101,11 @@ paths:
       parameters: []
       responses:
         '200':
-          description: Success or fail
+          description: Failure
           content:
             application/json:
               schema:
-                oneOf:
-                - "$ref": "#/components/schemas/login_success"
-                - "$ref": "#/components/schemas/fail_envelope"
+                "$ref": "#/components/schemas/fail_envelope"
       requestBody:
         content:
           application/json:
@@ -121,13 +119,43 @@ paths:
       - cookieAuth: []
       responses:
         '200':
-          description: Success or fail
+          description: Success
           content:
             application/json:
               schema:
                 oneOf:
-                - "$ref": "#/components/schemas/login_success"
-                - "$ref": "#/components/schemas/fail_envelope"
+                - type: object
+                  required:
+                  - status
+                  - logged_in
+                  - user_id
+                  - user
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - success
+                    logged_in:
+                      type: boolean
+                      enum:
+                      - true
+                    user_id:
+                      type: string
+                    user:
+                      type: object
+                - type: object
+                  required:
+                  - status
+                  - logged_in
+                  properties:
+                    status:
+                      type: string
+                      enum:
+                      - success
+                    logged_in:
+                      type: boolean
+                      enum:
+                      - false
   "/logout":
     post:
       summary: Log out
@@ -137,13 +165,11 @@ paths:
       - cookieAuth: []
       responses:
         '200':
-          description: Success or fail
+          description: Success
           content:
             application/json:
               schema:
-                oneOf:
-                - "$ref": "#/components/schemas/success_envelope"
-                - "$ref": "#/components/schemas/fail_envelope"
+                "$ref": "#/components/schemas/success_envelope"
   "/call":
     get:
       summary: Show call
@@ -774,23 +800,20 @@ paths:
       parameters: []
       responses:
         '200':
-          description: Success or fail
+          description: Success
           content:
             application/json:
               schema:
                 oneOf:
-                - "$ref": "#/components/schemas/meta_list_response"
-                - "$ref": "#/components/schemas/fail_envelope"
+                - "$ref": "#/components/schemas/search_profiles_response"
+                - "$ref": "#/components/schemas/search_productions_response"
+                - "$ref": "#/components/schemas/search_spaces_response"
+                - "$ref": "#/components/schemas/search_events_response"
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                query:
-                  type: string
-                type:
-                  type: string
+              "$ref": "#/components/schemas/search_load_results_request"
   "/search/suggest":
     post:
       summary: Get suggestions
@@ -2143,6 +2166,39 @@ components:
         interests:
           type: object
           additionalProperties: true
+    search_load_results_request:
+      type: object
+      required:
+      - pull_params
+      - db_key
+      properties:
+        pull_params:
+          type: object
+          properties:
+            first_half_results:
+              type: string
+              example: 'true'
+            n_results:
+              type: integer
+            starting_db_position:
+              type: integer
+            db_position:
+              type: integer
+            n_pulled:
+              type: integer
+            n_total:
+              type: integer
+        db_key:
+          type: string
+          enum:
+          - profiles
+          - productions
+          - spaces
+          - events
+          example: profiles
+        query:
+          type: object
+          nullable: true
     select_proposal_request:
       type: object
       required:
@@ -2546,6 +2602,335 @@ components:
           type: object
           additionalProperties: true
       additionalProperties: true
+    search_events_response:
+      type: object
+      required:
+      - status
+      - data
+      properties:
+        status:
+          type: string
+          example: success
+        events:
+          type: array
+          items:
+            type: object
+        pull_params:
+          type: object
+        data:
+          type: object
+          properties:
+            events:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  img:
+                    oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: string
+                  place:
+                    type: string
+                  address:
+                    type: object
+                    properties:
+                      route:
+                        type: string
+                      street_number:
+                        type: string
+                      door:
+                        type: string
+                      locality:
+                        type: string
+                      country:
+                        type: string
+                      postal_code:
+                        type: string
+                      location:
+                        type: object
+                        properties:
+                          lat:
+                            type: string
+                          lng:
+                            type: string
+                  eventTime:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                        time:
+                          type: array
+                          items:
+                            type: string
+                  categories:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                  id:
+                    type: string
+                  professional:
+                    type: boolean
+                  call_id:
+                    type: string
+                    nullable: true
+                  past_event:
+                    type: boolean
+                  color:
+                    type: string
+            pull_params:
+              type: object
+              properties:
+                starting_db_position:
+                  type: integer
+                db_position:
+                  type: integer
+                n_pulled:
+                  type: integer
+                n_total:
+                  type: integer
+                first_half_results:
+                  type: string
+                n_results:
+                  type: integer
+    search_productions_response:
+      type: object
+      required:
+      - status
+      - data
+      properties:
+        status:
+          type: string
+          example: success
+        productions:
+          type: array
+          items:
+            type: object
+        pull_params:
+          type: object
+        data:
+          type: object
+          properties:
+            productions:
+              type: array
+              items:
+                type: object
+                properties:
+                  profile_id:
+                    type: string
+                  id:
+                    type: string
+                  main_picture:
+                    type: array
+                    items:
+                      type: string
+                  format:
+                    type: string
+                  category:
+                    type: string
+                  title:
+                    type: string
+                  duration:
+                    type: string
+                  children:
+                    type: string
+                  cache:
+                    type: object
+                    nullable: true
+                    properties:
+                      value:
+                        type: string
+                      visible:
+                        type: string
+                      comment:
+                        type: string
+                  profile_color:
+                    type: string
+                  profile_name:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+            pull_params:
+              type: object
+              properties:
+                starting_db_position:
+                  type: integer
+                db_position:
+                  type: integer
+                n_pulled:
+                  type: integer
+                n_total:
+                  type: integer
+                first_half_results:
+                  type: string
+                n_results:
+                  type: integer
+    search_profiles_response:
+      type: object
+      required:
+      - status
+      - data
+      properties:
+        status:
+          type: string
+          example: success
+        profiles:
+          type: array
+          items:
+            type: object
+        pull_params:
+          type: object
+        data:
+          type: object
+          properties:
+            profiles:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  id:
+                    type: string
+                  facets:
+                    type: array
+                    items:
+                      type: string
+                  name:
+                    type: string
+                  profile_picture:
+                    type: array
+                    items:
+                      type: string
+                  address:
+                    type: object
+                    properties:
+                      locality:
+                        type: string
+                      postal_code:
+                        type: string
+                      neighborhood:
+                        type: string
+                      location:
+                        type: object
+                        properties:
+                          lat:
+                            type: string
+                          lng:
+                            type: string
+                  color:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+            pull_params:
+              type: object
+              properties:
+                starting_db_position:
+                  type: integer
+                db_position:
+                  type: integer
+                n_pulled:
+                  type: integer
+                n_total:
+                  type: integer
+                first_half_results:
+                  type: string
+                n_results:
+                  type: integer
+    search_spaces_response:
+      type: object
+      required:
+      - status
+      - data
+      properties:
+        status:
+          type: string
+          example: success
+        spaces:
+          type: array
+          items:
+            type: object
+        pull_params:
+          type: object
+        data:
+          type: object
+          properties:
+            spaces:
+              type: array
+              items:
+                type: object
+                properties:
+                  profile_id:
+                    type: string
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  address:
+                    type: object
+                    properties:
+                      route:
+                        type: string
+                      street_number:
+                        type: string
+                      door:
+                        type: string
+                      locality:
+                        type: string
+                      country:
+                        type: string
+                      postal_code:
+                        type: string
+                      location:
+                        type: object
+                        properties:
+                          lat:
+                            type: string
+                          lng:
+                            type: string
+                  description:
+                    type: string
+                  size:
+                    type: string
+                    nullable: true
+                  main_picture:
+                    type: array
+                    items:
+                      type: string
+                  profile_color:
+                    type: string
+                  profile_name:
+                    type: string
+            pull_params:
+              type: object
+              properties:
+                starting_db_position:
+                  type: integer
+                db_position:
+                  type: integer
+                n_pulled:
+                  type: integer
+                n_total:
+                  type: integer
+                first_half_results:
+                  type: string
+                n_results:
+                  type: integer
     space_response:
       type: object
       required:

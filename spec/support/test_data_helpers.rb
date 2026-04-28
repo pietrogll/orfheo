@@ -11,11 +11,11 @@ module TestDataHelpers
     user_data = {
       id: user_id,
       email: "user_#{SecureRandom.hex}@test.com",
-      password: BCrypt::Password.create('password123'),
-      validated: true,
+      password: BCrypt::Password.create(overrides[:password] || 'password123'),
+      validation: true,
       lang: 'es',
       interests: { event_call: { categories: '' } }
-    }.merge(overrides)
+    }.merge(overrides.except(:password))
 
     result = Repos::Users.save(user_data)
     # Mongo insert_one returns a Result object, not the document

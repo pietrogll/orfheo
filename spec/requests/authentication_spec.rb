@@ -30,14 +30,42 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
       produces 'application/json'
       parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/login_request' }
 
-      response '200', 'Success or fail' do
-        schema oneOf: [
-          { '$ref' => '#/components/schemas/login_success' },
-          { '$ref' => '#/components/schemas/fail_envelope' }
-        ]
+      response '200', 'Success' do
+        schema '$ref' => '#/components/schemas/login_success'
 
-        let(:body) { { email: 'test@example.com', password: 'password123' } }
-        run_test!
+        context 'when valid credentials provided' do
+          let(:body) { { email: 'test@example.com', password: 'password123' } }
+          
+          before do
+            create_user(email: 'test@example.com', password: 'password123', validation: true)
+          end
+          
+          run_test!
+        end
+      end
+
+      response '200', 'Failure' do
+        schema '$ref' => '#/components/schemas/fail_envelope'
+
+        context 'when user does not exist' do
+          let(:body) { { email: 'nonexistent@example.com', password: 'password123' } }
+          run_test!
+        end
+
+        context 'when password is incorrect' do
+          let(:body) { { email: 'test@example.com', password: 'wrongpassword' } }
+          
+          before do
+            create_user(email: 'test@example.com', password: 'password123', validation: true)
+          end
+          
+          run_test!
+        end
+
+        context 'when email format is invalid' do
+          let(:body) { { email: 'invalid-email', password: 'password123' } }
+          run_test!
+        end
       end
     end
 
@@ -46,12 +74,36 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
       produces 'application/json'
       security [cookieAuth: []]
 
-      response '200', 'Success or fail' do
+      response '200', 'Success' do
         schema oneOf: [
-          { '$ref' => '#/components/schemas/login_success' },
-          { '$ref' => '#/components/schemas/fail_envelope' }
+          {
+            type: :object,
+            required: %i[status logged_in user_id user],
+            properties: {
+              status: { type: :string, enum: ['success'] },
+              logged_in: { type: :boolean, enum: [true] },
+              user_id: { type: :string },
+              user: { type: :object }
+            }
+          },
+          {
+            type: :object,
+            required: %i[status logged_in],
+            properties: {
+              status: { type: :string, enum: ['success'] },
+              logged_in: { type: :boolean, enum: [false] }
+            }
+          }
         ]
-        run_test!
+        
+        context 'when logged in' do
+          before { login_as(create_user) }
+          run_test!
+        end
+
+        context 'when not logged in' do
+          run_test!
+        end
       end
     end
   end
@@ -59,14 +111,11 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
   path '/logout' do
     post 'Log out' do
       tags 'Auth'
-      security [cookieAuth: []]
       produces 'application/json'
+      security [cookieAuth: []]
 
-      response '200', 'Success or fail' do
-        schema oneOf: [
-          { '$ref' => '#/components/schemas/success_envelope' },
-          { '$ref' => '#/components/schemas/fail_envelope' }
-        ]
+      response '200', 'Success' do
+        schema '$ref' => '#/components/schemas/success_envelope'
         run_test!
       end
     end
