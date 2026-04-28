@@ -18,6 +18,272 @@ RSpec.describe 'Search', type: :request, swagger_doc: 'openapi.yaml' do
           { '$ref' => '#/components/schemas/search_spaces_response' },
           { '$ref' => '#/components/schemas/search_events_response' }
         ]
+        example 'application/json', :profiles_results, {
+          status: 'success',
+          profiles: [
+            {
+              id: 'profile-1',
+              _id: 'profile-1',
+              name: 'Atlas Collective',
+              facets: ['artist'],
+              profile_picture: ['atlas.jpg'],
+              address: {
+                locality: 'Valencia',
+                postal_code: '46001',
+                neighborhood: 'Ciutat Vella',
+                location: { lat: '39.4699', lng: '-0.3763' }
+              },
+              color: '#FF6600',
+              tags: %w[music performance]
+            }
+          ],
+          pull_params: {
+            starting_db_position: 0,
+            db_position: 1,
+            n_pulled: 1,
+            n_total: 1,
+            first_half_results: 'true',
+            n_results: 1
+          },
+          data: {
+            profiles: [
+              {
+                id: 'profile-1',
+                _id: 'profile-1',
+                name: 'Atlas Collective',
+                facets: ['artist'],
+                profile_picture: ['atlas.jpg'],
+                address: {
+                  locality: 'Valencia',
+                  postal_code: '46001',
+                  neighborhood: 'Ciutat Vella',
+                  location: { lat: '39.4699', lng: '-0.3763' }
+                },
+                color: '#FF6600',
+                tags: %w[music performance]
+              }
+            ],
+            pull_params: {
+              starting_db_position: 0,
+              db_position: 1,
+              n_pulled: 1,
+              n_total: 1,
+              first_half_results: 'true',
+              n_results: 1
+            }
+          }
+        }, 'Profiles search response'
+        example 'application/json', :productions_results, {
+          status: 'success',
+          productions: [
+            {
+              id: 'production-1',
+              profile_id: 'profile-1',
+              main_picture: ['production.jpg'],
+              format: 'show',
+              category: 'music',
+              title: 'Midnight Set',
+              duration: '60',
+              children: 'false',
+              cache: {
+                value: 'yes',
+                visible: 'true',
+                comment: 'Premiere'
+              },
+              profile_color: '#224488',
+              profile_name: 'Atlas Collective',
+              tags: ['live']
+            }
+          ],
+          pull_params: {
+            starting_db_position: 0,
+            db_position: 1,
+            n_pulled: 1,
+            n_total: 1,
+            first_half_results: 'true',
+            n_results: 1
+          },
+          data: {
+            productions: [
+              {
+                id: 'production-1',
+                profile_id: 'profile-1',
+                main_picture: ['production.jpg'],
+                format: 'show',
+                category: 'music',
+                title: 'Midnight Set',
+                duration: '60',
+                children: 'false',
+                cache: {
+                  value: 'yes',
+                  visible: 'true',
+                  comment: 'Premiere'
+                },
+                profile_color: '#224488',
+                profile_name: 'Atlas Collective',
+                tags: ['live']
+              }
+            ],
+            pull_params: {
+              starting_db_position: 0,
+              db_position: 1,
+              n_pulled: 1,
+              n_total: 1,
+              first_half_results: 'true',
+              n_results: 1
+            }
+          }
+        }, 'Productions search response'
+        example 'application/json', :spaces_results, {
+          status: 'success',
+          spaces: [
+            {
+              id: 'space-1',
+              profile_id: 'profile-1',
+              name: 'Black Box Hall',
+              type: 'venue',
+              address: {
+                route: 'Carrer de les Arts',
+                street_number: '10',
+                door: 'A',
+                locality: 'Valencia',
+                country: 'ES',
+                postal_code: '46002',
+                location: { lat: '39.4702', lng: '-0.3705' }
+              },
+              description: 'Flexible indoor venue',
+              size: '250',
+              main_picture: ['space.jpg'],
+              profile_color: '#118866',
+              profile_name: 'Atlas Collective'
+            }
+          ],
+          pull_params: {
+            starting_db_position: 0,
+            db_position: 1,
+            n_pulled: 1,
+            n_total: 1,
+            first_half_results: 'true',
+            n_results: 1
+          },
+          data: {
+            spaces: [
+              {
+                id: 'space-1',
+                profile_id: 'profile-1',
+                name: 'Black Box Hall',
+                type: 'venue',
+                address: {
+                  route: 'Carrer de les Arts',
+                  street_number: '10',
+                  door: 'A',
+                  locality: 'Valencia',
+                  country: 'ES',
+                  postal_code: '46002',
+                  location: { lat: '39.4702', lng: '-0.3705' }
+                },
+                description: 'Flexible indoor venue',
+                size: '250',
+                main_picture: ['space.jpg'],
+                profile_color: '#118866',
+                profile_name: 'Atlas Collective'
+              }
+            ],
+            pull_params: {
+              starting_db_position: 0,
+              db_position: 1,
+              n_pulled: 1,
+              n_total: 1,
+              first_half_results: 'true',
+              n_results: 1
+            }
+          }
+        }, 'Spaces search response'
+        example 'application/json', :events_results, {
+          status: 'success',
+          events: [
+            {
+              id: 'event-1',
+              name: 'Summer Signal',
+              type: 'festival',
+              img: ['event.jpg'],
+              place: 'Valencia',
+              address: {
+                route: 'Avinguda del Port',
+                street_number: '25',
+                door: '1',
+                locality: 'Valencia',
+                country: 'ES',
+                postal_code: '46021',
+                location: { lat: '39.4619', lng: '-0.3373' }
+              },
+              eventTime: [
+                {
+                  date: '2026-07-15',
+                  time: ['18:00', '22:30']
+                }
+              ],
+              categories: {
+                participants: ['music'],
+                hosts: ['festival']
+              },
+              professional: true,
+              call_id: nil,
+              past_event: false,
+              color: '#AA3355'
+            }
+          ],
+          pull_params: {
+            starting_db_position: 0,
+            db_position: 1,
+            n_pulled: 1,
+            n_total: 1,
+            first_half_results: 'true',
+            n_results: 1
+          },
+          data: {
+            events: [
+              {
+                id: 'event-1',
+                name: 'Summer Signal',
+                type: 'festival',
+                img: ['event.jpg'],
+                place: 'Valencia',
+                address: {
+                  route: 'Avinguda del Port',
+                  street_number: '25',
+                  door: '1',
+                  locality: 'Valencia',
+                  country: 'ES',
+                  postal_code: '46021',
+                  location: { lat: '39.4619', lng: '-0.3373' }
+                },
+                eventTime: [
+                  {
+                    date: '2026-07-15',
+                    time: ['18:00', '22:30']
+                  }
+                ],
+                categories: {
+                  participants: ['music'],
+                  hosts: ['festival']
+                },
+                professional: true,
+                call_id: nil,
+                past_event: false,
+                color: '#AA3355'
+              }
+            ],
+            pull_params: {
+              starting_db_position: 0,
+              db_position: 1,
+              n_pulled: 1,
+              n_total: 1,
+              first_half_results: 'true',
+              n_results: 1
+            }
+          }
+        }, 'Events search response'
 
         context 'when loading profiles' do
           let(:body) { { db_key: 'profiles', pull_params: { first_half_results: 'true' } } }

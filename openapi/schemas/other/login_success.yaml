@@ -9,4 +9,4 @@ properties:
     enum:
     - success
   lang:
-    "$ref": "#/components/schemas/Lang"
+    "$ref": "#/components/schemas/lang"

@@ -11,3 +11,6 @@ properties:
   profile:
     type: object
     additionalProperties: true
+  profile_status:
+    type: string
+additionalProperties: true

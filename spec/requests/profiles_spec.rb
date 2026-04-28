@@ -31,7 +31,8 @@ RSpec.describe 'Profile Management', type: :request, swagger_doc: 'openapi.yaml'
           { '$ref' => '#/components/schemas/profile_response' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:id) { SecureRandom.uuid }
+        let(:id) { profile[:id] }
+        let(:slug) { nil }
         run_test!
       end
     end

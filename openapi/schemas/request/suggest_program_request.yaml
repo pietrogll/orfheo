@@ -16,4 +16,4 @@ properties:
     type: object
     additionalProperties: true
   lang:
-    "$ref": "#/components/schemas/Lang"
+    "$ref": "#/components/schemas/lang"

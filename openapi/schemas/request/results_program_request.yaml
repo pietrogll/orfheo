@@ -22,6 +22,6 @@ properties:
   time:
     type: string
   lang:
-    "$ref": "#/components/schemas/Lang"
+    "$ref": "#/components/schemas/lang"
   program_timestamp:
     type: integer

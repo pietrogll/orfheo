@@ -16,7 +16,13 @@ RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml'
           { '$ref' => '#/components/schemas/program_response' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:id) { SecureRandom.uuid }
+        let(:id) { program[:_id] }
+        let(:event_id) { nil }
+
+        before do
+          login_as(user[:_id])
+        end
+
         run_test!
       end
     end

@@ -11,3 +11,8 @@ properties:
   event:
     type: object
     additionalProperties: true
+  event_status:
+    type: string
+  lang:
+    "$ref": "#/components/schemas/lang"
+additionalProperties: true

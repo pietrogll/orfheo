@@ -31,13 +31,15 @@ RSpec.describe 'Event Management', type: :request, swagger_doc: 'openapi.yaml' d
           { '$ref' => '#/components/schemas/event_response' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:id) { SecureRandom.uuid }
+        let(:id) { event[:_id] }
+        let(:slug) { nil }
         run_test!
       end
 
-      response '404', 'Event not found' do
+      response '200', 'Event not found' do
         schema '$ref' => '#/components/schemas/fail_envelope'
-        let(:id) { 'non-existent' }
+        let(:id) { SecureRandom.uuid }
+        let(:slug) { nil }
         run_test!
       end
     end

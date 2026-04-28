@@ -101,11 +101,13 @@ paths:
       parameters: []
       responses:
         '200':
-          description: Failure
+          description: Success or failure
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/fail_envelope"
+                oneOf:
+                - "$ref": "#/components/schemas/login_success"
+                - "$ref": "#/components/schemas/fail_envelope"
       requestBody:
         content:
           application/json:
@@ -156,6 +158,37 @@ paths:
                       type: boolean
                       enum:
                       - false
+  "/login/login":
+    post:
+      summary: Log in (legacy route)
+      tags:
+      - Auth
+      parameters: []
+      responses:
+        '200':
+          description: Success or failure
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    status: success
+                    lang: en
+                  summary: Successful login
+                failure_non_existing_user:
+                  value:
+                    status: fail
+                    reason: non_existing_user
+                  summary: Login failure when the user does not exist
+              schema:
+                oneOf:
+                - "$ref": "#/components/schemas/login_success"
+                - "$ref": "#/components/schemas/fail_envelope"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/login_request"
   "/logout":
     post:
       summary: Log out
@@ -244,18 +277,13 @@ paths:
           type: string
       responses:
         '200':
-          description: Success or fail
+          description: Event not found
           content:
             application/json:
               schema:
                 oneOf:
                 - "$ref": "#/components/schemas/event_response"
                 - "$ref": "#/components/schemas/fail_envelope"
-        '404':
-          description: Event not found
-          content:
-            application/json:
-              schema:
                 "$ref": "#/components/schemas/fail_envelope"
   "/users/create_event":
     post:
@@ -803,6 +831,261 @@ paths:
           description: Success
           content:
             application/json:
+              examples:
+                profiles_results:
+                  value:
+                    status: success
+                    profiles:
+                    - id: profile-1
+                      _id: profile-1
+                      name: Atlas Collective
+                      facets:
+                      - artist
+                      profile_picture:
+                      - atlas.jpg
+                      address:
+                        locality: Valencia
+                        postal_code: '46001'
+                        neighborhood: Ciutat Vella
+                        location:
+                          lat: '39.4699'
+                          lng: "-0.3763"
+                      color: "#FF6600"
+                      tags:
+                      - music
+                      - performance
+                    pull_params:
+                      starting_db_position: 0
+                      db_position: 1
+                      n_pulled: 1
+                      n_total: 1
+                      first_half_results: 'true'
+                      n_results: 1
+                    data:
+                      profiles:
+                      - id: profile-1
+                        _id: profile-1
+                        name: Atlas Collective
+                        facets:
+                        - artist
+                        profile_picture:
+                        - atlas.jpg
+                        address:
+                          locality: Valencia
+                          postal_code: '46001'
+                          neighborhood: Ciutat Vella
+                          location:
+                            lat: '39.4699'
+                            lng: "-0.3763"
+                        color: "#FF6600"
+                        tags:
+                        - music
+                        - performance
+                      pull_params:
+                        starting_db_position: 0
+                        db_position: 1
+                        n_pulled: 1
+                        n_total: 1
+                        first_half_results: 'true'
+                        n_results: 1
+                  summary: Profiles search response
+                productions_results:
+                  value:
+                    status: success
+                    productions:
+                    - id: production-1
+                      profile_id: profile-1
+                      main_picture:
+                      - production.jpg
+                      format: show
+                      category: music
+                      title: Midnight Set
+                      duration: '60'
+                      children: 'false'
+                      cache:
+                        value: 'yes'
+                        visible: 'true'
+                        comment: Premiere
+                      profile_color: "#224488"
+                      profile_name: Atlas Collective
+                      tags:
+                      - live
+                    pull_params:
+                      starting_db_position: 0
+                      db_position: 1
+                      n_pulled: 1
+                      n_total: 1
+                      first_half_results: 'true'
+                      n_results: 1
+                    data:
+                      productions:
+                      - id: production-1
+                        profile_id: profile-1
+                        main_picture:
+                        - production.jpg
+                        format: show
+                        category: music
+                        title: Midnight Set
+                        duration: '60'
+                        children: 'false'
+                        cache:
+                          value: 'yes'
+                          visible: 'true'
+                          comment: Premiere
+                        profile_color: "#224488"
+                        profile_name: Atlas Collective
+                        tags:
+                        - live
+                      pull_params:
+                        starting_db_position: 0
+                        db_position: 1
+                        n_pulled: 1
+                        n_total: 1
+                        first_half_results: 'true'
+                        n_results: 1
+                  summary: Productions search response
+                spaces_results:
+                  value:
+                    status: success
+                    spaces:
+                    - id: space-1
+                      profile_id: profile-1
+                      name: Black Box Hall
+                      type: venue
+                      address:
+                        route: Carrer de les Arts
+                        street_number: '10'
+                        door: A
+                        locality: Valencia
+                        country: ES
+                        postal_code: '46002'
+                        location:
+                          lat: '39.4702'
+                          lng: "-0.3705"
+                      description: Flexible indoor venue
+                      size: '250'
+                      main_picture:
+                      - space.jpg
+                      profile_color: "#118866"
+                      profile_name: Atlas Collective
+                    pull_params:
+                      starting_db_position: 0
+                      db_position: 1
+                      n_pulled: 1
+                      n_total: 1
+                      first_half_results: 'true'
+                      n_results: 1
+                    data:
+                      spaces:
+                      - id: space-1
+                        profile_id: profile-1
+                        name: Black Box Hall
+                        type: venue
+                        address:
+                          route: Carrer de les Arts
+                          street_number: '10'
+                          door: A
+                          locality: Valencia
+                          country: ES
+                          postal_code: '46002'
+                          location:
+                            lat: '39.4702'
+                            lng: "-0.3705"
+                        description: Flexible indoor venue
+                        size: '250'
+                        main_picture:
+                        - space.jpg
+                        profile_color: "#118866"
+                        profile_name: Atlas Collective
+                      pull_params:
+                        starting_db_position: 0
+                        db_position: 1
+                        n_pulled: 1
+                        n_total: 1
+                        first_half_results: 'true'
+                        n_results: 1
+                  summary: Spaces search response
+                events_results:
+                  value:
+                    status: success
+                    events:
+                    - id: event-1
+                      name: Summer Signal
+                      type: festival
+                      img:
+                      - event.jpg
+                      place: Valencia
+                      address:
+                        route: Avinguda del Port
+                        street_number: '25'
+                        door: '1'
+                        locality: Valencia
+                        country: ES
+                        postal_code: '46021'
+                        location:
+                          lat: '39.4619'
+                          lng: "-0.3373"
+                      eventTime:
+                      - date: '2026-07-15'
+                        time:
+                        - '18:00'
+                        - '22:30'
+                      categories:
+                        participants:
+                        - music
+                        hosts:
+                        - festival
+                      professional: true
+                      call_id:
+                      past_event: false
+                      color: "#AA3355"
+                    pull_params:
+                      starting_db_position: 0
+                      db_position: 1
+                      n_pulled: 1
+                      n_total: 1
+                      first_half_results: 'true'
+                      n_results: 1
+                    data:
+                      events:
+                      - id: event-1
+                        name: Summer Signal
+                        type: festival
+                        img:
+                        - event.jpg
+                        place: Valencia
+                        address:
+                          route: Avinguda del Port
+                          street_number: '25'
+                          door: '1'
+                          locality: Valencia
+                          country: ES
+                          postal_code: '46021'
+                          location:
+                            lat: '39.4619'
+                            lng: "-0.3373"
+                        eventTime:
+                        - date: '2026-07-15'
+                          time:
+                          - '18:00'
+                          - '22:30'
+                        categories:
+                          participants:
+                          - music
+                          hosts:
+                          - festival
+                        professional: true
+                        call_id:
+                        past_event: false
+                        color: "#AA3355"
+                      pull_params:
+                        starting_db_position: 0
+                        db_position: 1
+                        n_pulled: 1
+                        n_total: 1
+                        first_half_results: 'true'
+                        n_results: 1
+                  summary: Events search response
               schema:
                 oneOf:
                 - "$ref": "#/components/schemas/search_profiles_response"
@@ -884,14 +1167,8 @@ paths:
       security:
       - cookieAuth: []
       responses:
-        '200':
-          description: Success or fail
-          content:
-            application/json:
-              schema:
-                oneOf:
-                - "$ref": "#/components/schemas/meta_list_response"
-                - "$ref": "#/components/schemas/fail_envelope"
+        '302':
+          description: Redirects to welcome page when unauthenticated
   "/users/header":
     post:
       summary: Get user header data
@@ -1174,7 +1451,7 @@ components:
           enum:
           - success
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     participant_for_manager:
       type: object
       required:
@@ -1755,7 +2032,7 @@ components:
         event_id:
           "$ref": "#/components/schemas/Uuid"
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     event_upsert:
       type: object
       additionalProperties: true
@@ -1816,7 +2093,7 @@ components:
         call_id:
           "$ref": "#/components/schemas/Uuid"
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     id_only_request:
       type: object
       required:
@@ -1934,7 +2211,7 @@ components:
       - lang
       properties:
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     modify_param_proposal_request:
       type: object
       required:
@@ -2108,7 +2385,7 @@ components:
           type: string
           minLength: 8
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
         event_id:
           "$ref": "#/components/schemas/Uuid"
     results_program_request:
@@ -2135,7 +2412,7 @@ components:
         time:
           type: string
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
         program_timestamp:
           type: integer
     results_request:
@@ -2157,7 +2434,7 @@ components:
         event_id:
           "$ref": "#/components/schemas/Uuid"
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     save_interests_request:
       type: object
       required:
@@ -2306,7 +2583,7 @@ components:
           type: object
           additionalProperties: true
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     suggest_request:
       type: object
       required:
@@ -2321,7 +2598,7 @@ components:
         event_id:
           "$ref": "#/components/schemas/Uuid"
         lang:
-          "$ref": "#/components/schemas/Lang"
+          "$ref": "#/components/schemas/lang"
     suggest_tags_request:
       type: object
       required:
@@ -2389,6 +2666,11 @@ components:
         event:
           type: object
           additionalProperties: true
+        event_status:
+          type: string
+        lang:
+          "$ref": "#/components/schemas/lang"
+      additionalProperties: true
     form_response:
       type: object
       required:
@@ -2589,6 +2871,9 @@ components:
         profile:
           type: object
           additionalProperties: true
+        profile_status:
+          type: string
+      additionalProperties: true
     program_response:
       type: object
       required:

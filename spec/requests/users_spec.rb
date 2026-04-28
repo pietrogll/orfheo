@@ -10,11 +10,7 @@ RSpec.describe 'Users', type: :request, swagger_doc: 'openapi.yaml' do
       produces 'application/json'
       security [cookieAuth: []]
 
-      response '200', 'Success or fail' do
-        schema oneOf: [
-          { '$ref' => '#/components/schemas/meta_list_response' },
-          { '$ref' => '#/components/schemas/fail_envelope' }
-        ]
+      response '302', 'Redirects to welcome page when unauthenticated' do
         run_test!
       end
     end

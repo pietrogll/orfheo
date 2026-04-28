@@ -48,6 +48,6 @@ bundle exec sidekiq -r ./config/environment.rb
 ## API Documentation
 Regenerate `openapi/openapi.yaml` from request specs:
 ```bash
-bundle exec rake rswag:specs:swaggerize
+SWAGGER_DRY_RUN=0 RAILS_ENV=test rails rswag
 ```
 The documentation is also viewable at `/api-docs` when the server is running.

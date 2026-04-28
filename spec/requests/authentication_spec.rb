@@ -30,22 +30,21 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
       produces 'application/json'
       parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/login_request' }
 
-      response '200', 'Success' do
-        schema '$ref' => '#/components/schemas/login_success'
+      response '200', 'Success or failure' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/login_success' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
 
         context 'when valid credentials provided' do
           let(:body) { { email: 'test@example.com', password: 'password123' } }
-          
+
           before do
             create_user(email: 'test@example.com', password: 'password123', validation: true)
           end
-          
+
           run_test!
         end
-      end
-
-      response '200', 'Failure' do
-        schema '$ref' => '#/components/schemas/fail_envelope'
 
         context 'when user does not exist' do
           let(:body) { { email: 'nonexistent@example.com', password: 'password123' } }
@@ -54,11 +53,11 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
 
         context 'when password is incorrect' do
           let(:body) { { email: 'test@example.com', password: 'wrongpassword' } }
-          
+
           before do
             create_user(email: 'test@example.com', password: 'password123', validation: true)
           end
-          
+
           run_test!
         end
 
@@ -102,6 +101,45 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
         end
 
         context 'when not logged in' do
+          run_test!
+        end
+      end
+    end
+  end
+
+  path '/login/login' do
+    post 'Log in (legacy route)' do
+      tags 'Auth'
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :body, in: :body, schema: { '$ref' => '#/components/schemas/login_request' }
+
+      response '200', 'Success or failure' do
+        schema oneOf: [
+          { '$ref' => '#/components/schemas/login_success' },
+          { '$ref' => '#/components/schemas/fail_envelope' }
+        ]
+        example 'application/json', :success, {
+          status: 'success',
+          lang: 'en'
+        }, 'Successful login'
+        example 'application/json', :failure_non_existing_user, {
+          status: 'fail',
+          reason: 'non_existing_user'
+        }, 'Login failure when the user does not exist'
+
+        context 'when valid credentials provided' do
+          let(:body) { { email: 'test@example.com', password: 'password123' } }
+
+          before do
+            create_user(email: 'test@example.com', password: 'password123', validation: true)
+          end
+
+          run_test!
+        end
+
+        context 'when user does not exist' do
+          let(:body) { { email: 'nonexistent@example.com', password: 'password123' } }
           run_test!
         end
       end
