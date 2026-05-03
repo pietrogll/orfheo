@@ -25,6 +25,10 @@ Rails.application.configure do
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
+  # Compress JavaScripts and CSS.
+  config.assets.js_compressor = Uglifier.new(harmony: true)
+  config.assets.css_compressor = :sass
+
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX

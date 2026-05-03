@@ -28,3 +28,6 @@ AGENTS.md
 specs/
 .DS_Store
 coverage/
+
+heroku_cli.md
+.agents/
