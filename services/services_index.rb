@@ -20,3 +20,5 @@ require_relative './db_elements/storage'
 
 require_relative './websocket'
 require_relative './event_source'
+require_relative './cloudflare'
+

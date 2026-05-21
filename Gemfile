@@ -23,6 +23,8 @@ gem 'bcrypt'
 # External Services (preserved)
 gem 'cloudinary'
 gem 'uuid'
+gem 'httparty'
+
 
 # Utilities (preserved)
 gem 'dotenv'

@@ -1,0 +1,26 @@
+---
+type: object
+required:
+- status
+- program
+- hosts
+- program_timestamp
+properties:
+  status:
+    type: string
+    enum:
+    - success
+  program:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  hosts:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  program_timestamp:
+    type: integer
+    example: 1672531199000
+additionalProperties: true

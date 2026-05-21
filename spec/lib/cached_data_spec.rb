@@ -50,7 +50,8 @@ describe 'Caches' do
       expect(CachedEvent.read('program_event_id')).to eq 'my_value'
     end
 
-    it 'deletes a key and its value' do
+    it 'deletes a key and its value and triggers Cloudflare cache purge' do
+      expect(Services::Cloudflare).to receive(:purge_program_cache).with('event_id')
       CachedEvent.delete('event_id')
       expect(CachedEvent.read('program_event_id')).to eq nil
     end

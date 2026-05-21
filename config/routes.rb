@@ -204,5 +204,15 @@ Rails.application.routes.draw do
     post '/modify', to: 'participants#modify'
   end
 
-  # Mount Action Cable server
+  # API v1 endpoints
+  namespace :api do
+    namespace :v1 do
+      resources :events, only: [] do
+        member do
+          get :program
+        end
+      end
+    end
+  end
 end
+

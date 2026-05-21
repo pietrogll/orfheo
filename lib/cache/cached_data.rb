@@ -67,6 +67,7 @@ class CachedEvent < BaseCache
     def delete(event_id)
       @@cached_program.delete(program_key(event_id))
       @@cached_program.delete(hosts_key(event_id))
+      Services::Cloudflare.purge_program_cache(event_id) if defined?(Services::Cloudflare)
     end
 
     def write_program_with_timestamp(event_id, _program)

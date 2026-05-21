@@ -73,6 +73,51 @@ paths:
           application/json:
             schema:
               "$ref": "#/components/schemas/meta_tag_upsert"
+  "/api/v1/events/{id}/program":
+    get:
+      summary: Get event program
+      tags:
+      - Events
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Event ID
+        schema:
+          type: string
+      - name: lang
+        in: query
+        required: false
+        description: Language
+        schema:
+          type: string
+      - name: program_timestamp
+        in: query
+        required: false
+        description: Timestamp
+        schema:
+          type: integer
+      - name: If-Modified-Since
+        in: header
+        required: false
+        description: HTTP Date header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/event_program_response"
+        '304':
+          description: not modified
+        '400':
+          description: bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/fail_envelope"
   "/register":
     post:
       summary: Register a new user
@@ -3271,6 +3316,32 @@ components:
         forms:
           type: object
           additionalProperties: true
+    event_program_response:
+      type: object
+      required:
+      - status
+      - program
+      - hosts
+      - program_timestamp
+      properties:
+        status:
+          type: string
+          enum:
+          - success
+        program:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        hosts:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        program_timestamp:
+          type: integer
+          example: 1672531199000
+      additionalProperties: true
     event_response:
       type: object
       required:
