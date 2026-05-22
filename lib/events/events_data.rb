@@ -78,7 +78,6 @@ class EventData
     # Profile organizer
     event[:color] = profile_owner[:color]
     event[:organizer] = profile_owner[:name]
-    event[:organizer_email] = profile_owner[:email]
     # return
     [event, lang]
   end

@@ -4,8 +4,6 @@
 # Migrated from controllers/events.rb
 
 class EventsController < ApplicationController
-  skip_before_action :verify_authenticity_token,
-                     only: %i[create update destroy update_partners create_slug manager_data check_slug]
   before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility

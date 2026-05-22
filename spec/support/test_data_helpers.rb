@@ -202,6 +202,15 @@ module TestDataHelpers
     TestSessionMiddleware.session[:identity] = identity
     TestSessionMiddleware.session[:last_login] = Time.now.to_i
   end
+
+  def csrf_token
+    get '/services'
+    response.body[/meta name="csrf-token" content="([^"]+)"/, 1]
+  end
+
+  def csrf_headers
+    { 'X-CSRF-Token' => csrf_token }
+  end
 end
 
 RSpec.configure do |config|

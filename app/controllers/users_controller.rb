@@ -4,7 +4,6 @@
 # Migrated from controllers/users.rb
 
 class UsersController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[header modify_password save_interests delete_user modify_lang]
   before_action :redirect_to_welcome_unless_logged_in!, only: :index
   before_action :require_login!, except: %i[modify_lang save_interests index]
 
@@ -101,8 +100,7 @@ class UsersController < ApplicationController
   end
 
   def clean_session
-    session.delete(:identity)
-    session.delete(:last_login)
+    reset_session
   end
 
   # Validation helpers

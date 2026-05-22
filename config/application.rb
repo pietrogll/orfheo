@@ -47,9 +47,11 @@ module Orfheo
     config.middleware.use MyExceptionHandling
 
     # CORS configuration (if needed for API access)
+    allowed_origins = ENV.fetch('ORFHEO_ALLOWED_ORIGINS',
+                                'https://orfheo.org,https://www.orfheo.org,http://localhost:3000,http://127.0.0.1:3000').split(',').map(&:strip)
     config.middleware.insert_before 0, Rack::Cors do
       allow do
-        origins '*'
+        origins(*allowed_origins)
         resource '*',
                  headers: :any,
                  methods: %i[get post put patch delete options head]
@@ -57,7 +59,11 @@ module Orfheo
     end
 
     # Session configuration
-    config.session_store :cookie_store, key: '_orfheo_session'
+    config.session_store :cookie_store,
+                         key: '_orfheo_session',
+                         httponly: true,
+                         same_site: :lax,
+                         secure: Rails.env.production?
 
     # Time zone and locale
     config.time_zone = 'UTC'

@@ -28,12 +28,23 @@
   }
 
   ns.Widgets.HelpContactBtn = function(){
+    var organizerEmail = Pard.CachedEvent.organizer_email;
+    if (organizerEmail && organizerEmail.value) organizerEmail = organizerEmail.value;
+
     var _createdWidget = $('<div>').css({
       'width': '100%',
       'margin-top': '-.2rem',
       'margin-bottom': '1rem'
     });
-    var _mex = Pard.t.text('call.helpContactText',{organizer_mail: Pard.CachedEvent.organizer_email.value});
+    if (!organizerEmail){
+      return {
+        render: function(){
+          return _createdWidget;
+        }
+      }
+    }
+
+    var _mex = Pard.t.text('call.helpContactText',{organizer_mail: organizerEmail});
     var _mexContainer = $('<div>').append(_mex).hide().addClass('mex-helpContactBtn');
     var _helpBtn = $('<button>')
       .attr({

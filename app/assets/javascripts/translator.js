@@ -24,6 +24,10 @@ var Options = function(){
     })
     orfheoStorage = JSON.parse(localStorage[localStorageKey])
   }
+  if (orfheoStorage.register && orfheoStorage.register.pass){
+    delete orfheoStorage.register.pass
+    localStorage[localStorageKey] = JSON.stringify(orfheoStorage)
+  }
 
   return {
     register: function(){

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class FormsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy index get_call_forms]
+  skip_before_action :verify_authenticity_token, only: [:index]
   before_action :require_login!, except: [:index]
 
   # POST /forms/ (list forms for a call)
@@ -14,7 +14,7 @@ class FormsController < ApplicationController
 
   # POST /forms/get_call_forms
   def get_call_forms
-    check_call_exists!(params[:call_id])
+    check_call_ownership!(params[:call_id])
     forms = Repos::Forms.get({ call_id: params[:call_id] })
     success(forms: forms)
   end

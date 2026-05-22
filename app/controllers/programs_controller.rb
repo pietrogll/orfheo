@@ -4,8 +4,6 @@
 # Migrated from controllers/programs.rb
 
 class ProgramsController < ApplicationController
-  skip_before_action :verify_authenticity_token,
-                     only: %i[create update destroy space_order publish artist_subcategories_price set_permanents]
   before_action :require_login!
 
   # Rails 8.1 compatibility

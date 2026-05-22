@@ -60,7 +60,7 @@ class Dictionary
           },
           forgotten_password: {
             subject: 'Recupera tu cuenta',
-            body: "<p> Puedes acceder a tu página de usuario a través del siguiente enlace </p> <p> <a href=\"https://www.orfheo.org/login/validate?id=#{payload[:validation_code]}\">Accede a tu página</a></p> <p> Este enlace sólo es válido una vez. Si no recuerdas tu contraseña, no olvides definir una nueva una vez dentro. </p>"
+            body: "<p> Restablece tu contraseña a través del siguiente enlace </p> <p> <a href=\"https://www.orfheo.org/login/reset_password?token=#{payload[:reset_password_token]}\">Restablece tu contraseña</a></p> <p> Este enlace caduca en dos horas y sólo es válido una vez. </p>"
           },
           artist_proposal: {
             subject: "Propuesta enviada a #{payload[:event_name]}",
@@ -115,7 +115,7 @@ class Dictionary
           },
           forgotten_password: {
             subject: 'Recupera el teu compte',
-            body: "<p> Pots accedir a la teva pàgina d'usuari mitjançant el següent enllaç </p> <p> <a href=\"https://www.orfheo.org/login/validate?id=#{payload[:validation_code]}\">Accedeix a la teva pàgina</a></p> <p> Aquest enllaç només és vàlid un cop. Si no recordes la contrasenya, no oblidis definir una nova un cop dins. </p>"
+            body: "<p> Restableix la teva contrasenya mitjançant el següent enllaç </p> <p> <a href=\"https://www.orfheo.org/login/reset_password?token=#{payload[:reset_password_token]}\">Restableix la teva contrasenya</a></p> <p> Aquest enllaç caduca en dues hores i només és vàlid una vegada. </p>"
           },
           artist_proposal: {
             subject: "Proposta enviada a #{payload[:event_name]}",
@@ -158,7 +158,7 @@ class Dictionary
           },
           forgotten_password: {
             subject: 'Recover your account',
-            body: "<p> You can access your user page through the following link </p> <p> <a href=\"https://www.orfheo.org/login/validate?id=#{payload[:validation_code]}\">Access your page</a></p> <p> This link is only valid once. If you do not remember your password, do not forget to define a new one once inside. </p>"
+            body: "<p> Reset your password through the following link </p> <p> <a href=\"https://www.orfheo.org/login/reset_password?token=#{payload[:reset_password_token]}\">Reset your password</a></p> <p> This link expires in two hours and is valid only once. </p>"
           },
           artist_proposal: {
             subject: "You sent a proposal to #{payload[:event_name]}",

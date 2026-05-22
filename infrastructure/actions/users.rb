@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Actions
+  RESET_PASSWORD_WINDOW = 2.hours.to_i
+
   class UserRegistersUser
     def self.run(event_id, params)
       user = User.new params
@@ -90,6 +92,30 @@ module Actions
       user = Repos::Users.reseted_user email
       mailer = Services::Mails.new
       mailer.deliver_mail_to user, :forgotten_password
+    end
+  end
+
+  class UserResetPasswordTokenValid
+    def self.run(token)
+      return false unless UUID.validate(token)
+
+      user = Repos::Users.get(reset_password_token: token).first
+      return false if user.blank?
+
+      sent_at = user[:reset_password_sent_at].to_i
+      sent_at.positive? && sent_at >= RESET_PASSWORD_WINDOW.seconds.ago.to_i
+    end
+  end
+
+  class UserResetsPasswordWithToken
+    def self.run(token, password)
+      raise Pard::Invalid, 'invalid_reset_password_token' unless UserResetPasswordTokenValid.run(token)
+
+      user = Repos::Users.consume_reset_password_token(token)
+      raise Pard::Invalid, 'invalid_reset_password_token' if user.blank?
+
+      encrypted_password = Services::Encryptor.encrypt(password)
+      Repos::Users.modify({ id: user[:id], password: encrypted_password })
     end
   end
 

@@ -4,7 +4,6 @@
 # Migrated from controllers/activities.rb
 
 class ActivitiesController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy]
   before_action :require_login!
 
   # Rails 8.1 compatibility

@@ -4,7 +4,11 @@
 # Migrated from controllers/login.rb
 
 class SessionsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create register destroy forgotten_password]
+  skip_before_action :verify_authenticity_token, only: %i[create register forgotten_password validate edit_password]
+  before_action :throttle_login!, only: :create
+  before_action :throttle_register!, only: :register
+  before_action :throttle_password_reset!, only: %i[forgotten_password reset_password]
+  before_action :throttle_validation!, only: %i[validate edit_password]
 
   # POST /register - Register a new user
   def register
@@ -47,7 +51,7 @@ class SessionsController < ApplicationController
 
   # POST /logout or DELETE /login - User logout
   def destroy
-    clean_session
+    reset_session
     render json: { status: 'success' }, status: :ok
   end
 
@@ -77,16 +81,32 @@ class SessionsController < ApplicationController
     render json: { status: 'success' }, status: :ok
   end
 
+  # GET /login/reset_password?token=...
+  def edit_password
+    @reset_password_token = params[:token]
+    @token_valid = Actions::UserResetPasswordTokenValid.run(@reset_password_token)
+
+    return render :edit_password if @token_valid
+
+    render :edit_password, status: :unprocessable_entity
+  end
+
+  # POST /login/reset_password
+  def reset_password
+    scopify :token, :password
+    check_invalid_password(password)
+
+    Actions::UserResetsPasswordWithToken.run(token, password)
+
+    render json: { status: 'success' }, status: :ok
+  end
+
   private
 
   def register_session(user_id, saved_login_time)
+    reset_session
     session[:identity] = user_id
     session[:last_login] = saved_login_time
-  end
-
-  def clean_session
-    session.delete(:identity)
-    session.delete(:last_login)
   end
 
   def check_params(email, password)
@@ -104,6 +124,33 @@ class SessionsController < ApplicationController
 
   def user_exists?(email)
     Repos::Users.exists?(email: email)
+  end
+
+  def throttle_login!
+    throttle_request!('login', period: 1.minute, limit: 10, discriminator: params[:email].to_s.downcase)
+  end
+
+  def throttle_register!
+    throttle_request!('register', period: 15.minutes, limit: 10, discriminator: params[:email].to_s.downcase)
+  end
+
+  def throttle_password_reset!
+    throttle_request!('password_reset', period: 15.minutes, limit: 8, discriminator: params[:email].to_s.downcase.presence || params[:token].to_s)
+  end
+
+  def throttle_validation!
+    throttle_request!('validate', period: 15.minutes, limit: 20, discriminator: params[:id].to_s.presence || params[:token].to_s)
+  end
+
+  def throttle_request!(scope, period:, limit:, discriminator:)
+    key = ['rate-limit', scope, request.remote_ip, discriminator.presence || 'anonymous'].join(':')
+    attempts = Rails.cache.read(key).to_i
+    if attempts >= limit
+      render json: { status: 'fail', reason: 'rate_limited' }, status: :too_many_requests
+      return false
+    end
+
+    Rails.cache.write(key, attempts + 1, expires_in: period)
   end
 
   # Validation helpers (from BaseController)

@@ -4,8 +4,6 @@
 # Migrated from controllers/profiles.rb
 
 class ProfilesController < ApplicationController
-  skip_before_action :verify_authenticity_token,
-                     only: %i[create update destroy check_name list_profiles profile_productions_spaces]
   before_action :require_login!, except: %i[show show_by_slug index]
 
   # Rails 8.1 compatibility
@@ -38,7 +36,9 @@ class ProfilesController < ApplicationController
 
   # GET /profiles - List all profiles
   def index
-    profiles = Repos::Profiles.all
+    profiles = Repos::Profiles.all.map do |profile|
+      Actions::FilterProfile.run(profile)
+    end
     render json: { status: 'success', profiles: profiles }
   end
 
@@ -85,6 +85,7 @@ class ProfilesController < ApplicationController
   # POST /users/profile_productions_spaces - Get profile productions and spaces
   def profile_productions_spaces
     scopify :profile_id, :event_id
+    check_profile_ownership!(profile_id)
     productions = Actions::UserGetsProfileProductions.run(profile_id)
     spaces = Actions::UserGetsProfileSpaces.run(profile_id)
     submitted_spaces = event_id ? Actions::UserGetsProfileSpaces.filter(profile_id, event_id) : []

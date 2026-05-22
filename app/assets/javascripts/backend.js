@@ -3,6 +3,18 @@
 (function(ns){
 
   ns.Backend = (function(){
+    var _csrfToken = function(){
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      return meta && meta.getAttribute('content');
+    };
+
+    var _updateCsrfToken = function(xhr){
+      var token = xhr && xhr.getResponseHeader && xhr.getResponseHeader('X-CSRF-Token');
+      var meta = document.querySelector('meta[name="csrf-token"]');
+      if (token && meta){
+        meta.setAttribute('content', token);
+      }
+    };
 
     var _send = function(url, data, callback, callbackFail){
       return $.ajax({
@@ -10,13 +22,17 @@
         type: 'POST',
         dataType: 'json',
         data: data,
+        headers: {
+          'X-CSRF-Token': _csrfToken()
+        },
         timeout: 300000,  // wait for 5 minutes ?? / putting 0 it would wait forever
         error: function(xhr, status, err){
           console.log('ERROR FOR ', url,  status, err.toString())
           console.log('xhr ', xhr)
         }
       })
-      .done(function(data) {
+      .done(function(data, _textStatus, xhr) {
+        _updateCsrfToken(xhr);
         if (callback)
           callback(data);
       })
@@ -40,7 +56,8 @@
         dataType: 'json',
         data: data
       })
-      .done(function(data) {
+      .done(function(data, _textStatus, xhr) {
+        _updateCsrfToken(xhr);
         if (callback)
           callback(data);
       })
@@ -1159,4 +1176,3 @@
   }());
 
 }(Pard || {}));
-

@@ -6,7 +6,7 @@
 class SimpleTestSession < Hash
   def initialize(*args)
     super
-    @id = SecureRandom.hex(16)
+    renew_sid!
   end
 
   attr_reader :id
@@ -21,6 +21,21 @@ class SimpleTestSession < Hash
 
   def exists?
     true
+  end
+
+  def destroy
+    clear
+    renew_sid!
+  end
+
+  def options
+    @options ||= {}
+  end
+
+  private
+
+  def renew_sid!
+    @id = SecureRandom.hex(16)
   end
 end
 

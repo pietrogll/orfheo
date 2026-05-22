@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class SpaceProposalsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create amend update select destroy]
   before_action :require_login!
 
   # POST /users/send_space_proposal
