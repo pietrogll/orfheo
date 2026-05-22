@@ -121,6 +121,12 @@ module Actions
       Services::Gallery.delete_pictures(proposal[:photos], proposal[:id]) if proposal[:photos]
       proposalPhotos = Services::Gallery.get_photos_from_form proposal
       Services::Gallery.compare_and_delete_unused_pictures nil, { photos: proposalPhotos } unless proposalPhotos.blank?
+    rescue StandardError => e
+      # Image cleanup is best-effort: the associated production may have already
+      # been removed (taking its Cloudinary assets with it).  Log the error and
+      # let the proposal deletion continue so the user is not left with a
+      # dangling record they cannot remove.
+      Rails.logger.warn "[UserDeletesArtistProposal] remove_pictures failed for proposal #{proposal[:id]}: #{e.message}"
     end
   end
 
