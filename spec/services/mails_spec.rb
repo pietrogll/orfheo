@@ -12,7 +12,8 @@ describe Services::Mails do
       password: 'password',
       lang: 'es',
       validation: false,
-      validation_code: validation_code
+      validation_code: validation_code,
+      reset_password_token: validation_code
     }
   end
 
@@ -143,8 +144,8 @@ describe Services::Mails do
       expect(password_mail.from).to eq(['notification@orfheo.org'])
     end
 
-    it 'assigns the validation code to the body' do
-      expect(password_mail.body).to include(validation_code)
+    it 'assigns the reset password token to the body' do
+      expect(password_mail.body).to include("reset_password?token=#{validation_code}")
     end
   end
 

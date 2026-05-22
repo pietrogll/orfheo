@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class ArtistProposalsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create amend update destroy select modify_param]
   before_action :require_login!
 
   # POST /users/send_artist_proposal

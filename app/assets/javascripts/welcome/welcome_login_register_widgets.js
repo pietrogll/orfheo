@@ -368,7 +368,6 @@
       if (registerInfoStoraged.chkbx && registerInfoStoraged.chkbx != '') {
           _ckb.attr('checked', 'checked');
           emailField.setVal(registerInfoStoraged.usrname);
-          passwdField.setVal(registerInfoStoraged.pass);
           button.enable();
       } else {
           _ckb.removeAttr('checked');
@@ -380,14 +379,11 @@
 
     var _rememberMe = function(){
       if (_ckb.is(':checked')) {
-            // save username and password
             registerInfoStoraged.usrname = emailField.getVal();
-            registerInfoStoraged.pass = passwdField.getVal();
             registerInfoStoraged.chkbx = _ckb.val();
             Pard.Options.setRegister(registerInfoStoraged);
         } else {
             registerInfoStoraged.usrname = '';
-            registerInfoStoraged.pass = '';
             registerInfoStoraged.chkbx = '';
             Pard.Options.setRegister(registerInfoStoraged);
         }
@@ -527,4 +523,3 @@
 
 
 }(Pard || {}));
-

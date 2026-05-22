@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class FreeBlocksController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: %i[create update destroy]
   before_action :require_login!
 
   # POST /users/create_free_block

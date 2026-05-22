@@ -25,9 +25,14 @@ Rails.application.routes.draw do
   delete '/login', to: 'sessions#destroy' # Alternative logout via DELETE
   get '/validate', to: 'sessions#validate' # Email validation callback
   post '/forgotten_password', to: 'sessions#forgotten_password'
+  get '/reset_password', to: 'sessions#edit_password'
+  post '/reset_password', to: 'sessions#reset_password'
 
   # Legacy authentication routes (frontend expects /login/ prefixes)
   scope '/login' do
+    get '/validate', to: 'sessions#validate'
+    get '/reset_password', to: 'sessions#edit_password'
+    post '/reset_password', to: 'sessions#reset_password'
     post '/register', to: 'sessions#register'
     post '/login', to: 'sessions#create'
     post '/logout', to: 'sessions#destroy'
