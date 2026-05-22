@@ -9,7 +9,7 @@ class ProductionsController < ApplicationController
 
   # Rails 8.1 compatibility
   def self.action_encoding_template(_action_name)
-    'utf-8'
+    false
   end
 
   # POST /users/create_production - Create new production

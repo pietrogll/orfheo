@@ -6,7 +6,7 @@
 module ActionController
   class Base
     def self.action_encoding_template(_action_name)
-      'utf-8' # Return encoding name as string, not Encoding object
+      false
     end
   end
 end
