@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     post '/login', to: 'sessions#create'
     post '/logout', to: 'sessions#destroy'
     post '/forgotten_password', to: 'sessions#forgotten_password'
+    get '/validate', to: 'sessions#validate'
   end
 
   # Current user session info

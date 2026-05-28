@@ -405,4 +405,69 @@ RSpec.describe 'Authentication', type: :request, swagger_doc: 'openapi.yaml' do
       end
     end
   end
+
+  describe 'Email and Link Validation' do
+    let(:user_id) { SecureRandom.uuid }
+    let(:validation_code) { SecureRandom.uuid }
+
+    before do
+      Repos::Users.save({
+                          id: user_id,
+                          email: user_email,
+                          password: BCrypt::Password.create(user_password),
+                          lang: user_lang,
+                          validation: false,
+                          validation_code: validation_code,
+                          created_at: Time.now.to_i
+                        })
+    end
+
+    context 'GET /validate' do
+      context 'when valid validation code is provided' do
+        it 'validates the user, deletes the code, and redirects to users page' do
+          get '/validate', params: { id: validation_code }
+
+          expect(response).to redirect_to('/users')
+          user = Repos::Users.get_by_id(user_id)
+          expect(user[:validation]).to be true
+          expect(user[:validation_code]).to be_nil
+        end
+      end
+
+      context 'when invalid validation code is provided' do
+        it 'does not validate the user and redirects to root' do
+          get '/validate', params: { id: 'invalid-code' }
+
+          expect(response).to redirect_to('/')
+          user = Repos::Users.get_by_id(user_id)
+          expect(user[:validation]).to be false
+          expect(user[:validation_code]).to eq(validation_code)
+        end
+      end
+    end
+
+    context 'GET /login/validate' do
+      context 'when valid validation code is provided' do
+        it 'validates the user, deletes the code, and redirects to users page' do
+          get '/login/validate', params: { id: validation_code }
+
+          expect(response).to redirect_to('/users')
+          user = Repos::Users.get_by_id(user_id)
+          expect(user[:validation]).to be true
+          expect(user[:validation_code]).to be_nil
+        end
+      end
+
+      context 'when invalid validation code is provided' do
+        it 'does not validate the user and redirects to root' do
+          get '/login/validate', params: { id: 'invalid-code' }
+
+          expect(response).to redirect_to('/')
+          user = Repos::Users.get_by_id(user_id)
+          expect(user[:validation]).to be false
+          expect(user[:validation_code]).to eq(validation_code)
+        end
+      end
+    end
+  end
 end
