@@ -17,7 +17,7 @@ Module.class_eval do
     end
 
     subclass.define_singleton_method(:action_encoding_template) do |_action_name|
-      'utf-8' # Return encoding name as string
+      false
     end
   end
 end
@@ -28,7 +28,7 @@ Rails.application.config.after_initialize do
     next unless defined?(klass)
 
     klass.define_singleton_method(:action_encoding_template) do |_action_name|
-      'utf-8' # Return encoding name as string
+      false
     end
   end
 end

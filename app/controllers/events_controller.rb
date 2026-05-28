@@ -10,7 +10,7 @@ class EventsController < ApplicationController
 
   # Rails 8.1 compatibility
   def self.action_encoding_template(_action_name)
-    'utf-8'
+    false
   end
 
   # GET /event?id=xxx - Show event by ID
