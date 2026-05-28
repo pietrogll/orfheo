@@ -182,8 +182,14 @@
     }
 
     var _spotify = function(link){
+      var match = link['url'].match(/(track|artist|album|playlist)s?[\/:]?([a-zA-Z0-9]+)/i);
+      var type = 'track';
       var audio_id = link['url'].split('/').pop();
-      var _spotifyMedia = $('<iframe>').attr({'src': "https://open.spotify.com/embed?uri=spotify:track:" + audio_id, 'frameborder': '0', 'allowtransparency': 'true'}).css('height','5rem');
+      if (match) {
+        type = match[1].toLowerCase();
+        audio_id = match[2];
+      }
+      var _spotifyMedia = $('<iframe>').attr({'src': "https://open.spotify.com/embed?uri=spotify:" + type + ":" + audio_id, 'frameborder': '0', 'allowtransparency': 'true'}).css('height','5rem');
       multimedia[link['type']].push(_spotifyMedia);
       _done.push(link);
       _linksTriedToBeDone +=1;

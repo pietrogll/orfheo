@@ -90,9 +90,9 @@
     var ig_url = /^(http|https)\:\/\/www\.instagram\..*/i;
     var pt_url = /^(http|https)\:\/\/.*\.pinterest\.com\/pin\//i;
     var vn_url = /^(http|https)\:\/\/vine\..*/i;
-    var sp_url = /^(http|https)\:\/\/open\.spotify\.com\/track\/.*/i;
-    var sp_2url = /^(http|https)\:\/\/play\.spotify\.com\/track\/.*/i;
-    var sp_3url = /^spotify:track:.*/i;
+    var sp_url = /^(http|https)\:\/\/open\.spotify\.com\/(track|artist|album|playlist)\/.*/i;
+    var sp_2url = /^(http|https)\:\/\/play\.spotify\.com\/(track|artist|album|playlist)\/.*/i;
+    var sp_3url = /^spotify:(track|artist|album|playlist):.*/i;
     var bc_url = /.*src=\"(http|https)\:\/\/bandcamp\.com\/EmbeddedPlayer\/.*/i;
 
     var tw_url = /^(http|https)\:\/\/twitter\.com\/.*/i;
@@ -108,8 +108,12 @@
 
       var _composeResults = function(provider, type){
         if(provider == 'spotify'){
-          var _id = url.split('track').pop().substring(1);
-          url = 'https://open.spotify.com/track/' + _id;
+          var match = url.match(/(track|artist|album|playlist)s?[\/:]?([a-zA-Z0-9]+)/i);
+          if (match) {
+            var type = match[1].toLowerCase();
+            var id = match[2];
+            url = 'https://open.spotify.com/' + type + '/' + id;
+          }
         }
         _results.push({url: url, provider: provider, type: type});
         callback();
