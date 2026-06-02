@@ -20,11 +20,15 @@ RSpec.describe 'API V1 Events Program', type: :request, swagger_doc: 'openapi.ya
       let(:lang) { 'es' }
       let(:program_timestamp) { nil }
       let(:'If-Modified-Since') { nil }
+      let(:timestamp_time) { Time.utc(2023, 1, 1, 0, 0, 0) }
+      let(:program) { [{ id: 'performance-id', host_id: 'host-id', host_name: 'Host' }] }
 
       before do
-        allow(Services::Search).to receive(:get_program_results).and_return([])
-        allow(Services::Events).to receive(:get_event_program_hosts).and_return([])
-        allow(CachedEvent).to receive(:program_timestamp).with(id).and_return(1_672_531_199_000)
+        allow(Time).to receive(:now).and_return(timestamp_time)
+        allow(Services::Events).to receive(:get_uncached_event_program).with(id).and_return(program)
+        allow(Services::Search).to receive(:get_program_results_for_program).and_return([])
+        allow(Services::Events).to receive(:get_program_hosts_for).with(program).and_return([])
+        allow(CachedEvent).to receive(:program_timestamp)
       end
 
       response '200', 'success' do
@@ -34,12 +38,13 @@ RSpec.describe 'API V1 Events Program', type: :request, swagger_doc: 'openapi.ya
           expect(response.headers['Cache-Control']).to include('public')
           expect(response.headers['Cache-Control']).to include('max-age=31536000')
           expect(response.headers['Last-Modified']).to be_present
+          expect(CachedEvent).not_to have_received(:program_timestamp)
         end
       end
 
       response '304', 'not modified' do
         context 'when If-Modified-Since matches last modified' do
-          let(:'If-Modified-Since') { Time.at(1_672_531_199_000 / 1000.0).utc.httpdate }
+          let(:'If-Modified-Since') { timestamp_time.httpdate }
 
           run_test!
         end

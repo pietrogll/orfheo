@@ -20,6 +20,12 @@ module Services
         #  It search for participant_name, host_name, title, locality (city), short_description --> searcheable_fields
         check_lang! lang
         program = Services::Events.get_event_program(event_id) || []
+        get_program_results_for_program(lang, program, tags, filters, date, time)
+      end
+
+      def get_program_results_for_program(lang, program, tags, filters, date, time)
+        check_lang! lang
+        program ||= []
         unless date.blank?
           program = program.select do |performance|
             performance[:date] == date

@@ -28,8 +28,28 @@ module Services
         CachedEvent.program event_id
       end
 
+      def get_uncached_event_program(event_id)
+        event = Repos::Events.get_by_id event_id
+        raise Pard::Unexisting, 'event_not_found' if event.nil?
+
+        Services::Programs.arrange_program event[:program_id]
+      end
+
       def get_event_program_hosts(event_id)
         CachedEvent.program_hosts event_id
+      end
+
+      def get_program_hosts_for(program)
+        hosts_identifiers = []
+        Array(program).each_with_object([]) do |performance, accumulator|
+          next if performance[:host_id].blank? || performance[:host_name].blank?
+
+          identifier = performance[:host_id] + performance[:host_name]
+          unless hosts_identifiers.include?(identifier)
+            accumulator << performance
+            hosts_identifiers << identifier
+          end
+        end
       end
 
       def get_events

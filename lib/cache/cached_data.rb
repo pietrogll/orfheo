@@ -25,31 +25,32 @@ end
 
 class BaseCache
   class << self
-    @@cache = ActiveSupport::Cache::MemoryStore.new
-    # (expires_in: 5.minutes)
-
     def write(key, value)
-      @@cache.write(key, value)
+      cache.write(key, value)
     end
 
     def read(key)
-      @@cache.read(key)
+      cache.read(key)
     end
 
     def delete(key)
-      @@cache.delete(key)
+      cache.delete(key)
     end
 
     def clear
-      @@cache.clear
+      cache.clear
+    end
+
+    private
+
+    def cache
+      Rails.cache
     end
   end
 end
 
 class CachedEvent < BaseCache
   class << self
-    @@cached_program = @@cache
-
     def program(event_id)
       fetch_cached_program_data(event_id)[:program]
     end
@@ -59,14 +60,14 @@ class CachedEvent < BaseCache
     end
 
     def program_hosts(event_id)
-      @@cached_program.fetch(hosts_key(event_id)) do
+      cache.fetch(hosts_key(event_id)) do
         get_cached_program_hosts event_id
       end
     end
 
     def delete(event_id)
-      @@cached_program.delete(program_key(event_id))
-      @@cached_program.delete(hosts_key(event_id))
+      cache.delete(program_key(event_id))
+      cache.delete(hosts_key(event_id))
       Services::Cloudflare.purge_program_cache(event_id) if defined?(Services::Cloudflare)
     end
 
@@ -85,7 +86,7 @@ class CachedEvent < BaseCache
     end
 
     def fetch_cached_program_data(event_id)
-      @@cached_program.fetch(program_key(event_id)) do
+      cache.fetch(program_key(event_id)) do
         program = get_event_program(event_id)
         program_with_timestamp(program)
       end

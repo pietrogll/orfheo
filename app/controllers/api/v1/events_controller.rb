@@ -15,7 +15,7 @@ module Api
           return render json: { status: 'fail', reason: 'invalid_language' }, status: :bad_request
         end
 
-        timestamp = CachedEvent.program_timestamp(event_id)
+        timestamp = (Time.now.to_f * 1000).to_i
         last_modified_time = Time.at(timestamp / 1000.0).utc
 
         # 1. Standard HTTP Cache validation using Last-Modified and If-Modified-Since headers
@@ -32,9 +32,9 @@ module Api
           end
         end
 
-        # Retrieve program results and hosts (unfiltered)
-        results = Services::Search.get_program_results(lang, event_id, [], {}, nil, nil)
-        hosts = Services::Events.get_event_program_hosts(event_id)
+        program = Services::Events.get_uncached_event_program(event_id)
+        results = Services::Search.get_program_results_for_program(lang, program, [], {}, nil, nil)
+        hosts = Services::Events.get_program_hosts_for(program)
 
         success(
           program: results,
