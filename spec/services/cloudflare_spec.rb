@@ -18,20 +18,25 @@ RSpec.describe Services::Cloudflare do
 
     subject { described_class.purge_program_cache(event_id) }
 
+    let(:expected_headers) do
+      {
+        'Authorization' => 'Bearer token-xyz',
+        'Content-Type' => 'application/json'
+      }
+    end
+
     context 'when all environment variables are present' do
-      let(:expected_headers) do
-        {
-          'Authorization' => 'Bearer token-xyz',
-          'Content-Type' => 'application/json'
-        }
-      end
       let(:expected_body) do
         {
           files: [
             'https://example.com/api/v1/events/event-123/program?lang=es',
             'https://example.com/api/v1/events/event-123/program?lang=en',
             'https://example.com/api/v1/events/event-123/program?lang=ca',
-            'https://example.com/api/v1/events/event-123/program'
+            'https://example.com/api/v1/events/event-123/program',
+            'https://www.example.com/api/v1/events/event-123/program?lang=es',
+            'https://www.example.com/api/v1/events/event-123/program?lang=en',
+            'https://www.example.com/api/v1/events/event-123/program?lang=ca',
+            'https://www.example.com/api/v1/events/event-123/program'
           ]
         }.to_json
       end
@@ -41,6 +46,33 @@ RSpec.describe Services::Cloudflare do
       end
 
       it 'calls post on itself with the correct endpoint, headers, and body' do
+        subject
+        expect(described_class).to have_received(:post).with(
+          '/zones/zone-abc/purge_cache',
+          headers: expected_headers,
+          body: expected_body
+        )
+      end
+    end
+
+    context 'when DOMAIN_NAME already includes www' do
+      let(:domain) { 'www.example.com' }
+      let(:expected_body) do
+        {
+          files: [
+            'https://www.example.com/api/v1/events/event-123/program?lang=es',
+            'https://www.example.com/api/v1/events/event-123/program?lang=en',
+            'https://www.example.com/api/v1/events/event-123/program?lang=ca',
+            'https://www.example.com/api/v1/events/event-123/program'
+          ]
+        }.to_json
+      end
+
+      before do
+        allow(described_class).to receive(:post)
+      end
+
+      it 'purges the canonical host once' do
         subject
         expect(described_class).to have_received(:post).with(
           '/zones/zone-abc/purge_cache',

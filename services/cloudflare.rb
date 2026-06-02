@@ -13,12 +13,7 @@ module Services
 
         return if zone_id.blank? || api_token.blank? || domain.blank?
 
-        # Construct URLs for all supported languages
-        urls = %w[es en ca].map do |lang|
-          "https://#{domain}/api/v1/events/#{event_id}/program?lang=#{lang}"
-        end
-        # Add default URL in case lang parameter is omitted
-        urls << "https://#{domain}/api/v1/events/#{event_id}/program"
+        urls = purge_urls(domain, event_id)
 
         # Trigger Cloudflare API Purge using HTTParty
         headers = {
@@ -30,6 +25,33 @@ module Services
         post("/zones/#{zone_id}/purge_cache", headers: headers, body: body)
       rescue StandardError => e
         Rails.logger.error("Cloudflare Purge failed: #{e.message}")
+      end
+
+      private
+
+      def purge_urls(domain, event_id)
+        domains = domain_variants(domain)
+
+        domains.flat_map do |host|
+          language_urls(host, event_id) + [default_url(host, event_id)]
+        end
+      end
+
+      def domain_variants(domain)
+        normalized_domain = domain.sub(%r{\Ahttps?://}, '').delete_suffix('/')
+        apex_domain = normalized_domain.sub(/\Awww\./, '')
+
+        [normalized_domain, "www.#{apex_domain}"].uniq
+      end
+
+      def language_urls(domain, event_id)
+        %w[es en ca].map do |lang|
+          "#{default_url(domain, event_id)}?lang=#{lang}"
+        end
+      end
+
+      def default_url(domain, event_id)
+        "https://#{domain}/api/v1/events/#{event_id}/program"
       end
     end
   end
