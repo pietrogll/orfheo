@@ -88,6 +88,26 @@ RSpec.describe 'Activity Management', type: :request do
         expect(json[:event]).to eq('modifyPerformances')
         expect(json[:model]).to be_present
       end
+
+      it 'returns the updated performance time from the public program API' do
+        login_as(user[:_id])
+        updated_time = %w[1764615600000 1764619200000]
+
+        post '/users/modify_performances', params: {
+          event_id: event[:_id],
+          performances: [
+            {
+              id: activity[:_id],
+              dateTime: [{ date: '2025-12-01', time: updated_time }]
+            }
+          ],
+          signature: 'test-sig'
+        }
+        get "/api/v1/events/#{event[:_id]}/program"
+
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:program].find { |performance| performance[:id] == activity[:_id] }[:time]).to eq(updated_time)
+      end
     end
 
     context 'when logged in as non-owner' do
@@ -213,22 +233,25 @@ RSpec.describe 'Activity Management', type: :request do
       event_id: event_id,
       user_id: owner_id,
       name: 'Test Program',
+      order: [],
       created_at: Time.now
     }
     Repos::Programs.save(program_data)
+    Repos::Events.modify({ id: event_id, program_id: program_id })
     program_data.merge(_id: program_id)
   end
 
   def create_test_activity(program_id, event_id)
     activity_id = SecureRandom.uuid
+    participant = create_test_profile(user[:_id], name: 'Participant Profile')
     activity_data = {
       id: activity_id,
       program_id: program_id,
       event_id: event_id,
-      participant_id: SecureRandom.uuid,
+      participant_id: participant[:_id],
       host_id: profile[:_id],
       name: 'Test Activity',
-      dateTime: [{ date: '2025-12-01', time: '18:00' }],
+      dateTime: [{ date: '2025-12-01', time: %w[1764612000000 1764615600000] }],
       permanent: false,
       created_at: Time.now
     }

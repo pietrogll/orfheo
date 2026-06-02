@@ -84,6 +84,11 @@ describe 'Caches' do
         timestamp = CachedEvent.program_timestamp('event_id')
         expect(timestamp).to eq(expected_millisec_timestamp)
       end
+
+      it 'skips program hosts without host display data' do
+        allow(Services::Programs).to receive(:arrange_program).and_return([{ host_id: 'host_id' }])
+        expect(CachedEvent.program_hosts('event_id')).to eq([])
+      end
     end
   end
 end

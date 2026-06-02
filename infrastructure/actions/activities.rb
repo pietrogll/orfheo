@@ -5,10 +5,9 @@ module Actions
     def self.run(params, owner_id)
       event = Repos::Events.get_by_id(params[:event_id])
       host_id = event[:profile_id]
-      CachedEvent.delete params[:event_id]
 
       activities_data = Util.arrayify_hash(params[:performances])
-      activities_data.map do |activity|
+      activities = activities_data.map do |activity|
         # Populate mandatory fields for Activity.new
         activity[:event_id] ||= params[:event_id]
         activity[:program_id] ||= params[:program_id]
@@ -34,6 +33,8 @@ module Actions
         add_participant_info new_activity, new_participant if new_participant
         new_activity
       end
+      CachedEvent.delete params[:event_id]
+      activities
     end
 
     def self.create_and_save_activity(activity)
@@ -70,8 +71,9 @@ module Actions
 
   class UserModifiesActivities
     def self.run(params, _owner_id = nil)
+      activities = modify Util.arrayify_hash(params[:performances])
       CachedEvent.delete params[:event_id]
-      modify Util.arrayify_hash(params[:performances])
+      activities
     end
 
     def self.modify(activities)
@@ -111,7 +113,6 @@ module Actions
   class UserDeletesActivities
     def self.run(params, event_id)
       target_event_id = params.is_a?(Hash) ? params[:event_id] : event_id
-      CachedEvent.delete target_event_id
       # Handle both legacy array input and hash payloads
       performance_ids = if params.is_a?(Array)
                           params.map { |p| p.is_a?(Hash) ? p[:id] : nil }.compact
@@ -125,7 +126,7 @@ module Actions
         performance_ids = params.map { |p| p.is_a?(Hash) ? p[:id] : nil }.compact
       end
 
-      performance_ids.map do |activity_id|
+      activities = performance_ids.map do |activity_id|
         activity = Repos::Activities.get_by_id activity_id
         next unless activity
 
@@ -134,6 +135,8 @@ module Actions
         remove_participant_from_program activity
         activity
       end.compact
+      CachedEvent.delete target_event_id
+      activities
     end
 
     def self.remove_activity_from_program(activity)

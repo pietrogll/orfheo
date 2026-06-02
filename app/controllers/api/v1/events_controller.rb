@@ -18,7 +18,8 @@ module Api
         timestamp = CachedEvent.program_timestamp(event_id)
         last_modified_time = Time.at(timestamp / 1000.0).utc
 
-        # 1. Standard HTTP Cache validation (If-Modified-Since)
+        # 1. Standard HTTP Cache validation using Last-Modified and If-Modified-Since headers
+        # -> allow Cloudfare to return 304 if the program data hasn't changed sinec Last-Modified
         response.headers['Last-Modified'] = last_modified_time.httpdate
         response.headers['Cache-Control'] = 'public, max-age=31536000'
 
@@ -29,11 +30,6 @@ module Api
           rescue ArgumentError
             # Ignore malformed If-Modified-Since header
           end
-        end
-
-        # 2. Backward compatibility fallback for query param program_timestamp
-        if !params[:program_timestamp].nil? && (timestamp.to_i == params[:program_timestamp].to_i)
-          return head :not_modified
         end
 
         # Retrieve program results and hosts (unfiltered)

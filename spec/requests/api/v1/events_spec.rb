@@ -38,12 +38,6 @@ RSpec.describe 'API V1 Events Program', type: :request, swagger_doc: 'openapi.ya
       end
 
       response '304', 'not modified' do
-        context 'when program timestamp matches' do
-          let(:program_timestamp) { 1_672_531_199_000 }
-
-          run_test!
-        end
-
         context 'when If-Modified-Since matches last modified' do
           let(:'If-Modified-Since') { Time.at(1_672_531_199_000 / 1000.0).utc.httpdate }
 
