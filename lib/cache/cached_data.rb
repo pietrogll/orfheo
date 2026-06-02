@@ -98,6 +98,8 @@ class CachedEvent < BaseCache
 
     def get_event_program(event_id)
       event = Repos::Events.get_by_id event_id
+      raise Pard::Unexisting, 'event_not_found' if event.nil?
+
       Services::Programs.arrange_program event[:program_id]
     end
 

@@ -25,19 +25,15 @@ module Api
         if request.headers['If-Modified-Since'].present?
           begin
             if_modified_since = Time.httpdate(request.headers['If-Modified-Since'])
-            if last_modified_time.to_i <= if_modified_since.to_i
-              return head :not_modified
-            end
+            return head :not_modified if last_modified_time.to_i <= if_modified_since.to_i
           rescue ArgumentError
             # Ignore malformed If-Modified-Since header
           end
         end
 
         # 2. Backward compatibility fallback for query param program_timestamp
-        unless params[:program_timestamp].nil?
-          if timestamp.to_i == params[:program_timestamp].to_i
-            return head :not_modified
-          end
+        if !params[:program_timestamp].nil? && (timestamp.to_i == params[:program_timestamp].to_i)
+          return head :not_modified
         end
 
         # Retrieve program results and hosts (unfiltered)
