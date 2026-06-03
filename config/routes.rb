@@ -207,6 +207,9 @@ Rails.application.routes.draw do
 
   # API v1 endpoints
   namespace :api do
+    # Server-side Google Geocoding proxy (keeps API key secret)
+    get '/geocode', to: 'geocode#show'
+
     namespace :v1 do
       resources :events, only: [] do
         member do

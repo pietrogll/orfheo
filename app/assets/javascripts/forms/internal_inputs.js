@@ -988,8 +988,7 @@
         }
       });
       if (_check){
-        var uri = "https://maps.googleapis.com/maps/api/geocode/json?address="  + _addressValues.locality + '+' + _addressValues.postal_code + "&key=" + window.GOOGLE_MAPS_API_KEY;
-        $.get(uri, function(data){
+        Pard.Backend.geocode(_addressValues.locality + ' ' + _addressValues.postal_code, function(data){
           if(data.status == "OK" && data.results.length > 0){
             _addressValues.location = data.results[0].geometry.location;
           }
@@ -1184,28 +1183,35 @@
         var _spinnerCheckLocation = new Spinner();
         _spinnerCheckLocation.spin();
         $('body').append(_spinnerCheckLocation.el);
-        var uri = Pard.Widgets.RemoveAccents("https://maps.googleapis.com/maps/api/geocode/json?address=" + _addressInserted.route + "+" + _addressInserted.street_number + "+" + _addressInserted.locality + "+" + _addressInserted.postal_code + "&key=" + window.GOOGLE_MAPS_API_KEY);
-        var _location;
-        $.post(uri, function(data){
-          if(data.status == "OK" && data.results.length > 0){
-            _geocod = data.results[0].geometry.location;
-            _displayMap(_geocod);
-          }
-          else{
+        Pard.Backend.geocode(
+          Pard.Widgets.RemoveAccents(_addressInserted.route + ' ' + _addressInserted.street_number + ' ' + _addressInserted.locality + ' ' + _addressInserted.postal_code),
+          function(data){
+            if(data.status == "OK" && data.results.length > 0){
+              _geocod = data.results[0].geometry.location;
+              _displayMap(_geocod);
+            }
+            else{
+              _errorBox.append($('<p>').text(Pard.t.text('widget.inputAddressSpace.warning')).css({
+                'color':'red',
+                'margin-bottom':'0'
+              }));
+              if (_latField && _lonField) {
+                _latField.setVal('');
+                _lonField.setVal('');
+                _hereBtn.trigger('click');
+              }          
+            }
+            _spinnerCheckLocation.stop();
+            _addressInserted['location'] = _geocod;
+          },
+          function(){
             _errorBox.append($('<p>').text(Pard.t.text('widget.inputAddressSpace.warning')).css({
               'color':'red',
               'margin-bottom':'0'
             }));
-            if (_latField && _lonField) {
-              _latField.setVal('');
-              _lonField.setVal('');
-              _hereBtn.trigger('click');
-            }          
+            _spinnerCheckLocation.stop();
           }
-          _spinnerCheckLocation.stop();
-          _addressInserted['location'] = _geocod;
-          return _addressInserted;
-        });
+        );
       }
       else{
         return _addressInserted;
