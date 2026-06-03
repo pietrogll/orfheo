@@ -45,6 +45,43 @@ Run Sidekiq:
 bundle exec sidekiq -r ./config/environment.rb
 ```
 
+## Sync Local DB from Production
+
+1.  **Get the production URI**:
+    ```bash
+    heroku config:get MONGOLAB_URI
+    ```
+
+2.  **Dump from production**:
+
+    ```bash
+    mongodump --uri="$MONGOLAB_URI" --archive=orfheo_prod.dump --gzip --tls --tlsInsecure
+    ```
+
+3.  **Restore to local** (pipe via `zcat` to handle namespace correctly):
+
+    ```bash
+    zcat orfheo_prod.dump | mongorestore --uri="mongodb://127.0.0.1:27017/orfheo_dev" \
+      --archive --drop \
+      --nsInclude="$(echo "$MONGOLAB_URI" | sed -n 's|.*/\([^?]*\).*|\1|p').*"
+    ```
+
+    This restores all collections under the production database namespace. If the restore creates a separate `heroku_1qqrwjjv` database instead of writing to `orfheo_dev`, migrate the collections:
+
+    ```bash
+    mongosh mongodb://127.0.0.1:27017 --quiet --eval "
+      const fromDB = 'heroku_1qqrwjjv', toDB = 'orfheo_dev';
+      db.getSiblingDB(fromDB).getCollectionNames().forEach(c => {
+        db.getSiblingDB(toDB).getCollection(c).drop();
+        db.adminCommand({ renameCollection: fromDB + '.' + c, to: toDB + '.' + c });
+      });
+      db.getSiblingDB(fromDB).dropDatabase();
+      print('Migrated to ' + toDB);
+    "
+    ```
+
+    > `--drop` clears existing local data before restoring. Omit it to keep local collections not present in production.
+
 ## API Documentation
 Regenerate `openapi/openapi.yaml` from request specs:
 ```bash
