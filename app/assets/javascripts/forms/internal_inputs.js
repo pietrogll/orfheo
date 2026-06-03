@@ -988,7 +988,7 @@
         }
       });
       if (_check){
-        var uri = "https://maps.googleapis.com/maps/api/geocode/json?address="  + _addressValues.locality + '+' + _addressValues.postal_code + "&key=AIzaSyCimmihWSDJV09dkGVYeD60faKAebhYJXg";
+        var uri = "https://maps.googleapis.com/maps/api/geocode/json?address="  + _addressValues.locality + '+' + _addressValues.postal_code + "&key=" + window.GOOGLE_MAPS_API_KEY;
         $.get(uri, function(data){
           if(data.status == "OK" && data.results.length > 0){
             _addressValues.location = data.results[0].geometry.location;
@@ -1184,7 +1184,7 @@
         var _spinnerCheckLocation = new Spinner();
         _spinnerCheckLocation.spin();
         $('body').append(_spinnerCheckLocation.el);
-        var uri = Pard.Widgets.RemoveAccents("https://maps.googleapis.com/maps/api/geocode/json?address=" + _addressInserted.route + "+" + _addressInserted.street_number + "+" + _addressInserted.locality + "+" + _addressInserted.postal_code + "&key=AIzaSyCimmihWSDJV09dkGVYeD60faKAebhYJXg");
+        var uri = Pard.Widgets.RemoveAccents("https://maps.googleapis.com/maps/api/geocode/json?address=" + _addressInserted.route + "+" + _addressInserted.street_number + "+" + _addressInserted.locality + "+" + _addressInserted.postal_code + "&key=" + window.GOOGLE_MAPS_API_KEY);
         var _location;
         $.post(uri, function(data){
           if(data.status == "OK" && data.results.length > 0){
