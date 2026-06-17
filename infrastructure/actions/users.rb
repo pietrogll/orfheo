@@ -3,6 +3,9 @@
 module Actions
   class UserRegistersUser
     def self.run(event_id, params)
+      email = params[:email]&.downcase
+      raise Pard::Invalid::ExistingUser if Repos::Users.exists?(email: email)
+
       user = User.new params
       mailer = Services::Mails.new
       if Repos::Events.exists?(event_id)

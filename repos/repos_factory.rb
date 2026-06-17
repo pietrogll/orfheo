@@ -45,6 +45,12 @@ end
 module BaseReposMethods
   def save(object)
     collection.insert_one object.to_h
+  rescue Mongo::Error::OperationFailure => e
+    if e.message.include?('E11000') || e.code == 11000
+      raise Pard::Invalid::ExistingUser
+    else
+      raise e
+    end
   end
 
   def modify(object)

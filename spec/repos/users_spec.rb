@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+
 describe Repos::Users do
   let(:user_id) { '5c41cf77-32b0-4df2-9376-0960e64a654a' }
   let(:validation_code) { '3c61cf77-32b0-4df2-9376-0960e64a654a' }
@@ -29,6 +31,13 @@ describe Repos::Users do
                                        'validation' => false,
                                        'validation_code' => validation_code
                                      })
+    end
+
+    context 'when the email already exists in the database' do
+      it 'raises a Pard::Invalid::ExistingUser error due to unique index' do
+        duplicate_user = unvalidated_user.merge(id: SecureRandom.uuid)
+        expect { Repos::Users.save(duplicate_user) }.to raise_error(Pard::Invalid::ExistingUser)
+      end
     end
   end
 
