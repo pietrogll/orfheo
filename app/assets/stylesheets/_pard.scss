@@ -2294,9 +2294,13 @@ ul.dropdownMenu{
 
 .container-insideMenu{
   padding:  0;
-  width: 15rem;
+  width: 15rem !important;
   left: -10.5rem !important;
   top: 2rem !important;
+}
+
+.menuEvents li {
+  position: relative;
 }
 
 .eventMananagerChoice{
@@ -2311,6 +2315,7 @@ ul.dropdownMenu{
   width: 7rem;
   z-index: 10;
   right: 0;
+  top: 0;
   ul{
     margin-left: 0;
   }

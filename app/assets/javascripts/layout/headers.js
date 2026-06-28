@@ -438,7 +438,7 @@
                       function () {
                         setTimeout(function () {
                           if (!(_eventManagerChoice[event.event_id].hasClass('isOver'))) _eventManagerChoice[event.event_id].removeClass('showEventManagerChoice');
-                        }, 50)
+                        }, 200)
 
                       }
                     )
