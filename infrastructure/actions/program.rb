@@ -25,6 +25,12 @@ module Actions
     end
   end
 
+  class UserArtistSubcategoriesPrice
+    def self.run(_owner_id, params)
+      Actions::UserSavesArtistSubcatPrices.run(params[:program_id], params[:subcategories_price], params[:event_id])
+    end
+  end
+
   class UserCreatesProgram
     def self.run(user_id, params)
       program = Program.new(user_id, params).create
@@ -104,15 +110,23 @@ module Actions
     def self.update_activities(program_id, permanents)
       permanent_activities = Repos::Activities.get({ '$and': [{ program_id: program_id }, { permanent: 'true' }] })
       Actions::UserModifiesActivities.modify(permanent_activities.reject do |permanent_act|
-        permanent_dt = permanents.deep_dup.each_with_object([]) do |dt, dt_arr|
-          dt = Util.string_keyed_hash_to_symbolized(dt)
-          if dt[:subcategories].blank? || dt[:subcategories].include?(Repos::Artistproposals.get_by_id(permanent_act[:participant_proposal_id])[:subcategory])
-            dt_arr << dt.except(:subcategories)
-          end
-        end
+        permanent_dt = permanents_for_activity(permanents, permanent_act)
         permanent_act[:dateTime] = permanent_dt unless permanent_dt.blank?
         permanent_dt.blank?
       end)
+    end
+
+    def self.permanents_for_activity(permanents, permanent_act)
+      proposal = Repos::Artistproposals.get_by_id(permanent_act[:participant_proposal_id])
+      subcategory = proposal ? proposal[:subcategory] : permanent_act[:participant_subcategory]
+      permanents.deep_dup.each_with_object([]) do |dt, dt_arr|
+        dt = Util.string_keyed_hash_to_symbolized(dt)
+        dt_arr << dt.except(:subcategories) if permanent_applies?(dt, subcategory)
+      end
+    end
+
+    def self.permanent_applies?(date_time, subcategory)
+      date_time[:subcategories].blank? || (subcategory && date_time[:subcategories].include?(subcategory))
     end
   end
 end

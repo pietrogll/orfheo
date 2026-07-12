@@ -80,6 +80,10 @@ class ProgramsController < ApplicationController
   def artist_subcategories_price
     scopify :event_id, :signature
     owner_id = check_event_ownership!(event_id)
+
+    # Map frontend payload legacy keys
+    symbolized_params[:program_id] ||= symbolized_params[:id]
+
     hash = Actions::UserArtistSubcategoriesPrice.run(owner_id, symbolized_params)
     send_web_socket_message("event:#{event_id}", 'artistSubcategoriesPrice', hash, signature)
 
@@ -90,9 +94,21 @@ class ProgramsController < ApplicationController
   def set_permanents
     scopify :event_id, :signature, :program_id, :permanents
     owner_id = check_event_ownership!(event_id)
-    check_permanents!(permanents)
-    hash = Actions::UserSetPermanents.run(owner_id, symbolized_params)
-    send_web_socket_message("event:#{event_id}", 'setPermanents', hash, signature)
+
+    # Map frontend payload legacy keys
+    symbolized_params[:program_id] ||= symbolized_params[:id]
+    the_program_id = symbolized_params[:program_id]
+    # Filter to valid hash entries only: rack-test / jQuery encode [] as [""],
+    # and arrays of objects as [{...}]. We want actual date/time hash objects.
+    the_permanents = permanent_hashes(symbolized_params[:permanents])
+
+    check_set_permanents!(the_program_id, the_permanents)
+
+    unless the_permanents.blank?
+      symbolized_params[:permanents] = the_permanents
+      hash = Actions::UserSetPermanents.run(owner_id, symbolized_params)
+      send_web_socket_message("event:#{event_id}", 'setPermanents', hash, signature)
+    end
 
     render json: { status: 'success' }
   end
@@ -105,6 +121,33 @@ class ProgramsController < ApplicationController
     raise Pard::Invalid, 'program_ownership' unless owner_id == session[:identity] || admin?
 
     owner_id
+  end
+
+  # Validate permanent configuration during set_permanents.
+  # Mirrors the original Sinatra logic: only raise if the user sent an explicitly
+  # empty permanents list while permanent activities already exist in the program.
+  def check_set_permanents!(program_id, permanents)
+    # permanents.blank? is true when nil OR an empty array — both meaning "clear"
+    if permanents.blank? && Repos::Activities.get({ '$and': [{ program_id: program_id }, { permanent: 'true' }] }).present?
+      raise Pard::Invalid, 'existing_permanent_activities'
+    end
+  end
+
+  # Normalise the permanents param into an array of hashes.
+  #
+  # jQuery serialises an array of objects as a hash with numeric string keys:
+  #   permanents[0][date]=...  =>  {"0"=>{"date"=>...}, "1"=>...}
+  # rack-test / form-encode serialises an empty array as  permanents[]=  which
+  # Rails parses back as  [""]  (a non-empty array with one blank string).
+  #
+  # Util.arrayify_hash handles both: converts {"0"=>{...}} → [{...}] and
+  # returns an Array as-is. We then discard any non-hash elements (e.g. "").
+  def permanent_hashes(permanents)
+    return [] if permanents.blank?
+
+    Util.arrayify_hash(permanents).then do |arr|
+      arr.is_a?(Array) ? arr.select { |p| p.is_a?(Hash) } : []
+    end
   end
 
   # Validate permanent activities exist

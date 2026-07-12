@@ -330,35 +330,107 @@ RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml'
   end
 
   describe 'POST /users/set_permanents' do
+    let(:permanents_params) do
+      [
+        { date: '2026-07-12', time: [1752278400000, 1752285600000] }
+      ]
+    end
+
     it 'sets permanent activity times' do
-      activity = create_test_activity(program[:_id], event[:_id])
       login_as(user[:_id])
 
       post '/users/set_permanents', params: {
         event_id: event[:_id],
-        program_id: program[:_id],
-        permanents: [activity[:_id]],
+        id: program[:_id],
+        permanents: permanents_params,
         signature: 'test-sig'
       }
 
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('success')
+
+      updated_program = Repos::Programs.get_by_id(program[:_id])
+      expect(updated_program[:permanents]).to be_present
     end
 
-    it 'validates permanent activities exist' do
+    it 'raises error when permanents blank and there exists permanent activities in the program' do
+      permanent_activity = create_test_activity(program[:_id], event[:_id])
+      Repos::Activities.modify(id: permanent_activity[:id], permanent: 'true')
+
       login_as(user[:_id])
 
       post '/users/set_permanents', params: {
         event_id: event[:_id],
-        program_id: program[:_id],
-        permanents: ['non-existent-id'],
+        id: program[:_id],
+        permanents: [],
         signature: 'test-sig'
       }
 
       expect(response).to have_http_status(:ok)
       json = JSON.parse(response.body, symbolize_names: true)
       expect(json[:status]).to eq('fail')
+      expect(json[:reason]).to eq('existing_permanent_activities')
+    end
+
+    it 'sets permanent times using the activity subcategory when the proposal is missing' do
+      permanent_activity = create_test_activity(program[:_id], event[:_id])
+      Repos::Activities.modify(
+        id: permanent_activity[:id],
+        permanent: 'true',
+        participant_id: SecureRandom.uuid,
+        host_id: SecureRandom.uuid,
+        participant_proposal_id: SecureRandom.uuid,
+        participant_subcategory: '3',
+        dateTime: [{ date: '2024-10-18', time: %w[1729260000000 1729263600000] }]
+      )
+
+      login_as(user[:_id])
+
+      post '/users/set_permanents', params: {
+        event_id: event[:_id],
+        id: program[:_id],
+        permanents: {
+          '0' => {
+            date: '2024-10-19',
+            time: %w[1729350000000 1729360800000],
+            subcategories: %w[1 3 8]
+          }
+        },
+        signature: 'test-sig'
+      }
+
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('success')
+
+      updated_activity = Repos::Activities.get_by_id(permanent_activity[:id])
+      expect(updated_activity[:dateTime].map { |date_time| date_time[:date] }).to eq(['2024-10-19'])
+    end
+  end
+
+  describe 'POST /users/artist_subcategories_price' do
+    let(:price_params) do
+      {
+        '1': { price: '25.0', ticket_url: 'http://example.com' }
+      }
+    end
+
+    it 'sets artist subcategory prices' do
+      login_as(user[:_id])
+
+      post '/users/artist_subcategories_price', params: {
+        event_id: event[:_id],
+        id: program[:_id],
+        subcategories_price: price_params,
+        signature: 'test-sig'
+      }
+
+      expect(response).to have_http_status(:ok)
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(json[:status]).to eq('success')
+
+      updated_program = Repos::Programs.get_by_id(program[:_id])
+      expect(updated_program[:subcategories_price]).to eq(price_params)
     end
   end
 
