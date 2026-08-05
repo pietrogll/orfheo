@@ -15,6 +15,13 @@ end
 # Make globally accessible for existing repository pattern
 $db = MONGO_CLIENT
 
+# Create a unique index on email for the users collection
+begin
+  MONGO_CLIENT[:users].indexes.create_one({ email: 1 }, unique: true)
+rescue Mongo::Error::OperationFailure => e
+  Rails.logger.warn "Could not create unique index on users.email: #{e.message}"
+end
+
 Rails.logger.info "MongoDB connected: #{mongodb_uri}"
 
 # Graceful shutdown

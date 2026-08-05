@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
+
 describe 'Actions Users' do
   include_examples 'ids'
   include_examples 'db_elements'
@@ -43,6 +45,41 @@ describe 'Actions Users' do
 
       result_2 = Actions::UpdateLoginTime.run user_id, intermediated_time
       expect(result_2).to be intermediated_time
+    end
+  end
+
+  describe 'UserRegistersUser' do
+    let(:event_id) { 'event-id-123' }
+    let(:register_params) do
+      {
+        email: 'new_unique_email@test.com',
+        password: 'securepassword',
+        lang: 'en',
+        notification: 'true'
+      }
+    end
+
+    let(:mailer_double) { instance_double(Services::Mails, deliver_mail_to: true) }
+
+    before do
+      allow(Services::Mails).to receive(:new).and_return(mailer_double)
+    end
+
+    context 'when the email does not exist' do
+      it 'registers the user and creates a database record' do
+        expect {
+          Actions::UserRegistersUser.run(event_id, register_params)
+        }.to change { Repos::Users.get({ email: 'new_unique_email@test.com' }).count }.by(1)
+      end
+    end
+
+    context 'when the email already exists' do
+      it 'raises Pard::Invalid::ExistingUser' do
+        existing_params = register_params.merge(email: 'email@test.com')
+        expect {
+          Actions::UserRegistersUser.run(event_id, existing_params)
+        }.to raise_error(Pard::Invalid::ExistingUser)
+      end
     end
   end
 end

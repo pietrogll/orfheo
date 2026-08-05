@@ -932,6 +932,15 @@
       )
     }
 
+    var _geocode = function(address, callback, callbackFail){
+      _get(
+        '/api/geocode',
+        { address: address },
+        callback,
+        callbackFail
+      );
+    }
+
     var _checkSlug = function(slug, callback){
       _send(
         '/users/check_slug',
@@ -1149,6 +1158,7 @@
       openCallMail: _openCallMail,
       textMail: _textMail,
       checkParticipantName: _checkParticipantName,
+      geocode: _geocode,
       selectArtistProposal: _selectArtistProposal,
       selectSpaceProposal: _selectSpaceProposal,
       getProposals: _getProposals,
