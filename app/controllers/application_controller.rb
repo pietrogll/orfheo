@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  # Disable CSRF for API-like behavior (configure per your needs)
-  protect_from_forgery with: :null_session
+  protect_from_forgery with: :exception
 
   rescue_from Pard::Unexisting, Pard::Invalid do |exception|
     message = if exception.respond_to?(:message)
@@ -14,6 +13,10 @@ class ApplicationController < ActionController::Base
     render json: { status: 'fail', reason: message }, status: :ok
   end
 
+  rescue_from ActionController::InvalidAuthenticityToken do
+    render json: { status: 'fail', reason: 'invalid_csrf' }, status: :unprocessable_entity
+  end
+
   # Include concerns
   include Scopify
   include Guards
@@ -21,6 +24,7 @@ class ApplicationController < ActionController::Base
 
   # Symbolize params before every action
   before_action :symbolize_params
+  after_action :expose_csrf_token
 
   # Helper methods
 
@@ -50,5 +54,13 @@ class ApplicationController < ActionController::Base
 
   def logged_in?
     session[:identity].present?
+  end
+
+  private
+
+  def expose_csrf_token
+    return unless protect_against_forgery?
+
+    response.set_header('X-CSRF-Token', form_authenticity_token)
   end
 end

@@ -26,6 +26,7 @@ class User
       lang: params[:lang],
       validation: false,
       validation_code: validation_code,
+      validation_sent_at: Time.now.to_i,
       register_date: Time.now.to_i * 1000
     }
     new_u[:interests] =

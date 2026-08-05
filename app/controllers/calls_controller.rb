@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class CallsController < ApplicationController
-  skip_before_action :verify_authenticity_token,
-                     only: %i[create destroy update add_whitelist delete_whitelist checks_participant_name
-                              get_call_proposals]
   before_action :require_login!, except: []
   before_action :require_admin, only: %i[show destroy]
 
