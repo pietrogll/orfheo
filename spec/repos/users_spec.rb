@@ -88,11 +88,13 @@ describe Repos::Users do
   end
 
   describe 'Reseted user' do
-    it 'adds a new validation code to the user' do
+    it 'adds a new reset password token to the user' do
       Repos::Users.validate(validation_code)
       Repos::Users.reseted_user('email@test.com')
       saved_entry = @db['users'].find({}).first
-      expect(UUID.validate(saved_entry['validation_code'])).to eq(true)
+      expect(UUID.validate(saved_entry['reset_password_token'])).to eq(true)
+      expect(saved_entry).not_to include('validation_code')
+      expect(saved_entry['reset_password_sent_at']).to be > 0
     end
 
     it 'returns the user after the reset' do

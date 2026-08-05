@@ -95,6 +95,7 @@ The Rails controller layer now keeps the existing cookie-session model for the w
 | `/profile/:slug` | `GET` | Public | Redirects to `/profile?id=...`. |
 | `/event_manager` | `GET` | Owner/Admin | Event manager page shell. |
 | `/program` | `GET` | Owner/Admin | Returns program only to owner/admin. |
+| `/api/v1/events/:id/program` | `GET` | Public | Returns cached public program for an event. HTTP-cacheable (`Cache-Control: public, max-age=31536000`, `Last-Modified`/`If-Modified-Since` → `304`); `lang` restricted to `en`/`es`/`ca`, others rejected with `400 invalid_language`. |
 
 ### Event management
 

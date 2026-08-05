@@ -4,7 +4,6 @@ module Api
   module V1
     class EventsController < ApplicationController
       skip_before_action :verify_authenticity_token
-      before_action :require_login!, except: %i[program]
 
       # GET /api/v1/events/:id/program
       def program
