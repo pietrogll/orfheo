@@ -4,6 +4,9 @@ module Api
   module V1
     class EventsController < ApplicationController
       skip_before_action :verify_authenticity_token
+      skip_after_action :expose_csrf_token
+
+      before_action :skip_session
 
       # GET /api/v1/events/:id/program
       def program
@@ -40,6 +43,12 @@ module Api
           hosts: hosts,
           program_timestamp: timestamp
         )
+      end
+
+      private
+
+      def skip_session
+        request.session_options[:skip] = true
       end
     end
   end

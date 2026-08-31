@@ -38,6 +38,8 @@ RSpec.describe 'API V1 Events Program', type: :request, swagger_doc: 'openapi.ya
           expect(response.headers['Cache-Control']).to include('public')
           expect(response.headers['Cache-Control']).to include('max-age=31536000')
           expect(response.headers['Last-Modified']).to be_present
+          expect(response.headers['Set-Cookie']).to be_nil
+          expect(response.headers['X-CSRF-Token']).to be_nil
           expect(CachedEvent).not_to have_received(:program_timestamp)
         end
       end
