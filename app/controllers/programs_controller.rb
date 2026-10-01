@@ -67,7 +67,14 @@ class ProgramsController < ApplicationController
   # POST /users/publish - Publish program
   def publish
     scopify :event_id, :signature
-    owner_id = check_event_ownership!(event_id)
+
+    # Map frontend payload legacy keys
+    symbolized_params[:program_id] ||= symbolized_params[:id]
+
+    owner_id = check_program_ownership!(symbolized_params[:program_id])
+    check_event_ownership!(event_id)
+    check_future_event!(event_id, 'event') unless admin?
+
     hash = Actions::UserPublishProgram.run(owner_id, symbolized_params)
     send_web_socket_message("event:#{event_id}", 'publish', hash, signature)
 
@@ -115,6 +122,8 @@ class ProgramsController < ApplicationController
 
   # Check if user owns the program (through event ownership)
   def check_program_ownership!(program_id)
+    raise Pard::Invalid, 'non_existing_program' unless Repos::Programs.exists?(program_id)
+
     owner_id = Repos::Programs.get_owner(program_id)
     raise Pard::Invalid, 'program_ownership' unless owner_id == session[:identity] || admin?
 

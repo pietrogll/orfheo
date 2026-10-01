@@ -841,6 +841,8 @@ paths:
             schema:
               type: object
               properties:
+                id:
+                  type: string
                 event_id:
                   type: string
   "/users/get_call_proposals":

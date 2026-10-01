@@ -110,14 +110,20 @@ RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml'
       consumes 'application/json'
       produces 'application/json'
       security [cookieAuth: []]
-      parameter name: :body, in: :body, schema: { type: :object, properties: { event_id: { type: :string } } }
+      parameter name: :body, in: :body,
+                schema: { type: :object, properties: { id: { type: :string }, event_id: { type: :string } } }
 
       response '200', 'Success or fail' do
         schema oneOf: [
           { '$ref' => '#/components/schemas/success_envelope' },
           { '$ref' => '#/components/schemas/fail_envelope' }
         ]
-        let(:body) { { event_id: SecureRandom.uuid } }
+        let(:body) { { id: program[:_id], event_id: event[:_id] } }
+
+        before do
+          login_as(user[:_id])
+        end
+
         run_test!
       end
     end
@@ -152,6 +158,18 @@ RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml'
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body, symbolize_names: true)
         expect(json[:status]).to eq('fail')
+      end
+    end
+
+    context 'when the program does not exist' do
+      it 'responds with a non_existing_program reason' do
+        login_as(user[:_id])
+
+        get '/program?id=otter'
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:reason]).to eq('non_existing_program')
       end
     end
   end
@@ -314,18 +332,121 @@ RSpec.describe 'Program Management', type: :request, swagger_doc: 'openapi.yaml'
   end
 
   describe 'POST /users/publish' do
-    it 'publishes program' do
+    def publish_request(program_id)
       login_as(user[:_id])
 
       post '/users/publish', params: {
+        id: program_id,
         event_id: event[:_id],
-        program_id: program[:_id],
         signature: 'test-sig'
       }
+    end
 
-      expect(response).to have_http_status(:ok)
-      json = JSON.parse(response.body, symbolize_names: true)
-      expect(json[:status]).to eq('success')
+    context 'when the program exists' do
+      before { publish_request(program[:_id]) }
+
+      it 'returns success' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'responds with a success status' do
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:status]).to eq('success')
+      end
+
+      it 'marks the program as published' do
+        expect(Repos::Programs.get_by_id(program[:_id])[:published]).to eq(true)
+      end
+
+      it 'unpublishes the program on a second request' do
+        publish_request(program[:_id])
+
+        expect(Repos::Programs.get_by_id(program[:_id])[:published]).to eq(false)
+      end
+    end
+
+    context 'when the program does not exist' do
+      before { publish_request('otter') }
+
+      it 'returns success' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'responds with a non_existing_program reason' do
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:reason]).to eq('non_existing_program')
+      end
+
+      it 'does not create a published program document' do
+        expect(Repos::Programs.get_by_id('otter')).to be_nil
+      end
+    end
+
+    context 'when the user does not own the program' do
+      before do
+        other_user = create_test_user(email: 'publish-other@example.com')
+        login_as(other_user[:_id])
+
+        post '/users/publish', params: {
+          id: program[:_id],
+          event_id: event[:_id],
+          signature: 'test-sig'
+        }
+      end
+
+      it 'responds with a program_ownership reason' do
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:reason]).to eq('program_ownership')
+      end
+
+      it 'leaves the program unpublished' do
+        expect(Repos::Programs.get_by_id(program[:_id])[:published]).to be_falsey
+      end
+    end
+
+    context 'when the event is in the past' do
+      let(:past_event) do
+        create_test_event(
+          user[:_id],
+          profile[:_id],
+          date_from: (Time.now - 10.days).strftime('%Y-%m-%d'),
+          date_to: (Time.now - 5.days).strftime('%Y-%m-%d')
+        )
+      end
+      let(:past_program) { create_test_program(past_event[:_id], user[:_id]) }
+
+      before do
+        login_as(user[:_id])
+
+        post '/users/publish', params: {
+          id: past_program[:_id],
+          event_id: past_event[:_id],
+          signature: 'test-sig'
+        }
+      end
+
+      it 'responds with a past_event reason' do
+        json = JSON.parse(response.body, symbolize_names: true)
+        expect(json[:reason]).to eq('past_event')
+      end
+
+      it 'leaves the program unpublished' do
+        expect(Repos::Programs.get_by_id(past_program[:_id])[:published]).to be_falsey
+      end
+
+      it 'allows an admin to publish the past event' do
+        admin_user = create_test_user(email: 'publish-admin@example.com')
+        MetaRepos::Admins.save({ id: admin_user[:_id], email: admin_user[:email] })
+        login_as(admin_user[:_id])
+
+        post '/users/publish', params: {
+          id: past_program[:_id],
+          event_id: past_event[:_id],
+          signature: 'test-sig'
+        }
+
+        expect(Repos::Programs.get_by_id(past_program[:_id])[:published]).to eq(true)
+      end
     end
   end
 
